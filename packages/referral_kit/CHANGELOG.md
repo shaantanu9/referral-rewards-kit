@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.3.1 (2026-11-15)
+
+- Fix: `PendingClaimRetrier` built before `runApp` (as the starter app and the integration guide do) threw a
+  null-check error from `AppLifecycleListener` and the app opened on a blank screen. It now initialises the Flutter
+  binding first. Test: `retrier_before_run_app_test.dart`.
+- pub.dev metadata: description, topics, issue tracker; `publish_to: none` removed.
+
 ## 0.3.0 (tag `referral_kit-v0.3.0`)
 
 A drop-in for any app, from everything the first app had to build around 0.2.0: it wrote its own invite

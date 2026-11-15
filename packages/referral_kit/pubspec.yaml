@@ -1,10 +1,28 @@
 name: referral_kit
 description: >-
-  Invite-friends screens, invite-code entry and a typed client for the referral-kit Supabase RPCs:
-  install id that survives reinstall, offline claim queue, prompt policy and copy built from the live rules.
-version: 0.3.0
+  Invite-friends referral flow for Flutter apps on Supabase and RevenueCat: invite screen, code entry, offline
+  claim queue and an install id that survives reinstall.
+version: 0.3.1
 repository: https://github.com/shaantanu9/referral-rewards-kit
-publish_to: none
+issue_tracker: https://github.com/shaantanu9/referral-rewards-kit/issues
+topics:
+  - referral
+  - supabase
+  - revenuecat
+  - growth
+  - invite
+
+screenshots:
+  - description: "InviteHub: the user's own code with Share and Copy, the live reward rules, and the friend's gift with its real deadline."
+    path: screenshots/02-invite-hub.png
+  - description: "Code entry: a friend types or pastes an invite code; the steps show how the gift is earned."
+    path: screenshots/04-enter-code.png
+  - description: "Almost yours: the code is added, the progress bar shows the one step left before the gift lands."
+    path: screenshots/06-almost-yours.png
+  - description: "Reward cards on the app's home screen once a reward is granted, shown once per device."
+    path: screenshots/07-reward-cards.png
+  - description: "The same invite hub in dark mode; every widget takes the app's own theme."
+    path: screenshots/03-invite-hub-dark.png
 
 environment:
   sdk: ^3.8.0

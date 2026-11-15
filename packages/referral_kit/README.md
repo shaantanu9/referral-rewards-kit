@@ -1,23 +1,35 @@
 # referral_kit (Flutter)
 
-Updated: 2026-11-14 (0.3.0)
-The Flutter part of [referral-kit](../../README.md): a typed client for the kit's Supabase RPCs, the "Invite friends"
+Updated: 2026-11-15 (0.3.1)
+The Flutter part of [referral-kit](https://github.com/shaantanu9/referral-rewards-kit/blob/main/README.md): a typed client for the kit's Supabase RPCs, the "Invite friends"
 screen, invite-code entry, the reward card, an install id that survives reinstall, an offline claim queue, a prompt
-policy and copy built from the live rules. Design: [ADR 0001](../../docs/adr/0001-referral-kit.md) sections 4, 7, 8,
+policy and copy built from the live rules. Design: [ADR 0001](https://github.com/shaantanu9/referral-rewards-kit/blob/main/docs/adr/0001-referral-kit.md) sections 4, 7, 8,
 11. MIT.
 
-It works only with the kit's SQL migrations installed in your Supabase project (`supabase/migrations/`).
+It works only with the kit's SQL migrations installed in your Supabase project (`supabase/migrations/` in the [repository](https://github.com/shaantanu9/referral-rewards-kit)).
+
+<p>
+  <img src="https://raw.githubusercontent.com/shaantanu9/referral-rewards-kit/main/packages/referral_kit/screenshots/02-invite-hub.png" width="220" alt="invite hub">
+  <img src="https://raw.githubusercontent.com/shaantanu9/referral-rewards-kit/main/packages/referral_kit/screenshots/04-enter-code.png" width="220" alt="enter code">
+  <img src="https://raw.githubusercontent.com/shaantanu9/referral-rewards-kit/main/packages/referral_kit/screenshots/06-almost-yours.png" width="220" alt="almost yours">
+  <img src="https://raw.githubusercontent.com/shaantanu9/referral-rewards-kit/main/packages/referral_kit/screenshots/07-reward-cards.png" width="220" alt="reward cards">
+  <img src="https://raw.githubusercontent.com/shaantanu9/referral-rewards-kit/main/packages/referral_kit/screenshots/03-invite-hub-dark.png" width="220" alt="invite hub dark">
+</p>
 
 ## Install
 
-Not on pub.dev yet. Use git (pinned to a release tag) or a path:
+```sh
+flutter pub add referral_kit
+```
+
+Or from git (pinned to a release tag), or a path while developing the kit next to the app:
 
 ```yaml
 dependencies:
   referral_kit:
     git:
-      url: https://github.com/<owner>/referral-kit.git   # or a local clone: /path/to/referral-kit
-      ref: referral_kit-v0.3.0                            # a tag; never a moving branch in a release build
+      url: https://github.com/shaantanu9/referral-rewards-kit.git
+      ref: referral_kit-v0.3.1                            # a tag; never a moving branch in a release build
       path: packages/referral_kit
 ```
 
@@ -30,7 +42,7 @@ dependencies:
 Minimums: Flutter 3.38, Dart 3.8, iOS 15, Android API 24 (`flutter_secure_storage` 10 needs 23; Block Store 24).
 Ranges are wide on purpose: `share_plus` 11–13 (11 is the first with `SharePlus.instance`; 12 needs AGP 8.12, so an
 app on an older Gradle stays on 11), `intl` 0.19–0.20, `flutter_secure_storage` 10–11, `play_install_referrer`
-0.5–0.6, `shared_preferences` 2.3+. A full app that copies the wiring: [examples/starter_app](../../examples/starter_app).
+0.5–0.6, `shared_preferences` 2.3+. A full app that copies the wiring: [examples/starter_app](https://github.com/shaantanu9/referral-rewards-kit/blob/main/examples/starter_app).
 
 ## Wire it up (supabase_flutter)
 
@@ -87,7 +99,7 @@ that **not deployed**, distinct from offline:
 - With supabase_flutter, `PostgrestException(code: PGRST202)` is recognised by its text. A custom rpc should throw
   `ReferralUnavailableException(ReferralUnavailableReason.notDeployed)`, or pass `isNotDeployed: (e) => …` to the client.
 
-Going live: [docs/go-live.md](../../docs/go-live.md).
+Going live: [docs/go-live.md](https://github.com/shaantanu9/referral-rewards-kit/blob/main/docs/go-live.md).
 
 Add the strings to your app:
 
@@ -305,5 +317,5 @@ flutter analyze
 ```
 
 `example/` runs the widgets over a fake RPC and is how the native code is compiled (`flutter build apk --debug`;
-for iOS, `xcodebuild` on `example/ios/Runner.xcworkspace`). [examples/starter_app](../../examples/starter_app) is a
+for iOS, `xcodebuild` on `example/ios/Runner.xcworkspace`). [examples/starter_app](https://github.com/shaantanu9/referral-rewards-kit/blob/main/examples/starter_app) is a
 whole app (entry points, hub, reward card, analytics) over a stateful fake server, with a full-flow test.

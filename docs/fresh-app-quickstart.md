@@ -5,8 +5,7 @@ The short path from an empty app to rewards working, in order, with every comman
 gotchas: [rewards integration](rewards-integration.md) · API: [rewards-api.md](rewards-api.md) · design:
 [ADR 0002](adr/0002-rewards-engine.md) · invites: [integration.md](integration.md).
 
-Repo: `https://github.com/shaantanu9/referral-rewards-kit`. Package tags: `rewards_kit-v0.6.0`,
-`referral_kit-v0.3.0`.
+Repo: `https://github.com/shaantanu9/referral-rewards-kit`. Packages on pub.dev: `flutter pub add referral_kit rewards_kit` (git tags `referral_kit-v0.3.1`, `rewards_kit-v0.6.1` also work).
 
 ## 0. What you get, and what to switch on
 
@@ -87,7 +86,7 @@ dependencies:
   rewards_kit:
     git:
       url: https://github.com/shaantanu9/referral-rewards-kit.git
-      ref: rewards_kit-v0.4.0
+      ref: rewards_kit-v0.6.1
       path: packages/rewards_kit
 ```
 

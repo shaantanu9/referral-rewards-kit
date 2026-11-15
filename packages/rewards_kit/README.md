@@ -1,6 +1,6 @@
 # rewards_kit
 
-Flutter side of the rewards engine ([ADR 0002](../../docs/adr/0002-rewards-engine.md)): daily streaks, milestones
+Flutter side of the rewards engine ([ADR 0002](https://github.com/shaantanu9/referral-rewards-kit/blob/main/docs/adr/0002-rewards-engine.md)): daily streaks, milestones
 (quizzes passed, chapters read, friends invited), Instagram tag rewards, timed offers, and since 0.2 a daily quiz,
 quests, recharges, time windows, friend streaks, an activity heatmap, recaps and rewarded ads through RevenueCat, and
 since 0.3 surprise rewards with a reveal, and since 0.4 follow-ups that bring people back (notifications planned by the
@@ -8,20 +8,25 @@ engine, scheduled by the app; since 0.5 with one off switch per kind of reminder
 and a shareable year recap card.
 One state call, one track call, and widgets whose look is entirely yours.
 
-Status: **0.6.0, tested with fakes (`flutter test`); not yet run against a live project or on a phone.** It
+<p>
+  <img src="https://raw.githubusercontent.com/shaantanu9/referral-rewards-kit/main/packages/rewards_kit/screenshots/01-hub.png" width="220" alt="hub">
+  <img src="https://raw.githubusercontent.com/shaantanu9/referral-rewards-kit/main/packages/rewards_kit/screenshots/04-custom-look.png" width="220" alt="custom look">
+  <img src="https://raw.githubusercontent.com/shaantanu9/referral-rewards-kit/main/packages/rewards_kit/screenshots/05-quiz-and-goal.png" width="220" alt="quiz and goal">
+  <img src="https://raw.githubusercontent.com/shaantanu9/referral-rewards-kit/main/packages/rewards_kit/screenshots/06-follow-ups.png" width="220" alt="follow ups">
+  <img src="https://raw.githubusercontent.com/shaantanu9/referral-rewards-kit/main/packages/rewards_kit/screenshots/07-league-and-recap.png" width="220" alt="league and recap">
+</p>
+
+Status: **0.6.1, tested with fakes (`flutter test`); not yet run against a live project or on a phone.** It
 matches the server in `supabase/migrations/*_rewards_*` (ADR 0002 §18; SQL tests 13–28); the 0.4 / 0.5 follow-up calls
 match the contract in ADR 0002 §18.7 and §18.8.
 
 ## Install
 
-```yaml
-dependencies:
-  rewards_kit:
-    git:
-      url: https://github.com/shaantanu9/referral-rewards-kit.git
-      ref: rewards_kit-v0.6.0
-      path: packages/rewards_kit
+```sh
+flutter pub add rewards_kit
 ```
+
+The server side (SQL migrations, Edge Function, admin page) lives in the [repository](https://github.com/shaantanu9/referral-rewards-kit); start with the [rewards integration guide](https://github.com/shaantanu9/referral-rewards-kit/blob/main/docs/rewards-integration.md).
 
 ## Quick start
 

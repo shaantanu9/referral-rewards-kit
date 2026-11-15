@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.6.1 (2026-11-15)
+
+- First pub.dev release: description, topics, issue tracker and screenshots; `publish_to: none` removed. No code
+  changes from 0.6.0.
+
 ## 0.6.0 (2026-11-14)
 
 For opt-in weekly leagues and the year-end share card (ADR 0002 §18.10). Nothing changes for a 0.5 app; a server

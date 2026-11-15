@@ -1,11 +1,28 @@
 name: rewards_kit
 description: >-
-  Typed client, controller and themeable widgets for the rewards engine (ADR 0002): daily streaks, milestones,
-  Instagram tag rewards, timed offers, daily quizzes, quests, recharges, time windows, friend streaks and surprise
-  rewards with a reveal, follow-up notifications planned by the engine, opt-in weekly leagues and a shareable recap card, with server-honest countdowns and a builder for every widget.
-version: 0.6.0
+  Rewards for Flutter apps on Supabase: streaks, milestones, daily quizzes, quests, timed offers, leagues and
+  follow-ups, granted exactly once by the server, with themeable widgets.
+version: 0.6.1
 repository: https://github.com/shaantanu9/referral-rewards-kit
-publish_to: none
+issue_tracker: https://github.com/shaantanu9/referral-rewards-kit/issues
+topics:
+  - gamification
+  - rewards
+  - supabase
+  - streaks
+  - engagement
+
+screenshots:
+  - description: "Rewards hub: surprise odds, a streak with freezes, a milestone, a timed offer with a server countdown and an Instagram tag reward."
+    path: screenshots/01-hub.png
+  - description: "The same widgets with the app's own look: every widget has a builder."
+    path: screenshots/04-custom-look.png
+  - description: "Daily quiz card, the daily goal ring and the activity heatmap."
+    path: screenshots/05-quiz-and-goal.png
+  - description: "Follow-up settings per group (reminders, comeback, recap, emails) and the notifications planned by the engine."
+    path: screenshots/06-follow-ups.png
+  - description: "Opt-in weekly league and the shareable year recap card."
+    path: screenshots/07-league-and-recap.png
 
 environment:
   sdk: ^3.8.0

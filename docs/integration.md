@@ -28,8 +28,8 @@ Pin a release tag (never a branch in a release build). Until the repo is public,
 dependencies:
   referral_kit:
     git:
-      url: https://github.com/<owner>/referral-kit.git
-      ref: referral_kit-v0.3.0
+      url: https://github.com/shaantanu9/referral-rewards-kit.git
+      ref: referral_kit-v0.3.1
       path: packages/referral_kit
 ```
 
