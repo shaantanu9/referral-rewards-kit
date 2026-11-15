@@ -2,7 +2,8 @@ name: rewards_kit
 description: >-
   Rewards for Flutter apps on Supabase: streaks, milestones, daily quizzes, quests, timed offers, leagues and
   follow-ups, granted exactly once by the server, with themeable widgets.
-version: 0.6.1
+version: 0.6.2
+homepage: https://www.myind.ai
 repository: https://github.com/shaantanu9/referral-rewards-kit
 issue_tracker: https://github.com/shaantanu9/referral-rewards-kit/issues
 topics:
@@ -23,6 +24,8 @@ screenshots:
     path: screenshots/06-follow-ups.png
   - description: "Opt-in weekly league and the shareable year recap card."
     path: screenshots/07-league-and-recap.png
+  - description: "The admin dashboard (web/rewards-admin): events, rewards given, streaks, offers and problems, with every program set up from the page."
+    path: screenshots/08-admin-dashboard.png
 
 environment:
   sdk: ^3.8.0

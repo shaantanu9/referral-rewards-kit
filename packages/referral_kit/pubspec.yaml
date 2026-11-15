@@ -2,7 +2,8 @@ name: referral_kit
 description: >-
   Invite-friends referral flow for Flutter apps on Supabase and RevenueCat: invite screen, code entry, offline
   claim queue and an install id that survives reinstall.
-version: 0.3.1
+version: 0.3.2
+homepage: https://www.myind.ai
 repository: https://github.com/shaantanu9/referral-rewards-kit
 issue_tracker: https://github.com/shaantanu9/referral-rewards-kit/issues
 topics:

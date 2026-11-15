@@ -2,6 +2,8 @@
 
 [![pub: referral_kit](https://img.shields.io/pub/v/referral_kit?label=referral_kit)](https://pub.dev/packages/referral_kit) [![pub: rewards_kit](https://img.shields.io/pub/v/rewards_kit?label=rewards_kit)](https://pub.dev/packages/rewards_kit) [![CI](https://github.com/shaantanu9/referral-rewards-kit/actions/workflows/ci.yml/badge.svg)](https://github.com/shaantanu9/referral-rewards-kit/actions/workflows/ci.yml)
 
+Built and maintained by [Myind](https://www.myind.ai).
+
 Invite friends, earn rewards: an open-source referral flow for Flutter apps on Supabase with RevenueCat billing.
 
 - A user shares a code; when an invited friend starts using the app, both can get an in-app reward.

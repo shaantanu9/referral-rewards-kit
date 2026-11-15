@@ -1,5 +1,7 @@
 # rewards_kit
 
+Built and maintained by [Myind](https://www.myind.ai).
+
 Flutter side of the rewards engine ([ADR 0002](https://github.com/shaantanu9/referral-rewards-kit/blob/main/docs/adr/0002-rewards-engine.md)): daily streaks, milestones
 (quizzes passed, chapters read, friends invited), Instagram tag rewards, timed offers, and since 0.2 a daily quiz,
 quests, recharges, time windows, friend streaks, an activity heatmap, recaps and rewarded ads through RevenueCat, and
@@ -16,7 +18,11 @@ One state call, one track call, and widgets whose look is entirely yours.
   <img src="https://raw.githubusercontent.com/shaantanu9/referral-rewards-kit/main/packages/rewards_kit/screenshots/07-league-and-recap.png" width="220" alt="league and recap">
 </p>
 
-Status: **0.6.1, tested with fakes (`flutter test`); not yet run against a live project or on a phone.** It
+The admin dashboard that comes with it (`web/rewards-admin`, a static page):
+
+<img src="https://raw.githubusercontent.com/shaantanu9/referral-rewards-kit/main/packages/rewards_kit/screenshots/08-admin-dashboard.png" width="820" alt="Rewards admin dashboard">
+
+Status: **0.6.2, tested with fakes (`flutter test`); not yet run against a live project or on a phone.** It
 matches the server in `supabase/migrations/*_rewards_*` (ADR 0002 §18; SQL tests 13–28); the 0.4 / 0.5 follow-up calls
 match the contract in ADR 0002 §18.7 and §18.8.
 

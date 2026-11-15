@@ -1,6 +1,8 @@
 # referral_kit (Flutter)
 
-Updated: 2026-11-15 (0.3.1)
+Built and maintained by [Myind](https://www.myind.ai).
+
+Updated: 2026-11-15 (0.3.2)
 The Flutter part of [referral-kit](https://github.com/shaantanu9/referral-rewards-kit/blob/main/README.md): a typed client for the kit's Supabase RPCs, the "Invite friends"
 screen, invite-code entry, the reward card, an install id that survives reinstall, an offline claim queue, a prompt
 policy and copy built from the live rules. Design: [ADR 0001](https://github.com/shaantanu9/referral-rewards-kit/blob/main/docs/adr/0001-referral-kit.md) sections 4, 7, 8,

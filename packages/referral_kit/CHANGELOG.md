@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.3.2 (2026-11-15)
+
+- Homepage: https://www.myind.ai. No code changes.
+
 ## 0.3.1 (2026-11-15)
 
 - Fix: `PendingClaimRetrier` built before `runApp` (as the starter app and the integration guide do) threw a

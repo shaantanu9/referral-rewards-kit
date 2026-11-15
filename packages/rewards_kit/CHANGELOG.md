@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.6.2 (2026-11-15)
+
+- Homepage: https://www.myind.ai. The admin dashboard screenshot is on the package page. No code changes.
+
 ## 0.6.1 (2026-11-15)
 
 - First pub.dev release: description, topics, issue tracker and screenshots; `publish_to: none` removed. No code
