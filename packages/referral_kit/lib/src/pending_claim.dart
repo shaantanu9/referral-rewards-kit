@@ -163,6 +163,8 @@ class PendingClaimRetrier {
     on(tokenRefreshes, RetryTrigger.tokenRefresh);
     on(signInChanges, RetryTrigger.signInChange);
     if (listenToAppResume) {
+      // An app may build its referral setup before runApp; the listener needs the binding.
+      WidgetsFlutterBinding.ensureInitialized();
       _lifecycle = AppLifecycleListener(
         onResume: () => unawaited(_queue.retryPendingClaim(trigger: RetryTrigger.appResume)),
       );
