@@ -1,0 +1,162 @@
+{
+  "format": "rewards-config",
+  "version": 1,
+  "about": "Retention follow-ups only (from an earlier app's retention design): comeback nudges at +2/+5/+12 days without activity, a Sunday recap, emails 2, 7 and 21 days after sign-up for people who went quiet. Max one notification a day, max 3 emails 4 days apart, quiet hours 21:00-08:00, emails off until switched on. Replace App and the URL with yours.",
+  "settings": {
+    "email_max_series": 3,
+    "email_cooldown_days": 4,
+    "quiet_from": "21:00:00",
+    "quiet_to": "08:00:00"
+  },
+  "event_types": [],
+  "programs": [
+    {
+      "key": "comeback_2d",
+      "kind": "followup",
+      "sort": 1,
+      "public": {
+        "group_label": "Come-back reminders"
+      },
+      "config": {
+        "channel": "notification",
+        "trigger": {
+          "type": "inactive_days",
+          "days": 2
+        },
+        "time": "reminder",
+        "group": "daily",
+        "priority": 30,
+        "title": "App",
+        "body": "Your next step is still here. Two minutes, when you're ready.",
+        "payload": "/home"
+      }
+    },
+    {
+      "key": "comeback_5d",
+      "kind": "followup",
+      "sort": 2,
+      "public": {},
+      "config": {
+        "channel": "notification",
+        "trigger": {
+          "type": "inactive_days",
+          "days": 5
+        },
+        "time": "reminder",
+        "group": "daily",
+        "priority": 20,
+        "title": "App",
+        "body": "Even one step keeps it warm.",
+        "payload": "/home"
+      }
+    },
+    {
+      "key": "comeback_12d",
+      "kind": "followup",
+      "sort": 3,
+      "public": {},
+      "config": {
+        "channel": "notification",
+        "trigger": {
+          "type": "inactive_days",
+          "days": 12
+        },
+        "time": "reminder",
+        "group": "daily",
+        "priority": 10,
+        "title": "App",
+        "body": "Starting again is a skill too.",
+        "payload": "/home"
+      }
+    },
+    {
+      "key": "weekly_recap",
+      "kind": "followup",
+      "sort": 4,
+      "public": {
+        "group_label": "Weekly recap"
+      },
+      "config": {
+        "channel": "notification",
+        "trigger": {
+          "type": "weekly_recap",
+          "weekday": 7
+        },
+        "time": "18:00",
+        "group": "recap",
+        "priority": 30,
+        "title": "App",
+        "body": "Your week, in one look.",
+        "payload": "/recap"
+      }
+    },
+    {
+      "key": "email_day2",
+      "kind": "followup",
+      "sort": 5,
+      "public": {},
+      "config": {
+        "channel": "email",
+        "trigger": {
+          "type": "days_since_signup",
+          "from": 2,
+          "to": 3,
+          "no_activity_since_signup": true
+        },
+        "priority": 30,
+        "email": {
+          "subject": "Your first step is still saved, {{name}}",
+          "body": "It is still there, waiting for you.\n\nToday's step is two minutes, and nobody sees it but you.",
+          "button": "Open the app",
+          "url": "https://example.com/open",
+          "heading": "Hi {{name}}"
+        }
+      }
+    },
+    {
+      "key": "email_day7",
+      "kind": "followup",
+      "sort": 6,
+      "public": {},
+      "config": {
+        "channel": "email",
+        "trigger": {
+          "type": "days_since_signup",
+          "from": 7,
+          "to": 8,
+          "quiet_days": 4
+        },
+        "priority": 20,
+        "email": {
+          "subject": "One week since your first step",
+          "body": "One step this week keeps the habit.\n\nYour progress since day 1 is waiting.",
+          "button": "Open the app",
+          "url": "https://example.com/open"
+        }
+      }
+    },
+    {
+      "key": "email_day21",
+      "kind": "followup",
+      "sort": 7,
+      "public": {},
+      "config": {
+        "channel": "email",
+        "trigger": {
+          "type": "days_since_signup",
+          "from": 21,
+          "to": 23,
+          "quiet_days": 10
+        },
+        "priority": 10,
+        "email": {
+          "subject": "Starting again is a skill too",
+          "body": "No streak that matters was lost. One step at your level is ready.\n\nThis is the last email in this series.",
+          "button": "Open the app",
+          "url": "https://example.com/open"
+        }
+      }
+    }
+  ],
+  "rules": []
+}

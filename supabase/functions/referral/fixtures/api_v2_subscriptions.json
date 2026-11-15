@@ -1,0 +1,48 @@
+{
+  "object": "list",
+  "items": [
+    {
+      "object": "subscription",
+      "id": "sub_000000000001",
+      "customer_id": "8b6f2c1e-0000-4000-8000-00000000f001",
+      "original_customer_id": "8b6f2c1e-0000-4000-8000-00000000f001",
+      "product_id": "prod_000000000001",
+      "starts_at": 1762003602000,
+      "current_period_starts_at": 1762003600000,
+      "current_period_ends_at": 1764595600000,
+      "gives_access": true,
+      "pending_payment": false,
+      "auto_renewal_status": "will_renew",
+      "status": "active",
+      "total_revenue_in_usd": {
+        "currency": "USD",
+        "gross": 2.39
+      },
+      "presented_offering_id": "default",
+      "environment": "production",
+      "store": "app_store",
+      "store_subscription_identifier": "2000000000000004",
+      "ownership": "purchased"
+    },
+    {
+      "object": "subscription",
+      "id": "sub_000000000002",
+      "customer_id": "8b6f2c1e-0000-4000-8000-00000000f001",
+      "original_customer_id": "8b6f2c1e-0000-4000-8000-00000000f001",
+      "product_id": null,
+      "starts_at": 1762003600000,
+      "current_period_starts_at": 1762003600000,
+      "current_period_ends_at": 1762435600000,
+      "gives_access": true,
+      "pending_payment": false,
+      "auto_renewal_status": "will_not_renew",
+      "status": "active",
+      "environment": "production",
+      "store": "promotional",
+      "store_subscription_identifier": "promo_0002",
+      "ownership": "purchased"
+    }
+  ],
+  "next_page": null,
+  "url": "/v2/projects/proj0000/customers/8b6f2c1e-0000-4000-8000-00000000f001/subscriptions"
+}

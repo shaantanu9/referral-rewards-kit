@@ -1,0 +1,22 @@
+# secrets: real values never committed (.env.example holds blank names only)
+.env
+.env.*
+!.env.example
+supabase/.env
+supabase/functions/.env
+
+# agent worktrees
+.claude/worktrees/
+
+# local test database (scripts/test-db.sh)
+.pgtest/
+.pgtest-fn/
+.pgtest-rewards-fn/
+
+# tooling
+.DS_Store
+node_modules/
+.dart_tool/
+build/
+coverage/
+*.log

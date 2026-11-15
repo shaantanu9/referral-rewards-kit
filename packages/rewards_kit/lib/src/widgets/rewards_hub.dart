@@ -1,0 +1,137 @@
+import 'package:flutter/material.dart';
+
+import '../controller.dart';
+import '../models.dart';
+import '../texts.dart';
+import 'base.dart';
+import 'friend_streaks.dart';
+import 'league_board.dart';
+import 'milestone_progress.dart';
+import 'offer_banner.dart';
+import 'quest_list.dart';
+import 'quiz_card.dart';
+import 'recharge_meter.dart';
+import 'reward_inbox.dart';
+import 'social_tag_task.dart';
+import 'streak_card.dart';
+import 'surprise_odds.dart';
+import 'window_badge.dart';
+
+/// Every live program on one screen, in the server's order: inbox first, then each program's default widget.
+/// Replace any program's widget with [programBuilders] (`{'daily': (context, p) => MyStreak(...)}`), or hide one by
+/// returning `SizedBox.shrink()`. Titles come from the program's `public.title` when the app set one.
+///
+/// When the state has surprise rules (`state.surprises`), one "Surprises" card ([SurpriseOdds]) with every odds line
+/// sits right under the inbox, so the odds are seen before anything is earned. [showSurprises] false hides it
+/// (then show the odds somewhere else yourself).
+class RewardsHub extends StatelessWidget {
+  const RewardsHub({
+    super.key,
+    required this.controller,
+    this.texts = const RewardsTexts(),
+    this.programBuilders = const {},
+    this.onOpenInstagram,
+    this.onShareInvite,
+    this.onOpenQuiz,
+    this.onPlaySound,
+    this.imageBuilder,
+    this.scrollable = true,
+    this.padding = const EdgeInsets.all(16),
+    this.spacing = 12,
+    this.header,
+    this.showSurprises = true,
+  });
+
+  final RewardsController controller;
+  final RewardsTexts texts;
+  final Map<String, Widget Function(BuildContext context, ProgramInfo program)> programBuilders;
+  final void Function(String account)? onOpenInstagram;
+
+  /// Shares a friend-streak invite code ([FriendStreaks.onShareInvite]).
+  final void Function(String code)? onShareInvite;
+
+  /// Opens a quiz the app's way; default pushes `QuizScreen` ([QuizCard.onOpen]).
+  final void Function(String program)? onOpenQuiz;
+
+  /// For the default quiz screen: `listen` sounds and `picture` images.
+  final void Function(String soundId)? onPlaySound;
+  final Widget Function(BuildContext context, String url)? imageBuilder;
+
+  /// False inside a list that already scrolls.
+  final bool scrollable;
+  final EdgeInsetsGeometry padding;
+  final double spacing;
+  final Widget? header;
+
+  /// The "Surprises" odds card under the inbox. Default true.
+  final bool showSurprises;
+
+  Widget _program(BuildContext context, ProgramInfo p) {
+    final custom = programBuilders[p.key];
+    if (custom != null) return custom(context, p);
+    final title = p.public['title']?.toString();
+    return switch (p.kind) {
+      ProgramKind.streak => StreakCard(controller: controller, program: p.key, texts: texts),
+      ProgramKind.milestone => MilestoneProgress(controller: controller, program: p.key, title: title, texts: texts),
+      ProgramKind.offer => OfferBanner(controller: controller, program: p.key, title: title, texts: texts),
+      ProgramKind.socialTag => SocialTagTask(
+        controller: controller,
+        program: p.key,
+        texts: texts,
+        onOpenInstagram: onOpenInstagram,
+      ),
+      ProgramKind.quiz => QuizCard(
+        controller: controller,
+        program: p.key,
+        title: title,
+        texts: texts,
+        onOpen: onOpenQuiz,
+        onPlaySound: onPlaySound,
+        imageBuilder: imageBuilder,
+      ),
+      ProgramKind.questSet => QuestList(controller: controller, program: p.key, title: title, texts: texts),
+      ProgramKind.recharge => RechargeMeter(controller: controller, program: p.key, texts: texts),
+      ProgramKind.window => Align(
+        alignment: AlignmentDirectional.centerStart,
+        child: WindowBadge(controller: controller, program: p.key, title: title, texts: texts),
+      ),
+      ProgramKind.friendStreak => FriendStreaks(
+        controller: controller,
+        program: p.key,
+        title: title,
+        texts: texts,
+        onShareInvite: onShareInvite,
+      ),
+      ProgramKind.league => LeagueBoard(controller: controller, program: p.key, title: title, texts: texts),
+      // A comeback reward has nothing to show before it is earned; it lands in the inbox.
+      ProgramKind.comeback || ProgramKind.unknown => const SizedBox.shrink(),
+    };
+  }
+
+  @override
+  Widget build(BuildContext context) => RewardsListener(
+    controller: controller,
+    builder: (context) {
+      final children = <Widget>[
+        ?header,
+        RewardInbox(controller: controller, texts: texts),
+        if (showSurprises && controller.state.surprises.isNotEmpty) SurpriseOdds(controller: controller, texts: texts),
+        for (final p in controller.state.programs) _program(context, p),
+      ];
+      final column = Padding(
+        padding: padding,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          mainAxisSize: MainAxisSize.min,
+          spacing: spacing,
+          children: children,
+        ),
+      );
+      if (!scrollable) return column;
+      return RefreshIndicator(
+        onRefresh: controller.refresh,
+        child: SingleChildScrollView(physics: const AlwaysScrollableScrollPhysics(), child: column),
+      );
+    },
+  );
+}

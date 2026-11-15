@@ -1,0 +1,24 @@
+{
+  "api_version": "1.0",
+  "event": {
+    "id": "EVT-0015-TRANSFER",
+    "type": "TRANSFER",
+    "event_timestamp_ms": 1762864000000,
+    "app_id": "app00000000",
+    "store": "APP_STORE",
+    "environment": "PRODUCTION",
+    "transferred_from": [
+      "8b6f2c1e-0000-4000-8000-00000000f001",
+      "$RCAnonymousID:00000000000000000000000000000001"
+    ],
+    "transferred_to": [
+      "8b6f2c1e-0000-4000-8000-00000000a002"
+    ],
+    "subscriber_attributes": {
+      "$email": {
+        "value": "other@example.com",
+        "updated_at_ms": 1762000000000
+      }
+    }
+  }
+}

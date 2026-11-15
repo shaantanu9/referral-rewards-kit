@@ -1,0 +1,166 @@
+name: ci
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  secret-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  db-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: SQL migrations and tests on a throwaway Postgres
+        run: |
+          PGBIN=$(ls -d /usr/lib/postgresql/*/bin | sort -V | tail -1)
+          PGBIN="$PGBIN" scripts/test-db.sh
+          PGBIN="$PGBIN" PGTEST_LOCALE=C scripts/test-db.sh
+  logic:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+      - name: Function unit tests (logic, decide, grant, routes; no permissions)
+        run: |
+          deno fmt --check --config supabase/functions/referral/deno.json supabase/functions/referral/
+          deno lint supabase/functions/referral/
+          deno check supabase/functions/referral/
+          deno test --no-prompt supabase/functions/referral/
+  rewards-function:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+      - name: Rewards function unit tests (worker grants, Instagram webhook; no permissions)
+        run: |
+          deno fmt --check --config supabase/functions/rewards/deno.json supabase/functions/rewards/
+          deno lint supabase/functions/rewards/
+          deno check supabase/functions/rewards/
+          deno test --no-prompt supabase/functions/rewards/
+  function-integration:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+      - name: Edge Function story against a throwaway Postgres (fake RevenueCat, no network)
+        run: |
+          PGBIN=$(ls -d /usr/lib/postgresql/*/bin | sort -V | tail -1)
+          PGBIN="$PGBIN" scripts/test-function.sh
+  rewards-function-integration:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+      - name: Rewards Edge Function story against a throwaway Postgres (fake RevenueCat, no network)
+        run: |
+          PGBIN=$(ls -d /usr/lib/postgresql/*/bin | sort -V | tail -1)
+          PGBIN="$PGBIN" scripts/test-rewards-function.sh
+  invite-page:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+      - run: deno test --no-prompt --allow-read=. .
+        working-directory: web/invite
+  flutter:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: packages/referral_kit
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: 3.41.5
+          channel: stable
+      - run: flutter pub get
+      - run: find lib test example/lib -name '*.dart' -not -path '*/l10n/gen/*' | xargs dart format --output=none --set-exit-if-changed
+      - run: flutter analyze
+      - run: flutter test
+  rewards-kit:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: packages/rewards_kit
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: 3.41.5
+          channel: stable
+      - run: flutter pub get
+      - run: find lib test example/lib -name '*.dart' | xargs dart format --output=none --set-exit-if-changed
+      - run: flutter analyze
+      - run: flutter test
+  rewards-admin-page:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+      - name: Admin page helpers and demo backend
+        run: |
+          deno fmt --check --config web/rewards-admin/deno.json web/rewards-admin/
+          deno lint --config web/rewards-admin/deno.json web/rewards-admin/
+          deno test --no-prompt --allow-read=. web/rewards-admin/
+  rewards-ads-check:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: examples/rewards_ads_check
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: 3.41.5
+          channel: stable
+      - run: flutter pub get
+      - run: flutter analyze
+      - run: flutter test
+  rewards-notifications-check:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: examples/rewards_notifications_check
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: 3.41.5
+          channel: stable
+      - run: flutter pub get
+      - run: flutter analyze
+      - run: flutter test
+  starter-app:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: examples/starter_app
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: 3.41.5
+          channel: stable
+      - run: flutter pub get
+      - run: flutter analyze
+      - run: flutter test

@@ -1,0 +1,20 @@
+name: rewards_kit_example
+description: "Demonstrates the rewards_kit widgets over an in-memory fake server: default look and a fully custom one."
+publish_to: 'none'
+
+environment:
+  sdk: ^3.8.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+  rewards_kit:
+    path: ../
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true

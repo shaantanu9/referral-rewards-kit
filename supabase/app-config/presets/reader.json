@@ -1,0 +1,412 @@
+{
+  "format": "rewards-config",
+  "version": 1,
+  "about": "Reader app (comics, books, audio): reading streak with a free weekly freeze, Night owl, series explorer, daily quests, welcome offer completed by a purchase, Happy Hour window, comeback, Instagram tag, rewarded ads through RevenueCat. Surprise bonus on any chapter (1 in 10, 5-30 min, free users, at most 3 a day). Follow-ups: streak-at-risk and comeback notifications, reward-waiting reminder and two emails (off until emails are switched on).",
+  "settings": {
+    "ads_enabled": false,
+    "surprise_daily_cap": 3
+  },
+  "event_types": [
+    {
+      "name": "chapter_finished",
+      "source": "server",
+      "daily_limit": 200
+    },
+    {
+      "name": "share_made",
+      "source": "client",
+      "daily_limit": 20
+    },
+    {
+      "name": "rc_initial_purchase",
+      "source": "server",
+      "daily_limit": 10
+    },
+    {
+      "name": "ad_watched",
+      "source": "server",
+      "daily_limit": 20
+    }
+  ],
+  "programs": [
+    {
+      "key": "reading_streak",
+      "kind": "streak",
+      "sort": 1,
+      "public": {
+        "title": "Reading streak"
+      },
+      "config": {
+        "event": "chapter_finished",
+        "weekly_free_freezes": 1,
+        "max_freezes": 2
+      }
+    },
+    {
+      "key": "night_owl",
+      "kind": "milestone",
+      "sort": 2,
+      "public": {
+        "title": "Night owl"
+      },
+      "config": {
+        "event": "chapter_finished",
+        "where": {
+          "local_hour": {
+            "in": [
+              23,
+              0,
+              1,
+              2,
+              3
+            ]
+          }
+        }
+      }
+    },
+    {
+      "key": "explorer",
+      "kind": "milestone",
+      "sort": 3,
+      "public": {
+        "title": "Read 10 different series"
+      },
+      "config": {
+        "event": "chapter_finished",
+        "count": "distinct:series"
+      }
+    },
+    {
+      "key": "daily_tasks",
+      "kind": "quest_set",
+      "sort": 4,
+      "public": {
+        "title": "Today's tasks"
+      },
+      "config": {
+        "reset": "daily",
+        "tasks": [
+          {
+            "key": "read_two",
+            "event": "chapter_finished",
+            "count": 2
+          },
+          {
+            "key": "share_one",
+            "event": "share_made",
+            "count": 1
+          }
+        ]
+      }
+    },
+    {
+      "key": "welcome",
+      "kind": "offer",
+      "sort": 5,
+      "public": {
+        "title": "Welcome gift: subscribe within 24 hours"
+      },
+      "config": {
+        "window_minutes": 1440,
+        "start_on": "chapter_finished",
+        "complete_on": "rc_initial_purchase"
+      }
+    },
+    {
+      "key": "happy_hour",
+      "kind": "window",
+      "sort": 6,
+      "public": {
+        "title": "Happy Hour"
+      },
+      "config": {
+        "from": "21:00",
+        "to": "22:00"
+      }
+    },
+    {
+      "key": "welcome_back",
+      "kind": "comeback",
+      "sort": 7,
+      "config": {
+        "event": "chapter_finished",
+        "after_days": 7
+      }
+    },
+    {
+      "key": "tag_us",
+      "kind": "social_tag",
+      "sort": 8,
+      "public": {
+        "title": "Tag us on Instagram"
+      },
+      "config": {
+        "platform": "instagram",
+        "account": "your_account",
+        "code_prefix": "READ",
+        "repeat_days": 30
+      }
+    },
+    {
+      "key": "ad_fan",
+      "kind": "milestone",
+      "sort": 9,
+      "public": {
+        "title": "Watch 5 ads"
+      },
+      "config": {
+        "event": "ad_watched"
+      }
+    },
+    {
+      "key": "chapter_surprise",
+      "kind": "milestone",
+      "sort": 10,
+      "public": {
+        "title": "Surprise bonus",
+        "about": "Any finished chapter can bring a surprise: 1 in 10, 5-30 min of natural voice."
+      },
+      "config": {
+        "event": "chapter_finished"
+      }
+    },
+    {
+      "key": "fu_streak_reading",
+      "kind": "followup",
+      "sort": 50,
+      "public": {},
+      "config": {
+        "channel": "notification",
+        "trigger": {
+          "type": "streak_at_risk",
+          "program": "reading_streak",
+          "hours_before": 4
+        },
+        "time": "reminder",
+        "group": "daily",
+        "priority": 50,
+        "title": "App",
+        "body": "Day {{streak}} of your reading streak ends tonight.",
+        "payload": "/home"
+      }
+    },
+    {
+      "key": "fu_comeback_reading",
+      "kind": "followup",
+      "sort": 50,
+      "public": {},
+      "config": {
+        "channel": "notification",
+        "trigger": {
+          "type": "inactive_days",
+          "days": 2
+        },
+        "time": "reminder",
+        "group": "daily",
+        "priority": 30,
+        "title": "App",
+        "body": "Your next chapter is waiting.",
+        "payload": "/home"
+      }
+    },
+    {
+      "key": "fu_reward_reading",
+      "kind": "followup",
+      "sort": 50,
+      "public": {},
+      "config": {
+        "channel": "notification",
+        "trigger": {
+          "type": "reward_waiting"
+        },
+        "time": "reminder",
+        "group": "rewards",
+        "priority": 30,
+        "title": "App",
+        "body": "Something is waiting for you.",
+        "payload": "/rewards"
+      }
+    },
+    {
+      "key": "fu_email_day2_reading",
+      "kind": "followup",
+      "sort": 60,
+      "public": {},
+      "config": {
+        "channel": "email",
+        "trigger": {
+          "type": "days_since_signup",
+          "from": 2,
+          "to": 3,
+          "no_activity_since_signup": true
+        },
+        "priority": 10,
+        "email": {
+          "subject": "Your first chapter is still here, {{name}}",
+          "body": "Pick up where you left off. One chapter takes a few minutes.",
+          "button": "Open the app",
+          "url": "https://example.com/open"
+        }
+      }
+    },
+    {
+      "key": "fu_email_day7_reading",
+      "kind": "followup",
+      "sort": 60,
+      "public": {},
+      "config": {
+        "channel": "email",
+        "trigger": {
+          "type": "inactive_days",
+          "days": 7
+        },
+        "priority": 10,
+        "email": {
+          "subject": "One week since your last chapter",
+          "body": "One chapter this week keeps the habit going.",
+          "button": "Open the app",
+          "url": "https://example.com/open"
+        }
+      }
+    }
+  ],
+  "rules": [
+    {
+      "program": "reading_streak",
+      "threshold": 3,
+      "repeat": "each_cycle",
+      "kind": "minutes",
+      "amount": 15,
+      "params": {
+        "audience": "free"
+      }
+    },
+    {
+      "program": "reading_streak",
+      "threshold": 7,
+      "repeat": "each_cycle",
+      "kind": "chapters",
+      "amount": 1,
+      "params": {}
+    },
+    {
+      "program": "reading_streak",
+      "threshold": 14,
+      "repeat": "every",
+      "kind": "streak_freeze",
+      "amount": 1,
+      "params": {}
+    },
+    {
+      "program": "reading_streak",
+      "threshold": 30,
+      "repeat": "once",
+      "kind": "entitlement_days",
+      "amount": 7,
+      "params": {
+        "entitlement_id": "premium",
+        "audience": "free"
+      }
+    },
+    {
+      "program": "night_owl",
+      "threshold": 1,
+      "repeat": "once",
+      "kind": "badge",
+      "amount": 1,
+      "params": {
+        "badge": "night_owl"
+      }
+    },
+    {
+      "program": "explorer",
+      "threshold": 10,
+      "repeat": "once",
+      "kind": "badge",
+      "amount": 1,
+      "params": {
+        "badge": "explorer"
+      }
+    },
+    {
+      "program": "daily_tasks",
+      "threshold": null,
+      "repeat": "once",
+      "kind": "minutes",
+      "amount": 5,
+      "params": {
+        "task": "read_two"
+      }
+    },
+    {
+      "program": "daily_tasks",
+      "threshold": null,
+      "repeat": "once",
+      "kind": "mystery",
+      "amount": 1,
+      "params": {
+        "table": [
+          {
+            "kind": "minutes",
+            "amount": 10,
+            "weight": 8
+          },
+          {
+            "kind": "chapters",
+            "amount": 1,
+            "weight": 2
+          }
+        ]
+      }
+    },
+    {
+      "program": "welcome",
+      "threshold": null,
+      "repeat": "once",
+      "kind": "chapters",
+      "amount": 3,
+      "params": {}
+    },
+    {
+      "program": "welcome_back",
+      "threshold": null,
+      "repeat": "once",
+      "kind": "chapters",
+      "amount": 1,
+      "params": {}
+    },
+    {
+      "program": "tag_us",
+      "threshold": null,
+      "repeat": "once",
+      "kind": "chapters",
+      "amount": 5,
+      "params": {}
+    },
+    {
+      "program": "ad_fan",
+      "threshold": 5,
+      "repeat": "once",
+      "kind": "badge",
+      "amount": 1,
+      "params": {
+        "badge": "ad_fan"
+      }
+    },
+    {
+      "program": "chapter_surprise",
+      "threshold": 1,
+      "repeat": "every",
+      "kind": "minutes",
+      "amount": 30,
+      "params": {
+        "chance": 0.1,
+        "amount_range": [
+          5,
+          30
+        ],
+        "audience": "free"
+      }
+    }
+  ]
+}

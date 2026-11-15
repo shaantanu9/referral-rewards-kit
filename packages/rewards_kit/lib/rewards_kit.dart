@@ -1,0 +1,53 @@
+/// Rewards for any app on the rewards engine (ADR 0002): daily streaks, milestones, Instagram tag rewards, timed
+/// offers, daily quizzes, quests, recharges, time windows, friend streaks, opt-in weekly leagues and a shareable
+/// recap card, with countdowns that use the server's clock and a builder on every widget so the look is the app's own.
+library;
+
+export 'src/client.dart' show RewardsClient, RewardsRpc, followupOpenedKey;
+export 'src/clock.dart';
+export 'src/controller.dart';
+export 'src/errors.dart';
+export 'src/events.dart';
+export 'src/followup_models.dart';
+export 'src/followup_scheduler.dart';
+export 'src/http_rpc.dart';
+export 'src/league_models.dart';
+export 'src/models.dart';
+export 'src/programs.dart';
+export 'src/quiz_controller.dart';
+export 'src/quiz_models.dart';
+export 'src/reminder.dart';
+export 'src/state.dart';
+export 'src/surprise_models.dart';
+export 'src/tasks.dart';
+export 'src/texts.dart';
+export 'src/texts_followups.dart';
+export 'src/texts_leagues.dart';
+export 'src/texts_reveal.dart';
+export 'src/texts_v2.dart';
+export 'src/theme.dart';
+export 'src/widgets/activity_heatmap.dart';
+export 'src/widgets/base.dart';
+export 'src/widgets/countdown.dart';
+export 'src/widgets/daily_goal_ring.dart';
+export 'src/widgets/followup_settings.dart';
+export 'src/widgets/friend_streaks.dart';
+export 'src/widgets/league_board.dart';
+export 'src/widgets/milestone_progress.dart';
+export 'src/widgets/mystery_odds.dart';
+export 'src/widgets/offer_banner.dart';
+export 'src/widgets/quest_list.dart';
+export 'src/widgets/quiz_card.dart';
+export 'src/widgets/quiz_screen.dart';
+export 'src/widgets/quiz_views.dart';
+export 'src/widgets/recap_card.dart';
+export 'src/widgets/recap_share_card.dart';
+export 'src/widgets/recharge_meter.dart';
+export 'src/widgets/reward_inbox.dart';
+export 'src/widgets/reward_reveal.dart';
+export 'src/widgets/rewarded_ad_button.dart';
+export 'src/widgets/rewards_hub.dart';
+export 'src/widgets/social_tag_task.dart';
+export 'src/widgets/streak_card.dart';
+export 'src/widgets/surprise_odds.dart';
+export 'src/widgets/window_badge.dart';

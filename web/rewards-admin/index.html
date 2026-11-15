@@ -1,0 +1,367 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noindex, nofollow">
+    <meta http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; connect-src 'self' https://*.supabase.co wss://*.supabase.co http://localhost:* http://127.0.0.1:* https://cdn.jsdelivr.net; img-src 'self' data:; style-src 'self' 'unsafe-inline'; base-uri 'none'; form-action 'none'">
+    <link rel="icon" href="data:,">
+    <meta name="referrer" content="no-referrer">
+    <title>Rewards admin</title>
+    <style>
+    :root {
+      --bg: #f6f7f9;
+      --surface: #ffffff;
+      --text: #16181d;
+      --muted: #5d6470;
+      --line: #dfe2e8;
+      --accent: #0f766e;
+      --accent-text: #ffffff;
+      --warn: #b45309;
+      --bad: #b91c1c;
+      --ok: #15803d;
+      --chip: #eef0f4;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        --bg: #0f1115;
+        --surface: #171a21;
+        --text: #e8eaee;
+        --muted: #9aa3b2;
+        --line: #2a2f3a;
+        --accent: #2dd4bf;
+        --accent-text: #062b27;
+        --warn: #fbbf24;
+        --bad: #f87171;
+        --ok: #4ade80;
+        --chip: #222733;
+      }
+    }
+    :root[data-theme="dark"] {
+      --bg: #0f1115;
+      --surface: #171a21;
+      --text: #e8eaee;
+      --muted: #9aa3b2;
+      --line: #2a2f3a;
+      --accent: #2dd4bf;
+      --accent-text: #062b27;
+      --warn: #fbbf24;
+      --bad: #f87171;
+      --ok: #4ade80;
+      --chip: #222733;
+    }
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font: 15px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif;
+    }
+    header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--line);
+      position: sticky;
+      top: 0;
+      z-index: 2;
+    }
+    .grow {
+      flex: 1;
+    }
+    .layout {
+      display: grid;
+      grid-template-columns: 190px minmax(0, 1fr);
+      min-height: calc(100vh - 50px);
+    }
+    nav {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      padding: 12px;
+      border-right: 1px solid var(--line);
+      background: var(--surface);
+    }
+    nav a {
+      padding: 8px 10px;
+      border-radius: 8px;
+      color: var(--text);
+      text-decoration: none;
+    }
+    nav a.active,
+    nav a:hover {
+      background: var(--chip);
+    }
+    nav a.active {
+      font-weight: 600;
+    }
+    main {
+      padding: 16px 20px 64px;
+      min-width: 0;
+    }
+    main.narrow {
+      max-width: 460px;
+      margin: 48px auto;
+      padding: 0 16px;
+    }
+    h1 {
+      font-size: 24px;
+    }
+    h2 {
+      font-size: 20px;
+      margin: 8px 0 12px;
+    }
+    h3 {
+      font-size: 16px;
+      margin: 16px 0 8px;
+    }
+    h4 {
+      margin: 12px 0 6px;
+    }
+    .muted {
+      color: var(--muted);
+    }
+    .warn-text {
+      color: var(--bad);
+    }
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 14px 16px;
+      margin: 0 0 14px;
+    }
+    details.card > summary {
+      cursor: pointer;
+      list-style: none;
+    }
+    details.card > summary::-webkit-details-marker {
+      display: none;
+    }
+    details.card[open] > summary {
+      margin-bottom: 10px;
+    }
+    .grid2 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 380px), 1fr));
+      gap: 14px;
+    }
+    .tiles {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+    .tile {
+      display: block;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 12px;
+      color: var(--text);
+      text-decoration: none;
+    }
+    .tile.warn {
+      border-color: var(--warn);
+    }
+    .tile-value {
+      font-size: 24px;
+      font-weight: 700;
+    }
+    .tile-label {
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .chart {
+      width: 100%;
+      height: 120px;
+      display: block;
+    }
+    .chart rect {
+      fill: var(--accent);
+    }
+    .row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .between {
+      justify-content: space-between;
+    }
+    .form-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: end;
+      margin: 8px 0;
+    }
+    .form-row label {
+      flex: 1 1 150px;
+    }
+    label {
+      display: block;
+      margin: 8px 0;
+      font-size: 13px;
+      color: var(--muted);
+    }
+    label.inline {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--text);
+      font-size: 15px;
+    }
+    input,
+    select,
+    textarea {
+      display: block;
+      width: 100%;
+      margin-top: 4px;
+      padding: 8px 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--bg);
+      color: var(--text);
+      font: inherit;
+    }
+    input[type="checkbox"] {
+      width: auto;
+      display: inline;
+      margin: 0;
+    }
+    textarea {
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 13px;
+    }
+    button {
+      padding: 8px 14px;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      background: var(--surface);
+      color: var(--text);
+      font: inherit;
+      cursor: pointer;
+      margin: 6px 0;
+    }
+    button.primary {
+      background: var(--accent);
+      color: var(--accent-text);
+      border-color: var(--accent);
+    }
+    button.link {
+      border: none;
+      background: none;
+      color: var(--accent);
+      padding: 0;
+      text-decoration: underline;
+    }
+    button:focus-visible,
+    a:focus-visible,
+    input:focus-visible,
+    select:focus-visible,
+    textarea:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+    .table-wrap {
+      overflow-x: auto;
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      font-size: 14px;
+    }
+    th,
+    td {
+      text-align: left;
+      padding: 7px 8px;
+      border-bottom: 1px solid var(--line);
+      vertical-align: top;
+    }
+    th {
+      color: var(--muted);
+      font-weight: 600;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: .03em;
+    }
+    code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 12px;
+      word-break: break-all;
+    }
+    .chip {
+      display: inline-block;
+      padding: 1px 8px;
+      border-radius: 99px;
+      background: var(--chip);
+      font-size: 12px;
+    }
+    .chip.ok {
+      color: var(--ok);
+    }
+    .chip.bad {
+      color: var(--bad);
+    }
+    .chip.off {
+      color: var(--muted);
+    }
+    .chip.warn {
+      color: var(--warn);
+    }
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 20px;
+      transform: translate(-50%, 140%);
+      background: var(--text);
+      color: var(--bg);
+      padding: 10px 16px;
+      border-radius: 10px;
+      max-width: min(92vw, 560px);
+      transition: transform .2s;
+      z-index: 5;
+      visibility: hidden;
+    }
+    .toast.show {
+      transform: translate(-50%, 0);
+      visibility: visible;
+    }
+    .toast.err {
+      background: var(--bad);
+      color: #fff;
+    }
+    @media (max-width: 760px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+      nav {
+        flex-direction: row;
+        overflow-x: auto;
+        border-right: none;
+        border-bottom: 1px solid var(--line);
+        padding: 8px 16px;
+      }
+      nav a {
+        white-space: nowrap;
+      }
+      main {
+        padding: 16px 16px 64px;
+      }
+    }
+    </style>
+  </head>
+  <body>
+    <div id="app">
+      <main class="narrow"><p>Loading…</p><noscript>This page needs JavaScript.</noscript></main>
+    </div>
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+    <script type="module" src="./app.js"></script>
+  </body>
+</html>

@@ -1,0 +1,10 @@
+{
+  "applinks": {
+    "details": [
+      {
+        "appIDs": ["TEAMID.com.example.app"],
+        "components": [{ "/": "/i/*", "comment": "Invite links open the app with the code" }]
+      }
+    ]
+  }
+}

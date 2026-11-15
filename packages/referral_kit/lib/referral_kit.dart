@@ -1,0 +1,27 @@
+/// Flutter client and screens for referral-kit (ADR 0001): invite friends, enter an invite code, show rewards.
+library;
+
+export 'src/availability.dart';
+export 'src/client.dart';
+export 'src/code_format.dart';
+export 'src/copy.dart';
+export 'src/events.dart';
+export 'src/http_rpc.dart';
+export 'src/install_id.dart';
+export 'src/install_referrer.dart';
+export 'src/l10n/delegate.dart';
+export 'src/l10n/gen/referral_kit_localizations.dart';
+export 'src/models.dart' hide asList, asMap;
+export 'src/paste.dart';
+export 'src/pending_claim.dart';
+export 'src/prompt_policy.dart';
+export 'src/share.dart';
+export 'src/storage.dart';
+export 'src/texts.dart';
+export 'src/widgets/code_text.dart';
+export 'src/widgets/invite_code_entry.dart';
+export 'src/widgets/invite_code_section.dart';
+export 'src/widgets/invite_friends_screen.dart';
+export 'src/widgets/invite_hub.dart';
+export 'src/widgets/message.dart';
+export 'src/widgets/reward_card.dart';

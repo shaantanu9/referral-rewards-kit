@@ -1,0 +1,224 @@
+{
+  "format": "rewards-config",
+  "version": 1,
+  "about": "Quiz / learning app: daily quiz with score tiers, quiz streak, perfect-score badge, pass 10 different quizzes, friend streaks, hearts that recharge, rewards paid in RevenueCat in-app currency. A perfect score has a 1 in 4 chance of 5-25 bonus gems. Follow-ups: streak-at-risk and comeback notifications.",
+  "settings": {
+    "surprise_daily_cap": 3
+  },
+  "event_types": [
+    {
+      "name": "quiz_finished",
+      "source": "server",
+      "daily_limit": 100
+    },
+    {
+      "name": "quiz_first_pass",
+      "source": "server",
+      "daily_limit": 100
+    }
+  ],
+  "programs": [
+    {
+      "key": "daily_quiz",
+      "kind": "quiz",
+      "sort": 1,
+      "public": {
+        "title": "Daily quiz"
+      },
+      "config": {
+        "bank": "default",
+        "questions": 10,
+        "mix": {
+          "true_false": [
+            2,
+            3
+          ],
+          "odd_one_out": [
+            1,
+            2
+          ]
+        },
+        "attempts_per_day": 1
+      }
+    },
+    {
+      "key": "quiz_streak",
+      "kind": "streak",
+      "sort": 2,
+      "public": {
+        "title": "Quiz streak"
+      },
+      "config": {
+        "event": "quiz_finished",
+        "weekly_free_freezes": 1
+      }
+    },
+    {
+      "key": "perfect",
+      "kind": "milestone",
+      "sort": 3,
+      "public": {
+        "title": "Perfect scores"
+      },
+      "config": {
+        "event": "quiz_finished",
+        "where": {
+          "prop:score": {
+            "gte": 10
+          }
+        }
+      }
+    },
+    {
+      "key": "quiz_master",
+      "kind": "milestone",
+      "sort": 4,
+      "public": {
+        "title": "Pass 10 different quizzes"
+      },
+      "config": {
+        "event": "quiz_first_pass"
+      }
+    },
+    {
+      "key": "study_buddies",
+      "kind": "friend_streak",
+      "sort": 5,
+      "public": {
+        "title": "Study with friends"
+      },
+      "config": {
+        "event": "quiz_finished",
+        "max_friends": 5
+      }
+    },
+    {
+      "key": "hearts",
+      "kind": "recharge",
+      "sort": 6,
+      "public": {
+        "title": "Hearts"
+      },
+      "config": {
+        "max": 5,
+        "every_minutes": 240
+      }
+    },
+    {
+      "key": "fu_streak_quiz",
+      "kind": "followup",
+      "sort": 50,
+      "public": {},
+      "config": {
+        "channel": "notification",
+        "trigger": {
+          "type": "streak_at_risk",
+          "program": "quiz_streak",
+          "hours_before": 4
+        },
+        "time": "reminder",
+        "group": "daily",
+        "priority": 50,
+        "title": "App",
+        "body": "Day {{streak}} ends tonight. Today's quiz is ready.",
+        "payload": "/home"
+      }
+    },
+    {
+      "key": "fu_comeback_quiz",
+      "kind": "followup",
+      "sort": 50,
+      "public": {},
+      "config": {
+        "channel": "notification",
+        "trigger": {
+          "type": "inactive_days",
+          "days": 2
+        },
+        "time": "reminder",
+        "group": "daily",
+        "priority": 30,
+        "title": "App",
+        "body": "Today's quiz is ready when you are.",
+        "payload": "/home"
+      }
+    }
+  ],
+  "rules": [
+    {
+      "program": "daily_quiz",
+      "threshold": 6,
+      "repeat": "once",
+      "kind": "rc_currency",
+      "amount": 10,
+      "params": {
+        "currency_code": "GEMS"
+      }
+    },
+    {
+      "program": "daily_quiz",
+      "threshold": 9,
+      "repeat": "once",
+      "kind": "rc_currency",
+      "amount": 30,
+      "params": {
+        "currency_code": "GEMS"
+      }
+    },
+    {
+      "program": "quiz_streak",
+      "threshold": 7,
+      "repeat": "each_cycle",
+      "kind": "rc_currency",
+      "amount": 50,
+      "params": {
+        "currency_code": "GEMS"
+      }
+    },
+    {
+      "program": "perfect",
+      "threshold": 1,
+      "repeat": "once",
+      "kind": "badge",
+      "amount": 1,
+      "params": {
+        "badge": "perfect_score"
+      }
+    },
+    {
+      "program": "quiz_master",
+      "threshold": 10,
+      "repeat": "once",
+      "kind": "badge",
+      "amount": 1,
+      "params": {
+        "badge": "quiz_master"
+      }
+    },
+    {
+      "program": "study_buddies",
+      "threshold": 3,
+      "repeat": "each_cycle",
+      "kind": "rc_currency",
+      "amount": 20,
+      "params": {
+        "currency_code": "GEMS"
+      }
+    },
+    {
+      "program": "perfect",
+      "threshold": 1,
+      "repeat": "every",
+      "kind": "rc_currency",
+      "amount": 25,
+      "params": {
+        "chance": 0.25,
+        "amount_range": [
+          5,
+          25
+        ],
+        "currency_code": "GEMS"
+      }
+    }
+  ]
+}

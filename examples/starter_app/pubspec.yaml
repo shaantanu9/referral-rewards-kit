@@ -1,0 +1,29 @@
+name: referral_kit_starter
+description: "Starter app for referral_kit: the whole invite flow against a fake server. Copy it into a new app."
+publish_to: 'none'
+version: 0.1.0+1
+
+environment:
+  sdk: ^3.8.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  # In this repo: the package next door. In your app, use git (docs/integration.md, step 1):
+  #   referral_kit:
+  #     git:
+  #       url: https://github.com/<owner>/referral-kit.git   # or a local clone's path
+  #       ref: referral_kit-v0.3.0
+  #       path: packages/referral_kit
+  referral_kit:
+    path: ../../packages/referral_kit
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true

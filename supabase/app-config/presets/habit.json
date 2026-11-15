@@ -1,0 +1,176 @@
+{
+  "format": "rewards-config",
+  "version": 1,
+  "about": "Habit / wellness app: daily practice streak with a daily goal, weekly quests, weekend bonus, comeback, Premium days at 30 days. Follow-ups: streak-at-risk and comeback notifications, a Sunday recap.",
+  "settings": {},
+  "event_types": [
+    {
+      "name": "practice_done",
+      "source": "client",
+      "daily_limit": 30
+    },
+    {
+      "name": "journal_written",
+      "source": "client",
+      "daily_limit": 10
+    }
+  ],
+  "programs": [
+    {
+      "key": "practice",
+      "kind": "streak",
+      "sort": 1,
+      "public": {
+        "title": "Practice streak"
+      },
+      "config": {
+        "event": "practice_done",
+        "daily_goal": 2,
+        "weekly_free_freezes": 1,
+        "max_freezes": 3
+      }
+    },
+    {
+      "key": "weekly",
+      "kind": "quest_set",
+      "sort": 2,
+      "public": {
+        "title": "This week"
+      },
+      "config": {
+        "reset": "weekly",
+        "tasks": [
+          {
+            "key": "practice_10",
+            "event": "practice_done",
+            "count": 10
+          },
+          {
+            "key": "journal_3",
+            "event": "journal_written",
+            "count": 3
+          }
+        ]
+      }
+    },
+    {
+      "key": "weekend",
+      "kind": "milestone",
+      "sort": 3,
+      "public": {
+        "title": "Weekend practice"
+      },
+      "config": {
+        "event": "practice_done",
+        "where": {
+          "local_weekday": {
+            "in": [
+              6,
+              7
+            ]
+          }
+        }
+      }
+    },
+    {
+      "key": "back_again",
+      "kind": "comeback",
+      "sort": 4,
+      "config": {
+        "event": "practice_done",
+        "after_days": 5
+      }
+    },
+    {
+      "key": "fu_streak_practice",
+      "kind": "followup",
+      "sort": 50,
+      "public": {},
+      "config": {
+        "channel": "notification",
+        "trigger": {
+          "type": "streak_at_risk",
+          "program": "practice",
+          "hours_before": 4
+        },
+        "time": "reminder",
+        "group": "daily",
+        "priority": 50,
+        "title": "App",
+        "body": "Day {{streak}}: one practice today keeps it.",
+        "payload": "/home"
+      }
+    },
+    {
+      "key": "fu_recap_practice",
+      "kind": "followup",
+      "sort": 50,
+      "public": {},
+      "config": {
+        "channel": "notification",
+        "trigger": {
+          "type": "weekly_recap",
+          "weekday": 7
+        },
+        "time": "18:00",
+        "group": "recap",
+        "priority": 30,
+        "title": "App",
+        "body": "Your week of practice.",
+        "payload": "/recap"
+      }
+    }
+  ],
+  "rules": [
+    {
+      "program": "practice",
+      "threshold": 7,
+      "repeat": "each_cycle",
+      "kind": "badge",
+      "amount": 1,
+      "params": {
+        "badge": "one_week"
+      }
+    },
+    {
+      "program": "practice",
+      "threshold": 30,
+      "repeat": "once",
+      "kind": "entitlement_days",
+      "amount": 7,
+      "params": {
+        "entitlement_id": "premium"
+      }
+    },
+    {
+      "program": "weekly",
+      "threshold": null,
+      "repeat": "once",
+      "kind": "streak_freeze",
+      "amount": 1,
+      "params": {
+        "program": "practice"
+      }
+    },
+    {
+      "program": "weekend",
+      "threshold": 4,
+      "repeat": "every",
+      "kind": "badge",
+      "amount": 1,
+      "params": {
+        "badge": "weekend_warrior"
+      }
+    },
+    {
+      "program": "back_again",
+      "threshold": null,
+      "repeat": "once",
+      "kind": "streak_freeze",
+      "amount": 1,
+      "params": {
+        "program": "practice"
+      }
+    }
+  ]
+}

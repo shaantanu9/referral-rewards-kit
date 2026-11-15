@@ -1,0 +1,21 @@
+name: rewards_kit
+description: >-
+  Typed client, controller and themeable widgets for the rewards engine (ADR 0002): daily streaks, milestones,
+  Instagram tag rewards, timed offers, daily quizzes, quests, recharges, time windows, friend streaks and surprise
+  rewards with a reveal, follow-up notifications planned by the engine, opt-in weekly leagues and a shareable recap card, with server-honest countdowns and a builder for every widget.
+version: 0.6.0
+repository: https://github.com/shaantanu9/referral-rewards-kit
+publish_to: none
+
+environment:
+  sdk: ^3.8.0
+  flutter: ">=3.38.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0

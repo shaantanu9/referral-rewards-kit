@@ -1,0 +1,508 @@
+{
+  "@@locale": "en",
+  "inviteTitle": "Invite friends",
+  "@inviteTitle": {},
+  "yourCode": "Your invite code",
+  "@yourCode": {},
+  "share": "Share",
+  "@share": {},
+  "copyCode": "Copy code",
+  "@copyCode": {},
+  "codeCopied": "Code copied",
+  "@codeCopied": {},
+  "termsLink": "Program terms",
+  "@termsLink": {},
+  "rewardsEarned": "Rewards earned",
+  "@rewardsEarned": {},
+  "pendingRewards": "On the way",
+  "@pendingRewards": {},
+  "pendingItem": "{reward}, around {date}",
+  "@pendingItem": {
+    "placeholders": {
+      "reward": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "bankedItem": "{reward}, added when your current plan ends.",
+  "@bankedItem": {
+    "placeholders": {
+      "reward": {
+        "type": "String"
+      }
+    }
+  },
+  "skippedCap": "{count, plural, =1{1 reward was over the limit} other{{count} rewards were over the limit}}",
+  "@skippedCap": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "joinedCount": "{count, plural, =1{1 friend joined} other{{count} friends joined}}",
+  "@joinedCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "rulesJoinedEach": "You and your friend each get {reward} when they sign up and start using the app.",
+  "@rulesJoinedEach": {
+    "placeholders": {
+      "reward": {
+        "type": "String"
+      }
+    }
+  },
+  "rulesJoinedBoth": "You get {sharerReward} and your friend gets {friendReward} when they sign up and start using the app.",
+  "@rulesJoinedBoth": {
+    "placeholders": {
+      "sharerReward": {
+        "type": "String"
+      },
+      "friendReward": {
+        "type": "String"
+      }
+    }
+  },
+  "rulesJoinedSharerOnly": "You get {reward} when a friend you invited signs up and starts using the app.",
+  "@rulesJoinedSharerOnly": {
+    "placeholders": {
+      "reward": {
+        "type": "String"
+      }
+    }
+  },
+  "rulesJoinedFriendOnly": "Your friend gets {reward} when they sign up and start using the app.",
+  "@rulesJoinedFriendOnly": {
+    "placeholders": {
+      "reward": {
+        "type": "String"
+      }
+    }
+  },
+  "rulesPaid": "You get {reward} when a friend you invited subscribes (after any free trial).",
+  "@rulesPaid": {
+    "placeholders": {
+      "reward": {
+        "type": "String"
+      }
+    }
+  },
+  "capJoins": "{count, plural, =1{Up to 1 friend a month counts.} other{Up to {count} friends a month count.}}",
+  "@capJoins": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "capPaid": "{count, plural, =1{Up to 1 subscribing friend a year counts.} other{Up to {count} subscribing friends a year count.}}",
+  "@capPaid": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "paywallLine": "Or get {reward} free when a friend you invite subscribes.",
+  "@paywallLine": {
+    "placeholders": {
+      "reward": {
+        "type": "String"
+      }
+    }
+  },
+  "friendDisclosureBoth": "Your inviter gets a reward when you start using the app, and another if you subscribe, so they'll know when that happens. They never see your email or what you bought.",
+  "@friendDisclosureBoth": {},
+  "friendDisclosureJoined": "Your inviter gets a reward when you start using the app, so they'll know when that happens. They never see your email or what you bought.",
+  "@friendDisclosureJoined": {},
+  "friendDisclosurePaid": "Your inviter gets a reward if you subscribe, so they'll know when that happens. They never see your email or what you bought.",
+  "@friendDisclosurePaid": {},
+  "friendWelcome": "Welcome bonus: {reward}, thanks to your invite.",
+  "@friendWelcome": {
+    "placeholders": {
+      "reward": {
+        "type": "String"
+      }
+    }
+  },
+  "sharerJoinedReward": "A friend you invited started using the app. You got {reward}.",
+  "@sharerJoinedReward": {
+    "placeholders": {
+      "reward": {
+        "type": "String"
+      }
+    }
+  },
+  "sharerPaidReward": "A friend you invited subscribed. You got {reward}.",
+  "@sharerPaidReward": {
+    "placeholders": {
+      "reward": {
+        "type": "String"
+      }
+    }
+  },
+  "shareTextBoth": "I'm using {app}. Join with my code {code} and we both get {reward}: {link}",
+  "@shareTextBoth": {
+    "placeholders": {
+      "app": {
+        "type": "String"
+      },
+      "code": {
+        "type": "String"
+      },
+      "reward": {
+        "type": "String"
+      },
+      "link": {
+        "type": "String"
+      }
+    }
+  },
+  "shareTextSharerOnly": "I'm using {app}. Join with my code {code} and I get a bonus: {link}",
+  "@shareTextSharerOnly": {
+    "placeholders": {
+      "app": {
+        "type": "String"
+      },
+      "code": {
+        "type": "String"
+      },
+      "link": {
+        "type": "String"
+      }
+    }
+  },
+  "shareTextFriendOnly": "I'm using {app}. Join with my code {code} and you get {reward}: {link}",
+  "@shareTextFriendOnly": {
+    "placeholders": {
+      "app": {
+        "type": "String"
+      },
+      "code": {
+        "type": "String"
+      },
+      "reward": {
+        "type": "String"
+      },
+      "link": {
+        "type": "String"
+      }
+    }
+  },
+  "shareTextPlain": "I'm using {app}. Join with my code {code}: {link}",
+  "@shareTextPlain": {
+    "placeholders": {
+      "app": {
+        "type": "String"
+      },
+      "code": {
+        "type": "String"
+      },
+      "link": {
+        "type": "String"
+      }
+    }
+  },
+  "emptyEach": "No invites yet. Share your code: you each get {reward} when a friend starts using the app.",
+  "@emptyEach": {
+    "placeholders": {
+      "reward": {
+        "type": "String"
+      }
+    }
+  },
+  "emptySharerOnly": "No invites yet. Share your code: you get {reward} when a friend starts using the app.",
+  "@emptySharerOnly": {
+    "placeholders": {
+      "reward": {
+        "type": "String"
+      }
+    }
+  },
+  "emptyPlain": "No invites yet. Share your code with a friend.",
+  "@emptyPlain": {},
+  "paused": "Invites are paused right now. Rewards you've earned are safe.",
+  "@paused": {},
+  "codeDisabled": "Your code is paused while we review it. Rewards you've earned are safe.",
+  "@codeDisabled": {},
+  "loadFailed": "Couldn't load your invites. Check your connection and try again.",
+  "@loadFailed": {},
+  "retry": "Try again",
+  "@retry": {},
+  "notAvailable": "Invites aren't available yet. Check back soon.",
+  "@notAvailable": {
+    "description": "Referrals are not set up on the server yet (not deployed), or the user is signed out. No retry button."
+  },
+  "notAvailableCodeKept": "Invite codes aren't available yet. We saved your code and will add it when they are.",
+  "@notAvailableCodeKept": {
+    "description": "A code was entered while referrals are not available; it is kept and sent later."
+  },
+  "dismiss": "Got it",
+  "@dismiss": {},
+  "enterCodeTitle": "Have an invite code?",
+  "@enterCodeTitle": {},
+  "codeFieldLabel": "Invite code",
+  "@codeFieldLabel": {},
+  "addCode": "Add code",
+  "@addCode": {},
+  "useCode": "Use code {code}",
+  "@useCode": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "enterDifferentCode": "Enter a different code",
+  "@enterDifferentCode": {},
+  "paste": "Paste",
+  "@paste": {},
+  "windowCountdown": "{days, plural, =1{You can add an invite code for 1 more day} other{You can add an invite code for {days} more days}}",
+  "@windowCountdown": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "windowOver": "{days, plural, =1{Invite codes can only be added in your first day} other{Invite codes can only be added in your first {days} days}}",
+  "@windowOver": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "claimOk": "Code added.",
+  "@claimOk": {},
+  "offlineQueued": "We'll apply your code when you're back online.",
+  "@offlineQueued": {},
+  "errOwnCode": "That's your own code. Share it with a friend instead.",
+  "@errOwnCode": {},
+  "errAlreadyReferred": "You've already used an invite code.",
+  "@errAlreadyReferred": {},
+  "errUnknownCode": "We couldn't find that code. Codes have 8 letters or numbers and never contain O, 0, I, 1 or L.",
+  "@errUnknownCode": {},
+  "errWindowClosed": "{days, plural, =1{Invite codes can be added in your first day.} other{Invite codes can be added in your first {days} days.}}",
+  "@errWindowClosed": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "errRateLimited": "{minutes, plural, =1{Too many tries. Try again in 1 min.} other{Too many tries. Try again in {minutes} min.}}",
+  "@errRateLimited": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "errNotVerified": "Confirm your email and we'll add your code then.",
+  "@errNotVerified": {},
+  "errSameInstall": "This code can't be used on this device.",
+  "@errSameInstall": {},
+  "errProgramPaused": "Invites are paused right now.",
+  "@errProgramPaused": {},
+  "errUnavailable": "Invites aren't available for this account.",
+  "@errUnavailable": {},
+  "errGeneric": "We couldn't add that code right now. Try again later.",
+  "@errGeneric": {},
+  "rewardMinutes": "{count, plural, =1{1 min} other{{count} min}}",
+  "@rewardMinutes": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "rewardEntitlementDays": "{count, plural, =1{1 day of {name}} other{{count} days of {name}}}",
+  "@rewardEntitlementDays": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "rewardOther": "{amount} {kind}",
+  "@rewardOther": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      },
+      "kind": {
+        "type": "String"
+      }
+    }
+  },
+  "giftWaiting": "A gift is waiting for you: {reward}",
+  "@giftWaiting": {
+    "placeholders": {
+      "reward": {
+        "type": "String"
+      }
+    }
+  },
+  "giftWaitingPlain": "A gift from a friend is waiting for you",
+  "@giftWaitingPlain": {},
+  "daysLeftToAdd": "{count, plural, =1{Last day to add a code} other{Only {count} days left to add a code}}",
+  "@daysLeftToAdd": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "stepsTitle": "How you get it",
+  "@stepsTitle": {},
+  "stepAddCode": "Add your friend's code",
+  "@stepAddCode": {},
+  "stepStartUsing": "Start using {app}",
+  "@stepStartUsing": {
+    "placeholders": {
+      "app": {
+        "type": "String"
+      }
+    }
+  },
+  "stepRewardYou": "{reward} lands in your account",
+  "@stepRewardYou": {
+    "placeholders": {
+      "reward": {
+        "type": "String"
+      }
+    }
+  },
+  "stepRewardBoth": "{reward} lands for you, and for your friend",
+  "@stepRewardBoth": {
+    "placeholders": {
+      "reward": {
+        "type": "String"
+      }
+    }
+  },
+  "stepGift": "Your gift unlocks",
+  "@stepGift": {},
+  "almostTitle": "Almost yours",
+  "@almostTitle": {},
+  "almostLine": "Start using the app and your {reward} unlocks.",
+  "@almostLine": {
+    "placeholders": {
+      "reward": {
+        "type": "String"
+      }
+    }
+  },
+  "almostLineBoth": "Start using the app and your {reward} unlocks. Your friend gets theirs too.",
+  "@almostLineBoth": {
+    "placeholders": {
+      "reward": {
+        "type": "String"
+      }
+    }
+  },
+  "almostLinePlain": "Start using the app and your gift unlocks.",
+  "@almostLinePlain": {},
+  "almostProgress": "1 of 2 done: code added",
+  "@almostProgress": {},
+  "cannotAddClosed": "{days, plural, =1{Codes are for your first day, and yours has passed.} other{Codes are for your first {days} days, and yours have passed.}}",
+  "@cannotAddClosed": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "cannotAddNotEligible": "{days, plural, =1{A friend's code can be added once, in your first day. This account can't add one now.} other{A friend's code can be added once, in your first {days} days. This account can't add one now.}}",
+  "@cannotAddNotEligible": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "noLinkHint": "Your friend gets {app} from the app store and types this code in.",
+  "@noLinkHint": {
+    "placeholders": {
+      "app": {
+        "type": "String"
+      }
+    }
+  },
+  "shareTextNoLinkBoth": "I'm using {app}. Get it, add my invite code {code} and we both get {reward}: {link}",
+  "@shareTextNoLinkBoth": {
+    "placeholders": {
+      "app": {
+        "type": "String"
+      },
+      "code": {
+        "type": "String"
+      },
+      "reward": {
+        "type": "String"
+      },
+      "link": {
+        "type": "String"
+      }
+    }
+  },
+  "shareTextNoLinkFriend": "I'm using {app}. Get it, add my invite code {code} and you get {reward}: {link}",
+  "@shareTextNoLinkFriend": {
+    "placeholders": {
+      "app": {
+        "type": "String"
+      },
+      "code": {
+        "type": "String"
+      },
+      "reward": {
+        "type": "String"
+      },
+      "link": {
+        "type": "String"
+      }
+    }
+  },
+  "shareTextNoLinkPlain": "I'm using {app}. Get it and add my invite code {code}: {link}",
+  "@shareTextNoLinkPlain": {
+    "placeholders": {
+      "app": {
+        "type": "String"
+      },
+      "code": {
+        "type": "String"
+      },
+      "link": {
+        "type": "String"
+      }
+    }
+  },
+  "shareTextCodeOnly": "I'm using {app}. Get it and add my invite code {code}.",
+  "@shareTextCodeOnly": {
+    "placeholders": {
+      "app": {
+        "type": "String"
+      },
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "signInToInvite": "Sign in to get your invite code and to add a friend's code.",
+  "@signInToInvite": {},
+  "signIn": "Sign in",
+  "@signIn": {},
+  "notInThisVersion": "Invites aren't part of this version of the app.",
+  "@notInThisVersion": {}
+}

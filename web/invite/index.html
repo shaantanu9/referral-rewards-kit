@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="{{LANG}}">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Invite links must not be indexed or end up on coupon sites (ADR 8, 12). -->
+  <meta name="robots" content="noindex, nofollow">
+  <title>{{TITLE}}</title>
+  <link rel="canonical" href="{{CANONICAL}}">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="{{TITLE}}">
+  <meta property="og:description" content="{{LEAD}}">
+  <meta property="og:image" content="{{OG_IMAGE}}">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <style>
+    :root { color-scheme: light dark; --fg: #1b1b1f; --muted: #5d5d66; --bg: #fafafa; --card: #ffffff; --line: #d9d9e0; --accent: #2b59c3; --on-accent: #ffffff; }
+    @media (prefers-color-scheme: dark) { :root { --fg: #ececf1; --muted: #a7a7b3; --bg: #121214; --card: #1c1c20; --line: #34343c; --accent: #7aa2ff; --on-accent: #0b1020; } }
+    * { box-sizing: border-box; }
+    body { margin: 0; padding: 24px 16px; font: 17px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; color: var(--fg); background: var(--bg); }
+    main { max-width: 480px; margin: 0 auto; }
+    h1 { font-size: 1.5rem; margin: 0 0 8px; }
+    p { margin: 0 0 16px; color: var(--muted); }
+    .code { display: flex; gap: 12px; align-items: center; justify-content: space-between; padding: 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--card); margin: 0 0 24px; }
+    .code[hidden] { display: none; }
+    .code output { font: 600 1.75rem/1.2 ui-monospace, "SF Mono", Menlo, Consolas, monospace; letter-spacing: .08em; direction: ltr; unicode-bidi: isolate; overflow-wrap: anywhere; }
+    button, .store { min-height: 48px; padding: 12px 18px; border-radius: 10px; font: inherit; font-weight: 600; cursor: pointer; }
+    button { border: 1px solid var(--line); background: transparent; color: var(--fg); }
+    .store { display: block; text-align: center; text-decoration: none; background: var(--accent); color: var(--on-accent); margin: 0 0 6px; }
+    .note { font-size: .9rem; margin: 0 0 18px; }
+    footer { margin-top: 24px; font-size: .9rem; }
+    footer a { color: var(--accent); }
+    :focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>{{TITLE}}</h1>
+    <p id="lead">{{LEAD}}</p>
+    <div class="code" id="code-box" {{CODE_HIDDEN}}>
+      <output id="code" data-code="{{CODE}}" aria-label="{{CODE_SPOKEN}}">{{CODE_DISPLAY}}</output>
+      <button type="button" id="copy" data-copied="{{COPIED}}">{{COPY}}</button>
+    </div>
+    <a class="store" id="ios" href="{{APP_STORE_URL}}">{{APP_STORE}}</a>
+    <p class="note">{{APP_STORE_NOTE}}</p>
+    <a class="store" id="android" href="{{PLAY_URL}}">{{GOOGLE_PLAY}}</a>
+    <p class="note">{{PLAY_NOTE}}</p>
+    <p id="status" role="status" aria-live="polite"></p>
+    <footer><a href="{{TERMS_URL}}">{{TERMS}}</a></footer>
+  </main>
+  <script>
+    // Works without this script (server-rendered code). On a static host the code comes from the path /i/<CODE>.
+    // No analytics, no storage, nothing sent anywhere (ADR 12).
+    (function () {
+      var out = document.getElementById("code");
+      var code = out.getAttribute("data-code");
+      if (!code || code.indexOf("{{") === 0) {
+        var m = location.pathname.match(/\/i\/([A-Za-z0-9-]{8,9})\/?$/);
+        var c = m ? m[1].replace(/-/g, "").toUpperCase() : "";
+        if (/^[ABCDEFGHJKMNPQRSTUVWXYZ2-9]{8}$/.test(c)) {
+          code = c;
+          out.textContent = c.slice(0, 4) + "-" + c.slice(4);
+          out.setAttribute("data-code", c);
+          out.setAttribute("aria-label", c.split("").join(" "));
+          document.getElementById("code-box").hidden = false;
+          var a = document.getElementById("android");
+          a.href = a.href.split("&referrer=")[0] + "&referrer=" + encodeURIComponent("code=" + c);
+        } else {
+          code = "";
+        }
+      } else {
+        out.setAttribute("aria-label", code.split("").join(" "));
+      }
+      var status = document.getElementById("status");
+      function copy(done) {
+        if (!code || !navigator.clipboard) { if (done) done(); return; }
+        navigator.clipboard.writeText(code).then(function () {
+          status.textContent = document.getElementById("copy").getAttribute("data-copied");
+          if (done) done();
+        }, function () { if (done) done(); });
+      }
+      document.getElementById("copy").addEventListener("click", function () { copy(); });
+      // iOS has no install referrer: copy the code in the same tap, then go to the App Store (ADR 4.2).
+      document.getElementById("ios").addEventListener("click", function (e) {
+        if (!code) return;
+        e.preventDefault();
+        var href = this.href;
+        copy(function () { location.href = href; });
+      });
+    })();
+  </script>
+</body>
+</html>
