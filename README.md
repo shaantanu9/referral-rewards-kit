@@ -1,4 +1,6 @@
-# referral-kit
+# referral-rewards-kit
+
+[![pub: referral_kit](https://img.shields.io/pub/v/referral_kit?label=referral_kit)](https://pub.dev/packages/referral_kit) [![pub: rewards_kit](https://img.shields.io/pub/v/rewards_kit?label=rewards_kit)](https://pub.dev/packages/rewards_kit) [![CI](https://github.com/shaantanu9/referral-rewards-kit/actions/workflows/ci.yml/badge.svg)](https://github.com/shaantanu9/referral-rewards-kit/actions/workflows/ci.yml)
 
 Invite friends, earn rewards: an open-source referral flow for Flutter apps on Supabase with RevenueCat billing.
 
@@ -6,9 +8,19 @@ Invite friends, earn rewards: an open-source referral flow for Flutter apps on S
 - When the friend becomes a paying subscriber, the sharer gets free subscription days, granted through RevenueCat.
 - Built to pass App Store and Google Play review, grant every reward exactly once, and keep personal data out.
 
+<p>
+  <img src="packages/rewards_kit/screenshots/01-hub.png" width="200" alt="Rewards hub">
+  <img src="packages/rewards_kit/screenshots/07-league-and-recap.png" width="200" alt="League and recap">
+  <img src="packages/referral_kit/screenshots/02-invite-hub.png" width="200" alt="Invite hub">
+  <img src="packages/referral_kit/screenshots/06-almost-yours.png" width="200" alt="Almost yours">
+</p>
+<img src="docs/screenshots/admin/01-overview.png" width="820" alt="Admin dashboard overview">
+
+Every screen, with what it shows: [docs/showcase.md](docs/showcase.md).
+
 Status: **built and tested locally; not yet proven on real phones or against a live RevenueCat project.** Design:
-[ADR 0001](docs/adr/0001-referral-kit.md). Add it to an app: [integration guide](docs/integration.md) (git dependency
-on tag `referral_kit-v0.3.0`, one SQL file from [the template](supabase/app-config/template.sql), one `InviteHub`,
+[ADR 0001](docs/adr/0001-referral-kit.md). Add it to an app: [integration guide](docs/integration.md) (`flutter pub add referral_kit`, or a git dependency
+on tag `referral_kit-v0.3.1`, one SQL file from [the template](supabase/app-config/template.sql), one `InviteHub`,
 `onEvent` to your analytics), or start from the [starter app](examples/starter_app). Before release:
 [test plan](docs/test-plan.md) and [store review](docs/store-review.md). Go live: [checklist](docs/go-live.md).
 
