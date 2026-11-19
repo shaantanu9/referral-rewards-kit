@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'dart:math' as math;
 
+// material_ui needs Flutter 3.47+; kept until the minimum Flutter is raised.
+// ignore: deprecated_member_use
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
