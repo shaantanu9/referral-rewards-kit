@@ -53,6 +53,47 @@ void main() {
     expect(resolved.single.$2, RetryTrigger.tokenRefresh);
   });
 
+  test('a kept code survives rate_limited and anonymous_user on retry, and is claimed later', () async {
+    rpc.responses['referral_claim'] = {'reason': 'not_verified'};
+    await queue.claim('ABCDEFGH');
+    rpc.responses['referral_claim'] = {'reason': 'rate_limited', 'retry_after_seconds': 600};
+    expect((await queue.retryPendingClaim(trigger: RetryTrigger.appResume)).isQueued, isTrue);
+    expect(await queue.pendingCode(), 'ABCDEFGH', reason: 'an older server counts not_verified retries');
+    rpc.responses['referral_claim'] = {'reason': 'anonymous_user'};
+    expect((await queue.retryPendingClaim(trigger: RetryTrigger.appResume)).isQueued, isTrue);
+    expect(await queue.pendingCode(), 'ABCDEFGH', reason: 'a guest may still create an account');
+    expect(resolved, isEmpty);
+    rpc.responses['referral_claim'] = {'reason': 'ok', 'days_left': 30};
+    final r = await queue.retryPendingClaim(trigger: RetryTrigger.signInChange);
+    expect(r.result!.isOk, isTrue);
+    expect(await queue.pendingCode(), isNull);
+  });
+
+  test('a typed code refused as rate_limited is not kept (the user sees the answer)', () async {
+    rpc.responses['referral_claim'] = {'reason': 'rate_limited', 'retry_after_seconds': 600};
+    expect((await queue.claim('ABCDEFGH')).status, ClaimStatus.answered);
+    expect(await queue.pendingCode(), isNull);
+  });
+
+  test('keep: a link code is stored before sign-in without a call, then claimed on sign-in', () async {
+    expect(await queue.keep('\u2066abcd-efgh\u2069', source: 'link'), isTrue);
+    expect(rpc.names, isEmpty, reason: 'nothing is sent while signed out');
+    expect(await queue.pendingCode(), 'ABCDEFGH');
+    expect(await queue.pendingStatus(), ClaimStatus.queuedOffline);
+    final r = await queue.retryPendingClaim(trigger: RetryTrigger.signInChange);
+    expect(r.result!.isOk, isTrue);
+    expect(rpc.names, ['referral_claim']);
+    expect(await queue.pendingCode(), isNull);
+  });
+
+  test('keep ignores a malformed code and never replaces a kept one', () async {
+    expect(await queue.keep('nope'), isFalse);
+    expect(await queue.pendingCode(), isNull);
+    expect(await queue.keep('ABCDEFGH'), isTrue);
+    expect(await queue.keep('JKLMNPQR'), isFalse, reason: 'the first code the friend arrived with wins');
+    expect(await queue.pendingCode(), 'ABCDEFGH');
+  });
+
   test('a final refusal is not kept', () async {
     rpc.responses['referral_claim'] = {'reason': 'unknown_code'};
     expect((await queue.claim('ABCDEFGH')).status, ClaimStatus.answered);

@@ -47,7 +47,8 @@ class ClaimOutcome {
 /// Why a retry ran (ADR 11.6); passed through to [PendingClaimQueue.onResolved] for logging.
 enum RetryTrigger { reconnect, appResume, tokenRefresh, signInChange, manual }
 
-/// Keeps a code that was claimed offline, or refused only as `not_verified`, and retries it (ADR 11.6).
+/// Keeps a code that was claimed offline, refused only as `not_verified`, or stored with [keep] before sign-in, and
+/// retries it (ADR 11.6). A retry keeps the code on `rate_limited` and `anonymous_user` too.
 ///
 /// The app calls [retryPendingClaim] on reconnect, app resume, auth token refresh and any sign-in change, or uses
 /// [PendingClaimRetrier] to wire those up. The claim window still applies: the server decides on every retry.
@@ -80,6 +81,20 @@ class PendingClaimQueue {
   Future<void> clear() async {
     await _store.remove(storageKey);
     await _store.remove(statusKey);
+  }
+
+  /// Keeps [code] without calling the server, for a code that arrived from an invite link or the Play install
+  /// referrer before the friend signed in. The next [retryPendingClaim] (sign-in, resume, reconnect) claims it.
+  ///
+  /// Returns false, and changes nothing, for a malformed code or when a code is already kept: the first code the
+  /// friend arrived with wins. Reports `invite_link_opened` for a kept code.
+  Future<bool> keep(String code, {String source = 'link'}) async {
+    final norm = normaliseCode(code);
+    if (!isWellFormedCode(norm) || await pendingCode() != null) return false;
+    await _store.setString(storageKey, norm);
+    await _store.setString(statusKey, 'kept');
+    _client.reportLinkOpened(norm);
+    return true;
   }
 
   /// Claims [code] now; keeps it when the call fails or the answer is `not_verified`. Reports `code_submitted`
@@ -118,7 +133,13 @@ class PendingClaimQueue {
   Future<ClaimOutcome> _retry(RetryTrigger trigger) async {
     final code = await pendingCode();
     if (code == null) return const ClaimOutcome(ClaimStatus.nothingPending);
-    final outcome = await _attempt(code);
+    var outcome = await _attempt(code);
+    final reason = outcome.result?.reason;
+    if (reason == ClaimReason.rateLimited || reason == ClaimReason.anonymousUser) {
+      // Not final for a kept code: the limit passes and a guest may still create an account. The user typed nothing
+      // this time, so dropping the code here would lose it without them ever seeing why.
+      outcome = ClaimOutcome(ClaimStatus.queuedOffline, code: code, result: outcome.result);
+    }
     if (!outcome.isQueued) {
       await clear();
       onResolved?.call(outcome, trigger);
