@@ -197,6 +197,19 @@ void main() {
       expect(find.text('Code added.'), findsOneWidget);
     });
 
+    testWidgets('a code kept from a link shows prefilled: one tap, no "back online" message', (tester) async {
+      await queue.keep('ABCDEFGH');
+      await tester.pumpWidget(entry());
+      await tester.pumpAndSettle();
+      expect(find.text('Use code ABCD-EFGH'), findsOneWidget);
+      expect(find.textContaining('back online'), findsNothing);
+      expect(rpc.names.where((n) => n == 'referral_claim'), isEmpty, reason: 'nothing claimed before the tap');
+      await tester.tap(find.text('Use code ABCD-EFGH'));
+      await tester.pumpAndSettle();
+      expect(rpc.names.where((n) => n == 'referral_claim'), hasLength(1));
+      expect(find.text('Code added.'), findsOneWidget);
+    });
+
     testWidgets('per-reason message: rate_limited with minutes', (tester) async {
       rpc.responses['referral_claim'] = {'reason': 'rate_limited', 'retry_after_seconds': 3541};
       await tester.pumpWidget(entry());

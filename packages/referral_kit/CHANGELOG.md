@@ -13,7 +13,12 @@ behaves as before.
   its `client` changes, so a reward granted while the app was in the background, or a card built before sign-in,
   appears without a restart. Each reward is reported as shown once.
 - New: `PendingClaimQueue.keep(code)` keeps a code from an invite link or the install referrer before sign-in,
-  without a server call; the retrier claims it on sign-in.
+  without a server call, and `linkCode()` / `clearLinkCode()`. It is never claimed by itself (one tap, ADR §4.2):
+  `InviteCodeEntry` without an `initialCode` shows it as "Use code …"; open code entry after sign-in when
+  `linkCode()` is not null.
+- New platforms: macOS, Windows and Linux (Dart only: the install id is kept in `flutter_secure_storage` alone, paste
+  is the field's menu, no install referrer). iOS supports Swift Package Manager (`ios/referral_kit/Package.swift`);
+  CocoaPods apps are unchanged. pana: 160/160.
 - Fix: a kept code was dropped when a retry was answered `rate_limited` (5 resumes in an hour while the friend
   verified their email) or `anonymous_user`. Retries now keep it. A typed code still gets the answer at once.
 - pub.dev: the `package:flutter/material.dart` import is kept with an ignore comment (Flutter 3.50 deprecates it in

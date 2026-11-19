@@ -149,6 +149,11 @@ class _InviteCodeEntryState extends State<InviteCodeEntry> {
   }
 
   Future<void> _loadKept() async {
+    // A code kept from a link before sign-in: offered for one tap, like `initialCode` (already reported as opened).
+    if (_prefilled == null) {
+      final link = await widget.queue.linkCode();
+      if (mounted && link != null && isWellFormedCode(link)) setState(() => _prefilled = link);
+    }
     final code = await widget.queue.pendingCode();
     final status = await widget.queue.pendingStatus();
     if (!mounted || code == null || status == null) return;

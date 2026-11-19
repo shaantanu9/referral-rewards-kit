@@ -42,10 +42,11 @@ Everything below passes its local tests and CI, but nothing has yet run against 
 
 - [ ] Release referral_kit 0.4.0 and rewards_kit 0.6.3 (tags, pub.dev); then move the docs' tag references
       (README, integration guide, fresh-app quickstart) from 0.3.1 / 0.6.1.
-- [ ] Apps: call `queue.keep(code)` on invite-link and install-referrer arrival; route `/i/<CODE>`; wire a retrier
+- [ ] Apps: call `queue.keep(code)` on invite-link and install-referrer arrival, open code entry after sign-in when
+      `queue.linkCode()` is set; route `/i/<CODE>`; wire a retrier
       with a sign-in stream (PostmeeAI has none); App Links `/i/` on Android; show `claimedCount` on Home.
-- [ ] iOS Swift Package Manager support for referral_kit (`ios/referral_kit/Package.swift`).
-- [ ] Built-in Kotlin for the Android plugin (drop `kotlin-android` / `kotlinOptions`).
+- [ ] Built-in Kotlin for the Android plugin (drop `kotlin-android` / `kotlinOptions`): needs the minimum raised to
+      Flutter 3.44 / Dart 3.12 first (owner decision; the apps build on 3.41.5).
 - [ ] Move to `package:material_ui` once the minimum Flutter is 3.47+.
 
 - [ ] Native-speaker review of the Hindi and Indonesian strings (`web/invite/strings.ts`, the package's ARB files).

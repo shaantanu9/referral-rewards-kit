@@ -75,23 +75,37 @@ void main() {
     expect(await queue.pendingCode(), isNull);
   });
 
-  test('keep: a link code is stored before sign-in without a call, then claimed on sign-in', () async {
+  test('keep: a link code is stored before sign-in and is never claimed without a tap (ADR 4.2 step 3)', () async {
     expect(await queue.keep('\u2066abcd-efgh\u2069', source: 'link'), isTrue);
-    expect(rpc.names, isEmpty, reason: 'nothing is sent while signed out');
-    expect(await queue.pendingCode(), 'ABCDEFGH');
-    expect(await queue.pendingStatus(), ClaimStatus.queuedOffline);
+    expect(rpc.names, isEmpty, reason: 'nothing is sent');
+    expect(await queue.linkCode(), 'ABCDEFGH');
+    expect(await queue.pendingCode(), isNull, reason: 'not in the retry queue');
+    expect(await queue.pendingStatus(), isNull);
     final r = await queue.retryPendingClaim(trigger: RetryTrigger.signInChange);
-    expect(r.result!.isOk, isTrue);
-    expect(rpc.names, ['referral_claim']);
-    expect(await queue.pendingCode(), isNull);
+    expect(r.status, ClaimStatus.nothingPending, reason: 'the retrier never claims a link code');
+    expect(rpc.names, isEmpty);
+    // The friend taps "Use code" on the entry screen: the normal claim, which clears the link code.
+    expect((await queue.claim('ABCDEFGH', source: 'prefilled')).result!.isOk, isTrue);
+    expect(await queue.linkCode(), isNull);
   });
 
-  test('keep ignores a malformed code and never replaces a kept one', () async {
+  test('keep ignores a malformed code and never replaces a kept one; a refused claim clears it', () async {
     expect(await queue.keep('nope'), isFalse);
-    expect(await queue.pendingCode(), isNull);
+    expect(await queue.linkCode(), isNull);
     expect(await queue.keep('ABCDEFGH'), isTrue);
     expect(await queue.keep('JKLMNPQR'), isFalse, reason: 'the first code the friend arrived with wins');
-    expect(await queue.pendingCode(), 'ABCDEFGH');
+    expect(await queue.linkCode(), 'ABCDEFGH');
+    rpc.responses['referral_claim'] = {'reason': 'own_code'};
+    await queue.claim('ABCDEFGH', source: 'prefilled');
+    expect(await queue.linkCode(), isNull, reason: 'answered: not offered again');
+  });
+
+  test('a link code survives an offline claim and moves into the retry queue', () async {
+    await queue.keep('ABCDEFGH');
+    rpc.error = Exception('offline');
+    expect((await queue.claim('ABCDEFGH', source: 'prefilled')).status, ClaimStatus.queuedOffline);
+    expect(await queue.pendingCode(), 'ABCDEFGH', reason: 'the friend tapped: now a normal kept claim');
+    expect(await queue.linkCode(), isNull);
   });
 
   test('a final refusal is not kept', () async {

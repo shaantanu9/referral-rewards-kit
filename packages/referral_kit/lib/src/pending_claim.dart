@@ -47,8 +47,8 @@ class ClaimOutcome {
 /// Why a retry ran (ADR 11.6); passed through to [PendingClaimQueue.onResolved] for logging.
 enum RetryTrigger { reconnect, appResume, tokenRefresh, signInChange, manual }
 
-/// Keeps a code that was claimed offline, refused only as `not_verified`, or stored with [keep] before sign-in, and
-/// retries it (ADR 11.6). A retry keeps the code on `rate_limited` and `anonymous_user` too.
+/// Keeps a code that was claimed offline or refused only as `not_verified`, and retries it (ADR 11.6). A retry keeps
+/// the code on `rate_limited` and `anonymous_user` too. Also holds a code from a link ([keep]) until the friend taps it.
 ///
 /// The app calls [retryPendingClaim] on reconnect, app resume, auth token refresh and any sign-in change, or uses
 /// [PendingClaimRetrier] to wire those up. The claim window still applies: the server decides on every retry.
@@ -65,6 +65,9 @@ class PendingClaimQueue {
 
   static const storageKey = 'pending_claim_code';
   static const statusKey = 'pending_claim_status';
+
+  /// Where [keep] stores a link code. Separate from [storageKey]: the retrier never sees it.
+  static const linkCodeKey = 'pending_claim_link_code';
   Future<ClaimOutcome>? _inFlight;
 
   /// The kept code, if any.
@@ -84,18 +87,25 @@ class PendingClaimQueue {
   }
 
   /// Keeps [code] without calling the server, for a code that arrived from an invite link or the Play install
-  /// referrer before the friend signed in. The next [retryPendingClaim] (sign-in, resume, reconnect) claims it.
+  /// referrer, often before the friend has signed in. It is **never claimed by itself**: a prefilled code needs one
+  /// tap after the friend has seen what the claim gives (ADR 0001 §4.2 step 3). `InviteCodeEntry` shows it as
+  /// "Use code …" when given no `initialCode`; after sign-in the app opens code entry when [linkCode] is not null.
   ///
-  /// Returns false, and changes nothing, for a malformed code or when a code is already kept: the first code the
-  /// friend arrived with wins. Reports `invite_link_opened` for a kept code.
+  /// Returns false, and changes nothing, for a malformed code or when a link code is already kept: the first code the
+  /// friend arrived with wins. Reports `invite_link_opened` for a kept code. Cleared by [claim].
   Future<bool> keep(String code, {String source = 'link'}) async {
     final norm = normaliseCode(code);
-    if (!isWellFormedCode(norm) || await pendingCode() != null) return false;
-    await _store.setString(storageKey, norm);
-    await _store.setString(statusKey, 'kept');
+    if (!isWellFormedCode(norm) || await linkCode() != null) return false;
+    await _store.setString(linkCodeKey, norm);
     _client.reportLinkOpened(norm);
     return true;
   }
+
+  /// The code kept by [keep] and not yet claimed, if any.
+  Future<String?> linkCode() => _store.getString(linkCodeKey);
+
+  /// Forgets the code kept by [keep] (e.g. the friend dismissed "Use code …").
+  Future<void> clearLinkCode() => _store.remove(linkCodeKey);
 
   /// Claims [code] now; keeps it when the call fails or the answer is `not_verified`. Reports `code_submitted`
   /// (`source`: `typed` | `pasted` | `prefilled` | the app's own) and then `code_claim_result` (`via`: [via]) through
@@ -109,6 +119,8 @@ class PendingClaimQueue {
     }
     final outcome = await _attempt(norm);
     if (!outcome.isQueued) await clear();
+    // Tapped: from here the code is a normal claim (kept for retry when offline), never offered as a link code again.
+    await clearLinkCode();
     _report(outcome, via);
     return outcome;
   }

@@ -209,9 +209,12 @@ final retrier = PendingClaimRetrier(queue: queue, signInChanges: ..., tokenRefre
   `InstallReferrerCodeReader` (Android).
 - **Keep a link code until the friend signs in** (0.4.0): the link or the install referrer usually arrives before
   there is a session. Call `await queue.keep(code)` the moment it arrives (it sends nothing, survives restarts, and
-  the first code wins), then let the retrier claim it on sign-in. Give the retrier a real `signInChanges` stream
-  (supabase_flutter: `client.auth.onAuthStateChange.where((s) => s.session != null)`), or nothing ever claims a kept
-  code. Read `InstallReferrerCodeReader` only to call `keep` with it: it remembers that the referrer was read.
+  the first code wins). It is never claimed by itself: a prefilled code needs one tap after the friend has seen what
+  the claim gives (ADR §4.2 step 3). After sign-in, when `await queue.linkCode() != null`, open code entry
+  (`InviteHub` with `initialSection: InviteHubSection.enterCode`, or `InviteCodeEntry`); it shows "Use code …"
+  without an `initialCode`. Read `InstallReferrerCodeReader` only to call `keep` with it: it remembers that the
+  referrer was read. The retrier (`PendingClaimRetrier`, with a real `signInChanges` stream) is still needed for
+  codes the friend tapped while offline.
 - **What the sharer sees** (0.4.0, server migration 18): `stats()` returns `claimedCount` (used the code, not started
   yet) and `joinedCount` from the first friend; `paidCount` stays hidden below `stats_floor`. Show them on Home too,
   not only on the invite screen, so a sharer sees that a friend used their link.
