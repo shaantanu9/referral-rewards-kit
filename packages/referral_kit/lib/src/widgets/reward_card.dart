@@ -1,5 +1,7 @@
 import 'dart:async';
 
+// material_ui needs Flutter 3.47+; kept until the minimum Flutter is raised.
+// ignore: deprecated_member_use
 import 'package:flutter/material.dart';
 
 import '../client.dart';
@@ -11,6 +13,10 @@ import 'code_text.dart';
 /// In-app card for rewards that landed (ADR 4.1 step 3, 4.2 step 5): reads `referral_pending` and calls
 /// `referral_ack` when the user dismisses one, so each device shows each card once. Shows nothing when there is
 /// nothing new or the call fails.
+///
+/// It asks again when the app comes back to the foreground and when it is given another [client], so a reward
+/// granted while the app was in the background, or a card built before the user signed in, still appears without a
+/// restart.
 class ReferralRewardCard extends StatefulWidget {
   const ReferralRewardCard({
     super.key,
@@ -53,26 +59,72 @@ class ReferralRewardCard extends StatefulWidget {
   State<ReferralRewardCard> createState() => _ReferralRewardCardState();
 }
 
-class _ReferralRewardCardState extends State<ReferralRewardCard> {
+class _ReferralRewardCardState extends State<ReferralRewardCard> with WidgetsBindingObserver {
   List<RewardItem> _items = const [];
+
+  /// Rewards already reported as shown by this card, so a reload does not report them again.
+  final Set<String> _shown = {};
+
+  /// Rewards dismissed here; kept hidden even if a reload races the ack.
+  final Set<String> _dismissed = {};
+  Future<void>? _loading;
+  int _generation = 0;
 
   @override
   void initState() {
     super.initState();
-    unawaited(_load());
+    WidgetsBinding.instance.addObserver(this);
+    _reload();
   }
 
-  Future<void> _load() async {
+  @override
+  void didUpdateWidget(ReferralRewardCard oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (!identical(oldWidget.client, widget.client)) {
+      _generation++;
+      _items = const [];
+      _shown.clear();
+      _dismissed.clear();
+      _loading = null;
+      _reload();
+    }
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) _reload();
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  void _reload() {
+    if (_loading != null) return;
+    final f = _load(_generation);
+    _loading = f;
+    unawaited(
+      f.whenComplete(() {
+        if (identical(_loading, f)) _loading = null;
+      }),
+    );
+  }
+
+  Future<void> _load(int generation) async {
     try {
-      final items = await widget.client.pending();
-      if (!mounted) return;
+      final all = await widget.client.pending();
+      if (!mounted || generation != _generation) return;
+      final items = all.where((r) => !_dismissed.contains(r.id)).toList(growable: false);
       setState(() => _items = items);
       for (final r in items) {
+        if (!_shown.add(r.id)) continue;
         _emit(ReferralEvent(ReferralEventName.rewardShown, rewardEventProps(r)));
         _safe(() => widget.onShown?.call(r));
       }
     } catch (_) {
-      // Nothing shown; the rewards stay pending on the server and appear next time.
+      // Nothing new shown; the rewards stay pending on the server and appear on the next resume or launch.
     }
   }
 
@@ -87,6 +139,7 @@ class _ReferralRewardCardState extends State<ReferralRewardCard> {
   }
 
   Future<void> _dismiss(RewardItem r) async {
+    _dismissed.add(r.id);
     setState(() => _items = _items.where((x) => x.id != r.id).toList());
     var acked = true;
     try {

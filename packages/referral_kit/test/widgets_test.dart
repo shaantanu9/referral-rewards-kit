@@ -82,10 +82,7 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.byKey(const ValueKey('referral-empty')), findsNothing);
       await tester.scrollUntilVisible(find.byKey(const ValueKey('referral-claimed')), 100);
-      expect(
-        find.text('1 friend used your code. Your reward comes when they start using the app.'),
-        findsOneWidget,
-      );
+      expect(find.text('1 friend used your code. Your reward comes when they start using the app.'), findsOneWidget);
       expect(find.byKey(const ValueKey('referral-joined')), findsNothing, reason: 'no "0 friends joined" line');
     });
 
