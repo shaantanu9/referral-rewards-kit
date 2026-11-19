@@ -15,13 +15,16 @@ select tests.ok(not exists (
 
 select tests.ok((select count(*) from pg_proc p join pg_namespace n on n.oid = p.pronamespace
                  where n.nspname = 'public' and p.proname like 'referral\_%' and p.proname not like 'referral\_svc\_%'
+                   and p.proname not like 'referral\_admin\_%'
                    and has_function_privilege('authenticated', p.oid, 'EXECUTE')) = 8,
-  'exactly eight client RPCs are callable by authenticated');
+  'exactly eight client RPCs are callable by authenticated (admin functions aside, migration 21)');
 
 -- The probe file, as an owner would run it on a live project.
 \ir ../probes/function_grants.sql
 select tests.ok((select count(*) from referral_function_grants where verdict = 'expected') = 8,
   'probe: the eight client RPCs are the only expected rows');
+select tests.ok((select count(*) from referral_function_grants where verdict = 'expected_admin') = 7,
+  'probe: the seven admin RPCs (migration 21) are expected, each checking the admin');
 select tests.ok(not exists (select 1 from referral_function_grants where verdict = 'kit_exposed'),
   'probe: no kit function is exposed after the migrations');
 select tests.ok(not exists (select 1 from referral_function_grants where role_name = 'anon'),

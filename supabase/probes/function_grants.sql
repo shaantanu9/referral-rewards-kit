@@ -6,6 +6,8 @@
 -- authenticated and service_role. So every helper an app or the kit creates is callable through PostgREST
 -- (`POST /rest/v1/rpc/<name>`) until someone revokes it. Expected result:
 --   verdict = 'expected'            the eight referral client RPCs, for authenticated only
+--   verdict = 'expected_admin'      a referral admin RPC (public.referral_admin_*) for authenticated: security definer
+--                                   with search_path = '' whose body calls referral.require_admin()
 --   verdict = 'expected_rewards'    a rewards RPC (public.rewards_*, not rewards_svc_*) for authenticated: security
 --                                   definer with search_path = '' (each checks auth.uid() / rewards.require_admin())
 --   verdict = 'kit_exposed'         a referral-kit or rewards function an API role can call that it must not: FIX NOW
@@ -31,7 +33,7 @@ fn as (
                      from unnest(p.proargtypes::oid[]) with ordinality as a(t, i)), '') || ')' as sig,
          (n.nspname in ('referral', 'referral_app', 'rewards', 'rewards_app')
           or (n.nspname = 'public' and (p.proname like 'referral\_%' or p.proname like 'rewards\_%'))) as kit,
-         p.proconfig
+         p.proconfig, p.prosrc
   from pg_catalog.pg_proc p join pg_catalog.pg_namespace n on n.oid = p.pronamespace
   where n.nspname in ('public', 'referral', 'referral_app', 'rewards', 'rewards_app')
     and p.prokind in ('f', 'p')
@@ -56,6 +58,9 @@ select c.sig as function_signature,
        c.prosecdef as security_definer,
        case
          when c.kit and c.role_name = 'authenticated' and c.sig in (select sig from client_rpcs) then 'expected'
+         when c.kit and c.role_name = 'authenticated' and c.nspname = 'public' and c.proname like 'referral\_admin\_%'
+              and c.prosecdef and coalesce(c.proconfig @> array['search_path=""'], false)
+              and position('referral.require_admin()' in c.prosrc) > 0 then 'expected_admin'
          when c.kit and c.role_name = 'authenticated' and c.nspname = 'public' and c.proname like 'rewards\_%'
               and c.proname not like 'rewards\_svc\_%' and c.prosecdef
               and coalesce(c.proconfig @> array['search_path=""'], false) then 'expected_rewards'
@@ -66,5 +71,5 @@ select c.sig as function_signature,
 from callable c;
 
 select * from referral_function_grants
-where verdict not in ('expected', 'expected_rewards')
+where verdict not in ('expected', 'expected_admin', 'expected_rewards')
 order by case verdict when 'kit_exposed' then 0 when 'app_definer_exposed' then 1 else 2 end, function_signature, role_name;
