@@ -1,3 +1,5 @@
+// material_ui needs Flutter 3.47+; kept until the minimum Flutter is raised.
+// ignore: deprecated_member_use
 import 'package:flutter/material.dart';
 
 import '../controller.dart';
@@ -120,51 +122,58 @@ class _FollowupSettingsState extends State<FollowupSettings> {
     final x = widget.texts.followups;
     final p = _prefs;
     final muted = t.bodyStyle?.copyWith(color: t.muted);
-    return Container(
-      decoration: t.card,
-      padding: t.padding,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(x.title, style: t.titleStyle),
-          if (p == null && _loading)
-            const Padding(padding: EdgeInsets.symmetric(vertical: 12), child: LinearProgressIndicator()),
-          if (p != null) ...[
-            SwitchListTile(
-              contentPadding: EdgeInsets.zero,
-              title: Text(x.reminders, style: t.bodyStyle),
-              subtitle: Text(x.remindersHint, style: muted),
-              value: !p.notificationsOff,
-              onChanged: (on) => _save({FollowupPrefs.notificationsOffKey: !on}),
-            ),
-            for (final g in p.groups)
-              SwitchListTile(
-                contentPadding: const EdgeInsetsDirectional.only(start: 24),
-                dense: true,
-                title: Text(g.label, style: t.bodyStyle),
-                value: !g.muted,
-                onChanged: p.notificationsOff ? null : (on) => _save(p.groupMutedPatch(g.group, !on)),
-              ),
-            if (widget.showEmails)
+    // A Material, not a decorated Container: the list tiles paint their background and ink on the nearest
+    // Material, and Flutter 3.50 asserts when a coloured DecoratedBox sits between them.
+    final card = t.card;
+    return Material(
+      color: card.color,
+      shape: RoundedRectangleBorder(borderRadius: card.borderRadius ?? BorderRadius.zero),
+      clipBehavior: Clip.antiAlias,
+      child: Padding(
+        padding: t.padding ?? EdgeInsets.zero,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(x.title, style: t.titleStyle),
+            if (p == null && _loading)
+              const Padding(padding: EdgeInsets.symmetric(vertical: 12), child: LinearProgressIndicator()),
+            if (p != null) ...[
               SwitchListTile(
                 contentPadding: EdgeInsets.zero,
-                title: Text(x.emails, style: t.bodyStyle),
-                subtitle: Text(x.emailsHint, style: muted),
-                value: !p.emailsOff,
-                onChanged: (on) => _save({FollowupPrefs.emailsOffKey: !on}),
+                title: Text(x.reminders, style: t.bodyStyle),
+                subtitle: Text(x.remindersHint, style: muted),
+                value: !p.notificationsOff,
+                onChanged: (on) => _save({FollowupPrefs.notificationsOffKey: !on}),
               ),
-            ListTile(
-              contentPadding: EdgeInsets.zero,
-              enabled: !p.notificationsOff,
-              title: Text(x.reminderTime, style: t.bodyStyle),
-              trailing: Text(p.reminderTime?.format(context) ?? x.reminderTimeDefault, style: muted),
-              onTap: () => _pickTime(p),
-            ),
+              for (final g in p.groups)
+                SwitchListTile(
+                  contentPadding: const EdgeInsetsDirectional.only(start: 24),
+                  dense: true,
+                  title: Text(g.label, style: t.bodyStyle),
+                  value: !g.muted,
+                  onChanged: p.notificationsOff ? null : (on) => _save(p.groupMutedPatch(g.group, !on)),
+                ),
+              if (widget.showEmails)
+                SwitchListTile(
+                  contentPadding: EdgeInsets.zero,
+                  title: Text(x.emails, style: t.bodyStyle),
+                  subtitle: Text(x.emailsHint, style: muted),
+                  value: !p.emailsOff,
+                  onChanged: (on) => _save({FollowupPrefs.emailsOffKey: !on}),
+                ),
+              ListTile(
+                contentPadding: EdgeInsets.zero,
+                enabled: !p.notificationsOff,
+                title: Text(x.reminderTime, style: t.bodyStyle),
+                trailing: Text(p.reminderTime?.format(context) ?? x.reminderTimeDefault, style: muted),
+                onTap: () => _pickTime(p),
+              ),
+            ],
+            if (_reason != null) Text(widget.texts.error(_reason!), style: t.bodyStyle?.copyWith(color: t.warning)),
+            if (p == null && !_loading && _reason != null) TextButton(onPressed: _load, child: Text(x.retry)),
           ],
-          if (_reason != null) Text(widget.texts.error(_reason!), style: t.bodyStyle?.copyWith(color: t.warning)),
-          if (p == null && !_loading && _reason != null) TextButton(onPressed: _load, child: Text(x.retry)),
-        ],
+        ),
       ),
     );
   }
