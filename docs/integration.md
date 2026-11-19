@@ -74,7 +74,7 @@ supabase secrets set --project-ref <ref> REVENUECAT_SECRET_KEY=... REVENUECAT_PR
 
 ## 3. Database: the kit's migrations
 
-Copy every `supabase/migrations/202611*_referral_*.sql` (fourteen files in 0.4.0: ten in 0.3.0, 17 and 18–20 since) into the app's `supabase/migrations/`
+Copy every `supabase/migrations/202611*_referral_*.sql` (fifteen files in 0.4.0: ten in 0.3.0, 17 and 18–21 since) into the app's `supabase/migrations/`
 in order, renumbered after the app's own latest migration if needed (never reordered, never edited). Before applying
 to a live project: read `supabase_migrations.schema_migrations` for the next free version, run
 [`supabase/probes/function_grants.sql`](../supabase/probes/function_grants.sql) to see what the app already exposes,
@@ -163,6 +163,15 @@ $$);
 The worker logs one JSON line of alerts per run (`failed_rewards`, `failed_events`, `sharers_under_review`,
 `privacy_problems`, `daily_cap_reached`, `starts_given_up` once when events stop waiting for a start; `starts.not_found`
 stays in the response, not as an alert). Route the function logs to wherever the owner looks.
+
+## 7b. Admin: see every referral
+
+Migration 21 adds `public.referral_admin_*` (overview, every referral with both people's emails, a person by email /
+id / code, failing rewards with retry, re-check activation, a log). Each checks
+`referral_app.app_referral_is_admin(auth.uid())`; the default reads `rewards.admins`, so with the rewards kit an admin
+is `insert into rewards.admins (user_id) values ('<auth user id>');`. Without the rewards kit, replace the hook. Open
+the admin page (`web/rewards-admin`, section Referrals) with the project's URL and anon key and sign in with that
+account. `privacy_problems()` reports any `referral_admin_*` function that does not call `referral.require_admin()`.
 
 ## 8. Invite page and app links (optional at first)
 

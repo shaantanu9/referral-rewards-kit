@@ -1,11 +1,11 @@
 # Rewards admin page
 
-Updated: 2026-11-14\
+Updated: 2026-11-19\
 The dashboard for the rewards engine: overview, programs and rules, quiz bank, user lookup, Instagram review, failed
 rewards, settings (incl. the ads switch), copy a setup between apps, audit log. Static files, no build step, on the
 admin API ([rewards-api.md §2–7](../../docs/rewards-api.md)).
 
-Status: **tested locally in demo mode (12 Deno tests; every section and action clicked through in Chromium at desktop
+Status: **tested locally in demo mode (22 Deno tests; Referrals section clicked through 2026-11-19; every section and action clicked through in Chromium at desktop
 and phone width, no console errors); never run against a live project.**
 
 ## Try it now (no project)
@@ -26,6 +26,9 @@ a busy machine during testing.
    `Content-Security-Policy: frame-ancestors 'none'` (a meta tag cannot) and `X-Content-Type-Options: nosniff`.
 2. Make the first admin, once, in the SQL editor: `insert into rewards.admins (user_id) values ('<your auth user id>');`
    More admins later from the API (`rewards_admin_set_admin`).
+   The Referrals section uses the same list: referral kit migration 21 reads `rewards.admins` through the hook
+   `referral_app.app_referral_is_admin` (replace it in an app without the rewards kit). It shows people's emails, so
+   only add accounts that may see them.
 3. Open the page, enter the project URL and the **anon / publishable** key (the page refuses a service-role or secret
    key), sign in with the email code. Only accounts in `rewards.admins` get past the sign-in; every admin function
    checks that itself, so the public key alone opens nothing.
@@ -35,6 +38,7 @@ a busy machine during testing.
 | Section    | Calls                                                                                    | Notes                                                                |
 | ---------- | ---------------------------------------------------------------------------------------- | -------------------------------------------------------------------- |
 | Overview   | `rewards_admin_analytics`                                                                | 7 / 30 / 90 days; counts only                                        |
+| Referrals  | `referral_admin_overview`, `_referrals`, `_user`, `_rewards`, `_retry_reward`, `_check_activation`, `_log` | Referral kit migration 21. Every referral with both people's emails, states, dates and rewards; search by email, id or code; a person's page; failing rewards with Retry now |
 | Programs   | `rewards_admin_config`, `save_program`, `add_rule`, `set_rule_active`, `save_event_type` | New programs start switched off; rules are added, never edited       |
 | Quiz bank  | `rewards_admin_quiz_list`, `quiz_save`, `quiz_stats`                                     | Add one, edit, hide, paste many as CSV; hardest questions            |
 | Users      | `rewards_admin_user`, `rewards_admin_track`, `rewards_admin_grant`                       | Test events; give a reward (note goes to the audit log)              |

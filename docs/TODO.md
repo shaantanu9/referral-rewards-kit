@@ -23,6 +23,8 @@ Everything below passes its local tests and CI, but nothing has yet run against 
 - [ ] Follow-ups on a phone (local notifications, replan after activity), one real Resend email with the unsubscribe
       link, a branded template in Gmail and Apple Mail.
 - [ ] The admin page against a live project (only its demo backend has been clicked through).
+- [ ] Referrals admin on a live project: apply migration 21, add yourself to `rewards.admins`, check a real referral
+      shows both emails and a failed reward retries.
 - [ ] Widgets on a phone: invite hub, reward card, surprise reveal (animation, haptic, reduced motion), league board,
       recap card, the share `channel` on iOS and Android.
 - [ ] Instagram: the Meta webhook (mentions, comments, story mentions) with real payloads.
