@@ -76,6 +76,29 @@ void main() {
       expect(find.textContaining('No invites yet.'), findsOneWidget);
     });
 
+    testWidgets('the sharer sees a friend who used the code before they start (no empty state)', (tester) async {
+      final one = {...statsJson(empty: true), 'claimed_count': 1, 'joined_count': 0};
+      await tester.pumpWidget(screen(FakeRpc({'referral_stats': one})));
+      await tester.pumpAndSettle();
+      expect(find.byKey(const ValueKey('referral-empty')), findsNothing);
+      await tester.scrollUntilVisible(find.byKey(const ValueKey('referral-claimed')), 100);
+      expect(
+        find.text('1 friend used your code. Your reward comes when they start using the app.'),
+        findsOneWidget,
+      );
+      expect(find.byKey(const ValueKey('referral-joined')), findsNothing, reason: 'no "0 friends joined" line');
+    });
+
+    testWidgets('the sharer sees their first joined friend', (tester) async {
+      final one = {...statsJson(empty: true), 'claimed_count': 0, 'joined_count': 1};
+      await tester.pumpWidget(screen(FakeRpc({'referral_stats': one})));
+      await tester.pumpAndSettle();
+      expect(find.byKey(const ValueKey('referral-empty')), findsNothing);
+      await tester.scrollUntilVisible(find.text('1 friend joined'), 100);
+      expect(find.text('1 friend joined'), findsOneWidget);
+      expect(find.byKey(const ValueKey('referral-claimed')), findsNothing);
+    });
+
     testWidgets('paused state keeps earned rewards visible', (tester) async {
       await tester.pumpWidget(screen(FakeRpc({'referral_terms': termsJson(enabled: false)})));
       await tester.pumpAndSettle();

@@ -273,13 +273,18 @@ class RewardItem {
   final Map<String, Object?> params;
 }
 
-/// `referral_stats`. Counts are null below the server's `stats_floor`.
+/// `referral_stats`.
+///
+/// [claimedCount] and [joinedCount] come from server migration 18 and are null from an older server. [paidCount] is
+/// null below the server's `stats_floor` (it would reveal one friend's purchase). An older server also sends
+/// [joinedCount] only from `stats_floor` joined friends.
 class ReferralStats {
   const ReferralStats({
     required this.rewardsGranted,
     required this.pending,
     required this.banked,
     required this.skippedCap,
+    this.claimedCount,
     this.joinedCount,
     this.paidCount,
   });
@@ -293,6 +298,7 @@ class ReferralStats {
       pending: list('pending'),
       banked: list('banked'),
       skippedCap: _int(m['skipped_cap']) ?? 0,
+      claimedCount: _int(m['claimed_count']),
       joinedCount: _int(m['joined_count']),
       paidCount: _int(m['paid_count']),
     );
@@ -304,8 +310,22 @@ class ReferralStats {
   final List<RewardItem> pending;
   final List<RewardItem> banked;
   final int skippedCap;
+
+  /// Friends who used the code and have not started using the app yet (still inside the activation window).
+  final int? claimedCount;
+
+  /// Friends who started using the app with the code.
   final int? joinedCount;
+
+  /// Joined friends who bought; null below `stats_floor`.
   final int? paidCount;
 
-  bool get isEmpty => rewardsGranted.isEmpty && pending.isEmpty && banked.isEmpty && skippedCap == 0;
+  /// True when there is nothing to show yet: no friend used the code and no reward exists.
+  bool get isEmpty =>
+      rewardsGranted.isEmpty &&
+      pending.isEmpty &&
+      banked.isEmpty &&
+      skippedCap == 0 &&
+      (claimedCount ?? 0) == 0 &&
+      (joinedCount ?? 0) == 0;
 }

@@ -165,6 +165,12 @@ abstract class ReferralKitLocalizations {
   /// **'{count, plural, =1{1 friend joined} other{{count} friends joined}}'**
   String joinedCount(int count);
 
+  /// Friends who used the sharer's code and have not started using the app yet.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 friend used your code. Your reward comes when they start using the app.} other{{count} friends used your code. Your rewards come when they start using the app.}}'**
+  String claimedCount(int count);
+
   /// No description provided for @rulesJoinedEach.
   ///
   /// In en, this message translates to:

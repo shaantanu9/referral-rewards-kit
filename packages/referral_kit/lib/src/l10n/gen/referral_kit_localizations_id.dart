@@ -55,6 +55,16 @@ class ReferralKitLocalizationsId extends ReferralKitLocalizations {
   }
 
   @override
+  String claimedCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count teman memakai kode Anda. Hadiah Anda datang setelah mereka mulai memakai aplikasi.',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String rulesJoinedEach(String reward) {
     return 'Anda dan teman masing-masing mendapat $reward saat mereka mendaftar dan mulai memakai aplikasi.';
   }

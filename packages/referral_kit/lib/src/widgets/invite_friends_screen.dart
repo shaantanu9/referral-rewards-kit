@@ -314,8 +314,13 @@ class _InviteFriendsScreenState extends State<InviteFriendsScreen> {
     if (!paused && code != null && s.isEmpty && !d.offline) {
       children.addAll([gap, Text(copy.emptyState(), key: const ValueKey('referral-empty'))]);
     }
-    if (s.joinedCount != null) {
-      children.addAll([gap, Text(l10n.joinedCount(s.joinedCount!), key: const ValueKey('referral-joined'))]);
+    final joined = s.joinedCount ?? 0;
+    if (joined > 0) {
+      children.addAll([gap, Text(l10n.joinedCount(joined), key: const ValueKey('referral-joined'))]);
+    }
+    final claimed = s.claimedCount ?? 0;
+    if (claimed > 0) {
+      children.addAll([gap, Text(l10n.claimedCount(claimed), key: const ValueKey('referral-claimed'))]);
     }
     if (s.rewardsGranted.isNotEmpty) {
       children.addAll([gap, Text(l10n.rewardsEarned, style: theme.textTheme.titleSmall)]);

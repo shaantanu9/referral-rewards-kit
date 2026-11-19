@@ -113,7 +113,12 @@ void main() {
     expect(s.paidCount, 1);
     final empty = ReferralStats.fromJson(statsJson(empty: true));
     expect(empty.isEmpty, isTrue);
-    expect(empty.joinedCount, isNull, reason: 'null below stats_floor');
+    expect(empty.joinedCount, isNull, reason: 'an older server sends null below stats_floor');
+    expect(empty.claimedCount, isNull, reason: 'an older server has no claimed_count');
+    final waiting = ReferralStats.fromJson({...statsJson(empty: true), 'claimed_count': 1, 'joined_count': 0});
+    expect(waiting.claimedCount, 1);
+    expect(waiting.joinedCount, 0);
+    expect(waiting.isEmpty, isFalse, reason: 'a friend who used the code is something to show');
   });
 
   test('pending and ack', () async {

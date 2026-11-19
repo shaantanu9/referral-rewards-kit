@@ -12,6 +12,7 @@
   "bankedItem": "{reward}, ditambahkan saat paket Anda saat ini berakhir.",
   "skippedCap": "{count, plural, other{{count} hadiah melebihi batas}}",
   "joinedCount": "{count, plural, other{{count} teman bergabung}}",
+  "claimedCount": "{count, plural, other{{count} teman memakai kode Anda. Hadiah Anda datang setelah mereka mulai memakai aplikasi.}}",
   "rulesJoinedEach": "Anda dan teman masing-masing mendapat {reward} saat mereka mendaftar dan mulai memakai aplikasi.",
   "rulesJoinedBoth": "Anda mendapat {sharerReward} dan teman Anda mendapat {friendReward} saat mereka mendaftar dan mulai memakai aplikasi.",
   "rulesJoinedSharerOnly": "Anda mendapat {reward} saat teman yang Anda undang mendaftar dan mulai memakai aplikasi.",

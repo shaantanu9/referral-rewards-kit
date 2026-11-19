@@ -85,11 +85,11 @@ select tests.ok(referral.activation_sweep() = 1, 'sweep handles the one claimed 
 select tests.ok((select state from referral.referrals where friend_id = pg_temp.uid('f12')) = 'expired',
                 'sweep expires a claim not activated in 30 days, even with activity');
 
--- stats: counts shown only from stats_floor (3) joined friends
+-- stats: joined count from the first friend, paid count only from stats_floor (3) (migration 18)
 select tests.ok((referral.stats(pg_temp.uid('sharer')) ->> 'joined_count')::int = 11 and
                 jsonb_array_length(referral.stats(pg_temp.uid('sharer')) -> 'rewards_granted') = 10 and
                 (referral.stats(pg_temp.uid('sharer')) ->> 'skipped_cap')::int = 1, 'stats for the sharer');
-select tests.ok(referral.stats(pg_temp.uid('f1')) -> 'joined_count' = 'null'::jsonb, 'no counts below the floor');
+select tests.ok(referral.stats(pg_temp.uid('f1')) -> 'paid_count' = 'null'::jsonb, 'no paid count below the floor');
 
 -- pending / ack per device
 select tests.ok(jsonb_array_length(referral.pending(pg_temp.uid('f1'), 'f1-phone-0000001')) = 1, 'friend has one card to show on a phone');
