@@ -13,7 +13,7 @@ Invite-friends screens and invite-code entry for referral-kit. iOS side: the UIP
   s.license          = { :file => '../LICENSE' }
   s.author           = { 'referral-kit contributors' => 'noreply@example.com' }
   s.source           = { :path => '.' }
-  s.source_files = 'Classes/**/*'
+  s.source_files = 'referral_kit/Sources/referral_kit/**/*.swift'
   s.dependency 'Flutter'
   s.platform = :ios, '15.0'
 
@@ -25,5 +25,5 @@ Invite-friends screens and invite-code entry for referral-kit. iOS side: the UIP
   # required reason APIs, update the PrivacyInfo.xcprivacy file to describe your
   # plugin's privacy impact, and then uncomment this line. For more information,
   # see https://developer.apple.com/documentation/bundleresources/privacy_manifest_files
-  s.resource_bundles = {'referral_kit_privacy' => ['Resources/PrivacyInfo.xcprivacy']}
+  s.resource_bundles = {'referral_kit_privacy' => ['referral_kit/Sources/referral_kit/PrivacyInfo.xcprivacy']}
 end

@@ -54,3 +54,12 @@ flutter:
         pluginClass: ReferralKitPlugin
       ios:
         pluginClass: ReferralKitPlugin
+      macos:
+        dartPluginClass: ReferralKitDesktop
+        dartFileName: src/desktop_plugin.dart
+      windows:
+        dartPluginClass: ReferralKitDesktop
+        dartFileName: src/desktop_plugin.dart
+      linux:
+        dartPluginClass: ReferralKitDesktop
+        dartFileName: src/desktop_plugin.dart
