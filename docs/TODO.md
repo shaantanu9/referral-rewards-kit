@@ -1,9 +1,13 @@
 # To do
 
-Updated: 2026-11-15
+Updated: 2026-11-19
 What is planned and not built yet, and what has not been proven outside tests. Build order: [build-plan.md](build-plan.md). Known problems: [ISSUES.md](ISSUES.md).
 
 ## Proof on the real thing
+
+- [ ] Apply migrations 18–20 to each app's live project (renumbered after its latest), then on two phones: A shares,
+      B signs up with the link → A's invite screen and Home show "1 friend used your code" at once; B starts → A sees
+      "1 friend joined" and the reward card on the next resume.
 
 Everything below passes its local tests and CI, but nothing has yet run against a live Supabase project, real RevenueCat, or a phone.
 
@@ -33,6 +37,14 @@ Everything below passes its local tests and CI, but nothing has yet run against 
 - [ ] Apple privacy label and Play Data safety wording (`docs/store-review.md` §4–5) [unconfirmed].
 
 ## Planned
+
+- [ ] Release referral_kit 0.4.0 and rewards_kit 0.6.3 (tags, pub.dev); then move the docs' tag references
+      (README, integration guide, fresh-app quickstart) from 0.3.1 / 0.6.1.
+- [ ] Apps: call `queue.keep(code)` on invite-link and install-referrer arrival; route `/i/<CODE>`; wire a retrier
+      with a sign-in stream (PostmeeAI has none); App Links `/i/` on Android; show `claimedCount` on Home.
+- [ ] iOS Swift Package Manager support for referral_kit (`ios/referral_kit/Package.swift`).
+- [ ] Built-in Kotlin for the Android plugin (drop `kotlin-android` / `kotlinOptions`).
+- [ ] Move to `package:material_ui` once the minimum Flutter is 3.47+.
 
 - [ ] Native-speaker review of the Hindi and Indonesian strings (`web/invite/strings.ts`, the package's ARB files).
 - [ ] More languages for `packages/referral_kit`.

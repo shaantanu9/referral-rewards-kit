@@ -74,7 +74,7 @@ supabase secrets set --project-ref <ref> REVENUECAT_SECRET_KEY=... REVENUECAT_PR
 
 ## 3. Database: the kit's migrations
 
-Copy every `supabase/migrations/2026111*_referral_*.sql` (ten files in 0.3.0) into the app's `supabase/migrations/`
+Copy every `supabase/migrations/202611*_referral_*.sql` (fourteen files in 0.4.0: ten in 0.3.0, 17 and 18–20 since) into the app's `supabase/migrations/`
 in order, renumbered after the app's own latest migration if needed (never reordered, never edited). Before applying
 to a live project: read `supabase_migrations.schema_migrations` for the next free version, run
 [`supabase/probes/function_grants.sql`](../supabase/probes/function_grants.sql) to see what the app already exposes,
@@ -198,6 +198,16 @@ final retrier = PendingClaimRetrier(queue: queue, signInChanges: ..., tokenRefre
   `initialSection: InviteHubSection.enterCode` from code entry points (a "Got a code from a friend?" row, a Home
   nudge, an invite link). Pass `initialCode` from the link (`/i/<CODE>` → your route's `?code=`) or from
   `InstallReferrerCodeReader` (Android).
+- **Keep a link code until the friend signs in** (0.4.0): the link or the install referrer usually arrives before
+  there is a session. Call `await queue.keep(code)` the moment it arrives (it sends nothing, survives restarts, and
+  the first code wins), then let the retrier claim it on sign-in. Give the retrier a real `signInChanges` stream
+  (supabase_flutter: `client.auth.onAuthStateChange.where((s) => s.session != null)`), or nothing ever claims a kept
+  code. Read `InstallReferrerCodeReader` only to call `keep` with it: it remembers that the referrer was read.
+- **What the sharer sees** (0.4.0, server migration 18): `stats()` returns `claimedCount` (used the code, not started
+  yet) and `joinedCount` from the first friend; `paidCount` stays hidden below `stats_floor`. Show them on Home too,
+  not only on the invite screen, so a sharer sees that a friend used their link.
+- **Rewards on Home**: `ReferralRewardCard` asks again on app resume and when given another client (0.4.0); give it a
+  `ValueKey(userId)` so a sign-out and sign-in as someone else starts clean.
 - **Invite base URL**: `inviteLink: (code) => Uri.parse('https://<site>/i/$code')`, the same host as the app links;
   `storeLink` for the time before the page exists; `onOpenTerms` opens `https://<site>/terms`.
 - **Your words**: `labels` / `labelsBuilder` name your reward kinds ("4 free chapters"); `texts: ReferralTexts(...)`

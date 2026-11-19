@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.6.3 (2026-11-19)
+
+- Fix: on Flutter 3.50, `FollowupSettings` threw "ListTile background color or ink splashes may be invisible" in
+  debug (and showed no tap ripple in release). Its card is now a `Material` with the same colour and radius.
+- pub.dev: the `package:flutter/material.dart` import is kept with an ignore comment (Flutter 3.50 deprecates it in
+  favour of `material_ui`, which needs Flutter 3.47+; this package supports 3.38+).
+
 ## 0.6.2 (2026-11-15)
 
 - Homepage: https://www.myind.ai. The admin dashboard screenshot is on the package page. No code changes.

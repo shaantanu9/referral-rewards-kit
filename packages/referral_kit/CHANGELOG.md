@@ -1,5 +1,24 @@
 # Changelog
 
+## 0.4.0 (2026-11-19)
+
+Needs server migrations 18–20 (`supabase/migrations/20261119*`); without 18 the new counts are null and the screen
+behaves as before.
+
+- Fix: the person who shared a link saw nothing after a friend signed up with it. `ReferralStats.claimedCount`
+  (friends who used the code and have not started yet) and `joinedCount` from the first friend; the invite screen
+  says "1 friend used your code. Your reward comes when they start using the app." `paidCount` still needs
+  `stats_floor` joined friends. `ReferralStats.isEmpty` is false once a friend used the code.
+- Fix: `ReferralRewardCard` read the pending rewards only when first built. It now asks again on app resume and when
+  its `client` changes, so a reward granted while the app was in the background, or a card built before sign-in,
+  appears without a restart. Each reward is reported as shown once.
+- New: `PendingClaimQueue.keep(code)` keeps a code from an invite link or the install referrer before sign-in,
+  without a server call; the retrier claims it on sign-in.
+- Fix: a kept code was dropped when a retry was answered `rate_limited` (5 resumes in an hour while the friend
+  verified their email) or `anonymous_user`. Retries now keep it. A typed code still gets the answer at once.
+- pub.dev: the `package:flutter/material.dart` import is kept with an ignore comment (Flutter 3.50 deprecates it in
+  favour of `material_ui`, which needs Flutter 3.47+; this package supports 3.38+).
+
 ## 0.3.2 (2026-11-15)
 
 - Homepage: https://www.myind.ai. No code changes.

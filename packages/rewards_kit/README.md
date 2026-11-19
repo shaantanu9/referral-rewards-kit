@@ -22,7 +22,7 @@ The admin dashboard that comes with it (`web/rewards-admin`, a static page):
 
 <img src="https://raw.githubusercontent.com/shaantanu9/referral-rewards-kit/main/packages/rewards_kit/screenshots/08-admin-dashboard.png" width="820" alt="Rewards admin dashboard">
 
-Status: **0.6.2, tested with fakes (`flutter test`); not yet run against a live project or on a phone.** It
+Status: **0.6.3, tested with fakes (`flutter test`); not yet run against a live project or on a phone.** It
 matches the server in `supabase/migrations/*_rewards_*` (ADR 0002 §18; SQL tests 13–28); the 0.4 / 0.5 follow-up calls
 match the contract in ADR 0002 §18.7 and §18.8.
 
