@@ -9,9 +9,11 @@ import { renderQuiz } from "./view_quiz.js";
 import { renderCopySetup, renderSettings } from "./view_setup.js";
 import { renderFollowups, renderRetention } from "./view_followups.js";
 import { renderLeagues } from "./view_leagues.js";
+import { renderReferrals } from "./view_referrals.js";
 
 const SECTIONS = [
   ["overview", "Overview", renderOverview],
+  ["referrals", "Referrals", renderReferrals],
   ["programs", "Programs", renderPrograms],
   ["quiz", "Quiz bank", renderQuiz],
   ["leagues", "Leagues", renderLeagues],

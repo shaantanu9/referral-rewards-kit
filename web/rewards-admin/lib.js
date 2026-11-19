@@ -105,10 +105,10 @@ export function summarizeChanges(changes) {
 /** The server's `rewards: <reason>` as a sentence for the admin. */
 export function reasonText(err) {
   const msg = String(err?.message ?? err ?? "");
-  const m = msg.match(/rewards: ([a-z_]+)(.*)/);
+  const m = msg.match(/(?:rewards|referral): ([a-z_]+)(.*)/);
   const reason = m ? m[1] : null;
   const known = {
-    not_admin: "This account is not an admin of rewards. Ask an admin to add it (rewards_admin_set_admin).",
+    not_admin: "This account is not an admin. Ask an admin to add it (rewards_admin_set_admin).",
     not_signed_in: "Signed out. Sign in again.",
     unknown_setting: `Unknown setting${m?.[2] ?? ""}.`,
     unknown_program: "No such program.",
@@ -124,9 +124,11 @@ export function reasonText(err) {
     bad_kind: "The kind is a lower-case name such as coins (a mystery cannot be given by hand).",
   };
   if (reason && known[reason]) return known[reason];
-  if (reason) return msg.slice(msg.indexOf("rewards:"));
+  if (reason) return msg.slice(m.index);
   if (/PGRST202|Could not find the function/.test(msg)) {
-    return "The rewards functions are not on this project yet (apply the migrations).";
+    return /referral_admin_/.test(msg)
+      ? "The referral admin functions are not on this project yet (apply referral migration 21)."
+      : "The rewards functions are not on this project yet (apply the migrations).";
   }
   if (/Failed to fetch|NetworkError/.test(msg)) return "Cannot reach the project. Check the URL and your connection.";
   return msg || "Something went wrong.";
@@ -350,4 +352,64 @@ export function leagueWeekLine(w) {
     if (w.promoted || w.demoted) parts.push(`${w.promoted} up, ${w.demoted} down`);
   }
   return parts.join(" · ");
+}
+
+// Referrals (migration 21) -------------------------------------------------------------------------------------------
+
+/** What each referral state means, for a person reading the list. */
+export const REFERRAL_STATES = {
+  claimed: ["Used the code", "warn", "The friend signed up with the code and has not started yet."],
+  joined: ["Joined", "ok", "The friend started using the app; joined rewards were queued."],
+  paid: ["Subscribed", "ok", "The friend bought; the sharer's paid reward is held, then granted."],
+  paid_cancelled: ["Purchase cancelled", "bad", "Refunded or transferred after the purchase."],
+  expired: ["Expired", "off", "The friend did not start within the activation window."],
+  refunded_late: ["Refunded late", "bad", "Refunded after the reward was granted (an abuse mark)."],
+  void: ["Void", "off", "Cancelled for fraud or by an admin."],
+};
+
+export function referralState(state) {
+  const [label, kind, hint] = REFERRAL_STATES[state] ?? [String(state ?? "–"), "off", ""];
+  return { label, kind, hint };
+}
+
+/** Reward state as a chip: granted ok; failed bad; waiting warn; the rest off. */
+export function rewardChip(state) {
+  if (state === "granted" || state === "banked") return "ok";
+  if (state === "failed" || state === "failed_retryable") return "bad";
+  if (state === "queued" || state === "granting") return "warn";
+  return "off";
+}
+
+/** "30 minutes to the sharer", for a reward row. */
+export function rewardLine(w) {
+  const who = w?.who === "sharer" ? "sharer" : "friend";
+  const kind = String(w?.kind ?? "").replace(/_/g, " ");
+  return `${fmtNum(w?.amount)} ${kind} to the ${who} (${w?.event ?? "?"})`;
+}
+
+/** Claimed → joined → paid in the period, with the share that moved on. */
+export function referralFunnel(o) {
+  const t = o?.totals ?? {};
+  const claimed = Number(t.claimed_in_window ?? 0);
+  const joined = Number(t.joined_in_window ?? 0);
+  const paid = Number(t.paid_in_window ?? 0);
+  const rate = (a, b) => (b > 0 ? a / b : null);
+  return [
+    { step: "Used a code", n: claimed, rate: null },
+    { step: "Started using the app", n: joined, rate: rate(joined, claimed) },
+    { step: "Subscribed", n: paid, rate: rate(paid, joined) },
+  ];
+}
+
+/** Arguments for referral_admin_referrals from the page's filters (blank = all). */
+export function referralListArgs({ state, search, cursor } = {}) {
+  const args = { max_rows: 50 };
+  if (state) args.state = state;
+  const q = String(search ?? "").trim();
+  if (q) args.search = q;
+  if (cursor?.before) {
+    args.before = cursor.before;
+    args.before_id = cursor.before_id;
+  }
+  return args;
 }

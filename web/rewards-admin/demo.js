@@ -1,6 +1,8 @@
 // In-memory stand-in for the rewards admin API (open the page with #demo). Same function names, arguments and answer
 // shapes as the SQL (docs/rewards-api.md); refusals use the same `rewards: <reason>` messages. Nothing leaves the tab.
 
+import { referralDemoFns } from "./demo_referral.js";
+
 const day = (n) => new Date(Date.now() - n * 86_400_000).toISOString().slice(0, 10);
 const uid = () => crypto.randomUUID();
 /** The Monday n days before this week's (UTC), as a date. */
@@ -299,6 +301,7 @@ export function createDemoBackend() {
     },
   ];
   const fns = {
+    ...referralDemoFns(),
     rewards_admin_followup_preview: ({ program }) => {
       const p = programs.find((x) => x.key === program && x.kind === "followup") ?? fail("unknown_program");
       if (p.config.channel !== "email") {
