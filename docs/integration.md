@@ -214,7 +214,13 @@ final retrier = PendingClaimRetrier(queue: queue, signInChanges: ..., tokenRefre
   (`InviteHub` with `initialSection: InviteHubSection.enterCode`, or `InviteCodeEntry`); it shows "Use code …"
   without an `initialCode`. Read `InstallReferrerCodeReader` only to call `keep` with it: it remembers that the
   referrer was read. The retrier (`PendingClaimRetrier`, with a real `signInChanges` stream) is still needed for
-  codes the friend tapped while offline.
+  codes the friend tapped while offline. Open code entry by itself only right after a sign-in (or a code just read
+  from the referrer), not on every start: a friend who chose "Enter a different code" and left still has the link
+  code kept, so show a quiet card instead ("Not now" calls `queue.clearLinkCode()`). The starter app does all of
+  this (`lib/invite_link.dart`, `lib/invite_screens.dart`, `lib/main.dart`); every step is in
+  [user-journey.md](user-journey.md).
+- **Reload Home when it is back on top** (a `RouteObserver` + `didPopNext`): an invite link opens its own screen
+  through the router, so a `then()` after your own `push` does not cover it.
 - **What the sharer sees** (0.4.0, server migration 18): `stats()` returns `claimedCount` (used the code, not started
   yet) and `joinedCount` from the first friend; `paidCount` stays hidden below `stats_floor`. Show them on Home too,
   not only on the invite screen, so a sharer sees that a friend used their link.
