@@ -1,6 +1,10 @@
 // A stand-in for the kit's Supabase functions, so the whole flow runs with no server. It answers the same RPC names
 // with the same JSON shapes (supabase/migrations/20261112000002…, 000003…, 000009…). A real app replaces it with
 // `(fn, params) => Supabase.instance.client.rpc(fn, params: params)` or `ReferralHttpRpc` (lib/referral_setup.dart).
+// It also plays the app's sign-in (a real app has its own auth) and the other people in the story: a friend who signs
+// up with your code, then starts using the app.
+import 'dart:async';
+
 import 'package:referral_kit/referral_kit.dart';
 
 class FakeReferralServer {
@@ -13,11 +17,27 @@ class FakeReferralServer {
 
   /// Turn off to see the "not available yet" state an app shows before the server side is deployed.
   bool deployed = true;
-  bool signedIn = true;
+
+  /// The app's sign-in, played here. A real app passes its auth stream (Supabase: `auth.onAuthStateChange`).
+  bool get signedIn => _signedIn;
+  bool _signedIn;
+  final _signIns = StreamController<bool>.broadcast();
+  Stream<bool> get signInChanges => _signIns.stream;
+  set signedIn(bool v) {
+    if (v == _signedIn) return;
+    _signedIn = v;
+    _signIns.add(v);
+  }
+
+  FakeReferralServer({bool signedIn = true}) : _signedIn = signedIn;
 
   /// The server's count of days left to add a code (the kit's `claim_days_left`).
   int claimDaysLeft = 3;
   bool claimed = false;
+
+  /// Friends who signed up with your code and have not started yet (`claimed_count`, migration 18), and friends who
+  /// started (`joined_count`).
+  int claimedFriends = 0;
   int joinedFriends = 0;
   final List<Map<String, Object?>> _granted = [];
   final Set<String> _acked = {};
@@ -65,7 +85,8 @@ class FakeReferralServer {
           'pending': [],
           'banked': [],
           'skipped_cap': 0,
-          'joined_count': joinedFriends == 0 ? null : joinedFriends,
+          'claimed_count': claimedFriends,
+          'joined_count': joinedFriends,
           'paid_count': null,
         };
       case 'referral_pending':
@@ -100,11 +121,17 @@ class FakeReferralServer {
     return true;
   }
 
-  /// Someone you invited starts using the app: your reward lands.
-  void aFriendJoins() {
+  /// A friend signs up with your code: nothing is earned yet, but you see "1 friend used your code".
+  void aFriendSignsUp() => claimedFriends++;
+
+  /// A friend who used your code starts using the app (the app's activation hook): your reward lands.
+  void aFriendStarts() {
+    if (claimedFriends > 0) claimedFriends--;
     joinedFriends++;
     _grant('sharer');
   }
+
+  void dispose() => unawaited(_signIns.close());
 
   void _grant(String who) => _granted.add({
     'id': '00000000-0000-4000-8000-${(_nextId++).toString().padLeft(12, '0')}',

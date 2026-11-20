@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:referral_kit/referral_kit.dart';
 
 import 'fake_referral_server.dart';
+import 'invite_link.dart';
 
 /// Build-time settings (`--dart-define=...`). With no Supabase URL the app runs on [FakeReferralServer].
 const supabaseUrl = String.fromEnvironment('SUPABASE_URL');
@@ -25,9 +26,13 @@ const rewardLabels = RewardLabels(
 
 /// Everything referral, built once at start-up.
 class ReferralSetup {
-  ReferralSetup({FakeReferralServer? fake, KeyValueStore? store, InstallIdStore? installIds})
-    : fake = supabaseUrl.isEmpty ? (fake ?? FakeReferralServer()) : null,
-      store = store ?? SharedPreferencesKeyValueStore() {
+  ReferralSetup({
+    FakeReferralServer? fake,
+    KeyValueStore? store,
+    InstallIdStore? installIds,
+    InstallReferrerSource? referrerSource,
+  }) : fake = supabaseUrl.isEmpty ? (fake ?? FakeReferralServer()) : null,
+       store = store ?? SharedPreferencesKeyValueStore() {
     client = ReferralClient(
       rpc: this.fake?.call ?? _httpRpc().call,
       installIds: installIds ?? DefaultInstallIdStore(),
@@ -37,9 +42,14 @@ class ReferralSetup {
       eventStore: this.store, // reward_granted once per reward, referral_feature_hidden once a day
     );
     queue = PendingClaimQueue(client: client, store: this.store);
-    // Sends a code kept while offline: on app resume here; also pass your reconnect / sign-in streams.
-    retrier = PendingClaimRetrier(queue: queue);
+    // Sends a code the friend tapped while offline: on app resume, and on sign-in. CHANGE: your auth stream
+    // (Supabase: `supabase.auth.onAuthStateChange`) and, if you have one, a reconnect stream.
+    retrier = PendingClaimRetrier(queue: queue, signInChanges: signInChanges);
+    referrer = InstallReferrerCodeReader(store: this.store, source: referrerSource);
   }
+
+  /// Fires when the user signs in or out. CHANGE: `supabase.auth.onAuthStateChange` (or your auth's stream).
+  Stream<Object?> get signInChanges => fake?.signInChanges ?? const Stream.empty();
 
   final FakeReferralServer? fake;
   final KeyValueStore store;
@@ -49,6 +59,23 @@ class ReferralSetup {
   late final ReferralClient client;
   late final PendingClaimQueue queue;
   late final PendingClaimRetrier retrier;
+  late final InstallReferrerCodeReader referrer;
+
+  /// Once at start-up: a code from the Play install referrer (Android; null elsewhere and on later starts) is kept
+  /// like a link code. Nothing is claimed: after sign-in the friend sees "Use code …" and taps once.
+  /// Returns true when it kept a code now.
+  Future<bool> start() async {
+    final code = await referrer.readOnce();
+    return code != null && await queue.keep(code, source: 'install_referrer');
+  }
+
+  /// An invite link arrived (`/i/<CODE>`): keep its code until the friend is signed in and taps "Use code …".
+  /// Returns the code, or null when the link has none. The first code a friend arrived with wins.
+  Future<String?> openedInviteLink(String link) async {
+    final code = codeFromInviteLink(link);
+    if (code != null) await queue.keep(code);
+    return code;
+  }
 
   /// The invite link for a code, or null while there is no invite page.
   Uri? inviteLink(String code) => inviteBase.isEmpty ? null : Uri.parse('$inviteBase/$code');
@@ -67,5 +94,8 @@ class ReferralSetup {
         null, // CHANGE: your signed-in user's access token (supabase.auth.currentSession?.accessToken)
   );
 
-  void dispose() => retrier.dispose();
+  void dispose() {
+    retrier.dispose();
+    fake?.dispose();
+  }
 }
