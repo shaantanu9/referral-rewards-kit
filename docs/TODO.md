@@ -1,6 +1,6 @@
 # To do
 
-Updated: 2026-11-19
+Updated: 2026-11-20
 What is planned and not built yet, and what has not been proven outside tests. Build order: [build-plan.md](build-plan.md). Known problems: [ISSUES.md](ISSUES.md).
 
 ## Proof on the real thing
@@ -42,6 +42,9 @@ Everything below passes its local tests and CI, but nothing has yet run against 
 
 - [ ] Release referral_kit 0.4.0 and rewards_kit 0.6.3 (tags, pub.dev); then move the docs' tag references
       (README, integration guide, fresh-app quickstart) from 0.3.1 / 0.6.1.
+- [x] Starter app shows the whole journey (2026-11-20, [user-journey.md](user-journey.md)): keep on link and install referrer, `/i/<CODE>` route, sign-in → "Use code …", retrier with a sign-in stream, `claimedCount` on Home. Apps still need it.
+- [ ] Move `codeFromInviteLink` (starter `lib/invite_link.dart`) into the package next release, so apps don't copy it.
+- [ ] Starter app on a phone with a real invite domain: Android App Link (assetlinks) and iOS Associated Domains (entitlement added in Xcode) opening `/i/<CODE>` cold and warm.
 - [ ] Apps: call `queue.keep(code)` on invite-link and install-referrer arrival, open code entry after sign-in when
       `queue.linkCode()` is set; route `/i/<CODE>`; wire a retrier
       with a sign-in stream (PostmeeAI has none); App Links `/i/` on Android; show `claimedCount` on Home.

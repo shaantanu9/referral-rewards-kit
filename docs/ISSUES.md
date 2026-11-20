@@ -1,11 +1,13 @@
 # Issues
 
-Updated: 2026-11-19
+Updated: 2026-11-20
 Every problem found, its cause, fix and proof. Newest first. Status: ✅ fixed and proven · 🟡 fixed, not proven on
 the real thing · 🔧 being fixed · ❌ open. Planned work lives in [TODO.md](TODO.md).
 
 | Status | Issue | Cause | Solution | Proof |
 |---|---|---|---|---|
+| 🟡 | The starter app (the copy every app starts from) showed only half the journey: an invite link never reached it, a link or install-referrer code was not kept before sign-in, no "Use code …" after sign-in, the sharer never saw "1 friend used your code" on Home | The starter was written for 0.3.0 and not updated with 0.4.0 (`keep`, `linkCode`, `claimedCount`) | Route `/i/<CODE>` + `InviteLinkScreen`, `ReferralSetup.start()` (install referrer), sign-in stream for the retrier and Home, waiting-code card with Not now, sharer line on Home, Android App Links filter; [user-journey.md](user-journey.md) | `examples/starter_app` `journey_test.dart` (5) + `flow_test.dart` (2) pass. Not on a phone, no real App Link domain |
+| ✅ | (found while fixing the above) After adding a code from the invite-link screen, Home still showed the waiting card | Home reloaded only after its own `push`; a link's screen comes from the router | `RouteObserver` + `didPopNext` reload | `journey_test.dart` first test failed before, passes after |
 | 🟡 | An admin could not see referrals at all: who invited whom, where each one is, which rewards failed and why | The kit had no admin functions or page for referrals (only rewards) | Migration 21: `referral_admin_*` behind `referral.require_admin()` (hook, default `rewards.admins`), action log; admin page section Referrals | SQL test 32 (35 checks: non-admin and anon refused, emails, paging on equal times, retry, log, privacy); 22 Deno tests; clicked through in demo at 1280 and 390 px. Not against a live project |
 | 🟡 | The person who shared a link saw nothing after a friend signed up with it (reported on an app, 2026-11-19) | `referral_stats` returned `joined_count` only from `stats_floor` (3) joined friends and never counted a friend who had claimed but not started (activation hook still false) | Migration 18: `claimed_count`, `joined_count` from the first friend, `paid_count` still floored (it would reveal a purchase); package 0.4.0 shows "N friends used your code" | SQL test 29 (11), 04 updated; widget tests (claimed line fails on the old screen); 864 SQL tests on UTF-8 and C locales. Not yet applied to a live project or seen on a phone |
 | 🟡 | A reward granted while the app was in the background, or before sign-in, did not appear on Home until the app was killed | `ReferralRewardCard` read `referral_pending` only in `initState` | 0.4.0: reloads on `AppLifecycleState.resumed` and when its client changes; each reward reported as shown once; dismissed cards stay hidden | `reward_card_refresh_test.dart` (4; 3 fail on the old card). Not on a phone |
