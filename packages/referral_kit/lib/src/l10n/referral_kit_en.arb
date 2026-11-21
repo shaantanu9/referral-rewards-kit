@@ -157,8 +157,9 @@
       }
     }
   },
-  "shareTextBoth": "I'm using {app}. Join with my code {code} and we both get {reward}: {link}",
+  "shareTextBoth": "Here's {reward} in {app}, on me: join with my code {code} and we both get it once you start using the app. {link}",
   "@shareTextBoth": {
+    "description": "Give-first share text (0.5): the friend and the sharer get the same joined reward.",
     "placeholders": {
       "app": {
         "type": "String"
@@ -188,8 +189,9 @@
       }
     }
   },
-  "shareTextFriendOnly": "I'm using {app}. Join with my code {code} and you get {reward}: {link}",
+  "shareTextFriendOnly": "Here's {reward} in {app}, on me: join with my code {code} and you get it once you start using the app. {link}",
   "@shareTextFriendOnly": {
+    "description": "Give-first share text: only the friend gets a joined reward.",
     "placeholders": {
       "app": {
         "type": "String"
@@ -449,7 +451,7 @@
       }
     }
   },
-  "shareTextNoLinkBoth": "I'm using {app}. Get it, add my invite code {code} and we both get {reward}: {link}",
+  "shareTextNoLinkBoth": "Here's {reward} in {app}, on me: get the app, add my invite code {code} and we both get it once you start using the app. {link}",
   "@shareTextNoLinkBoth": {
     "placeholders": {
       "app": {
@@ -466,7 +468,7 @@
       }
     }
   },
-  "shareTextNoLinkFriend": "I'm using {app}. Get it, add my invite code {code} and you get {reward}: {link}",
+  "shareTextNoLinkFriend": "Here's {reward} in {app}, on me: get the app, add my invite code {code} and you get it once you start using the app. {link}",
   "@shareTextNoLinkFriend": {
     "placeholders": {
       "app": {
@@ -513,5 +515,286 @@
   "signIn": "Sign in",
   "@signIn": {},
   "notInThisVersion": "Invites aren't part of this version of the app.",
-  "@notInThisVersion": {}
+  "@notInThisVersion": {},
+  "shareTextEach": "Here's {reward} in {app}, on me: join with my code {code} and you get it once you start using the app (I get a bonus too). {link}",
+  "@shareTextEach": {
+    "description": "Give-first share text: the friend and the sharer get different joined rewards.",
+    "placeholders": {
+      "app": {
+        "type": "String"
+      },
+      "code": {
+        "type": "String"
+      },
+      "reward": {
+        "type": "String"
+      },
+      "link": {
+        "type": "String"
+      }
+    }
+  },
+  "shareTextNoLinkEach": "Here's {reward} in {app}, on me: get the app, add my invite code {code} and you get it once you start using the app (I get a bonus too). {link}",
+  "@shareTextNoLinkEach": {
+    "placeholders": {
+      "app": {
+        "type": "String"
+      },
+      "code": {
+        "type": "String"
+      },
+      "reward": {
+        "type": "String"
+      },
+      "link": {
+        "type": "String"
+      }
+    }
+  },
+  "inviteHeadlineBoth": "Give a friend {reward}, and get the same, when they join with your code and start using the app",
+  "@inviteHeadlineBoth": {
+    "description": "Invite screen headline, give-first: both get the same joined reward.",
+    "placeholders": {
+      "reward": {
+        "type": "String"
+      }
+    }
+  },
+  "inviteHeadlineEach": "Give a friend {friendReward} and get {sharerReward} when they join with your code and start using the app",
+  "@inviteHeadlineEach": {
+    "placeholders": {
+      "friendReward": {
+        "type": "String"
+      },
+      "sharerReward": {
+        "type": "String"
+      }
+    }
+  },
+  "inviteHeadlineFriend": "Give a friend {reward} when they join with your code and start using the app",
+  "@inviteHeadlineFriend": {
+    "placeholders": {
+      "reward": {
+        "type": "String"
+      }
+    }
+  },
+  "inviteHeadlineSharer": "Get {reward} when a friend joins with your code and starts using the app",
+  "@inviteHeadlineSharer": {
+    "placeholders": {
+      "reward": {
+        "type": "String"
+      }
+    }
+  },
+  "waitingFriends": "{count, plural, =1{1 friend used your code.} other{{count} friends used your code.}}",
+  "@waitingFriends": {
+    "description": "Sharer's invite screen: friends who used the code and have not started yet (claimed_count).",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "waitingNextStep": "Their next step: {step}.",
+  "@waitingNextStep": {
+    "description": "After waitingFriends. {step} is the app's activation step (e.g. 'Read your first page') or stepStartUsing.",
+    "placeholders": {
+      "step": {
+        "type": "String"
+      }
+    }
+  },
+  "waitingRewardBoth": "{count, plural, =1{When they do it, you both get {reward}.} other{For each friend who does it, you both get {reward}.}}",
+  "@waitingRewardBoth": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "reward": {
+        "type": "String"
+      }
+    }
+  },
+  "waitingRewardYou": "{count, plural, =1{When they do it, you get {reward}.} other{For each friend who does it, you get {reward}.}}",
+  "@waitingRewardYou": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "reward": {
+        "type": "String"
+      }
+    }
+  },
+  "waitingRewardEach": "{count, plural, =1{When they do it, you get {sharerReward} and they get {friendReward}.} other{For each friend who does it, you get {sharerReward} and they get {friendReward}.}}",
+  "@waitingRewardEach": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "sharerReward": {
+        "type": "String"
+      },
+      "friendReward": {
+        "type": "String"
+      }
+    }
+  },
+  "waitingRewardFriend": "{count, plural, =1{When they do it, they get {reward}.} other{Each friend who does it gets {reward}.}}",
+  "@waitingRewardFriend": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "reward": {
+        "type": "String"
+      }
+    }
+  },
+  "whatsApp": "WhatsApp",
+  "@whatsApp": {
+    "description": "Button that opens WhatsApp with the share text; the user picks the chat."
+  },
+  "showQr": "Show QR code",
+  "@showQr": {},
+  "qrTitle": "Your invite link",
+  "@qrTitle": {},
+  "qrHint": "A friend scans this with their phone camera to open your invite.",
+  "@qrHint": {},
+  "qrSemantics": "QR code of your invite link",
+  "@qrSemantics": {},
+  "close": "Close",
+  "@close": {},
+  "boostDouble": "Double rewards until {date} for every friend who adds your code by then.",
+  "@boostDouble": {
+    "description": "Boost banner, multiplier 2, sharer and friend. {date} is the boost's last day, e.g. 'Sun, 23 Nov'. Never a timer.",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "boostTimes": "{multiplier}× rewards until {date} for every friend who adds your code by then.",
+  "@boostTimes": {
+    "description": "Boost banner, any multiplier but 2.",
+    "placeholders": {
+      "multiplier": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "boostFriendDouble": "Double welcome gift until {date} for friends who add your code by then.",
+  "@boostFriendDouble": {
+    "description": "Boost banner when only the friend's reward is boosted.",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "boostFriendTimes": "{multiplier}× welcome gift until {date} for friends who add your code by then.",
+  "@boostFriendTimes": {
+    "placeholders": {
+      "multiplier": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "invitePageTitle": "Your invite page",
+  "@invitePageTitle": {},
+  "showFirstName": "Show my first name",
+  "@showFirstName": {},
+  "firstNameLabel": "First name",
+  "@firstNameLabel": {},
+  "invitePageExplainRewarded": "Your first name is shown to friends who open your link, with a note that you get a reward if they join.",
+  "@invitePageExplainRewarded": {
+    "description": "Disclosure under the first-name toggle when the sharer is rewarded (FTC 16 CFR 255.5)."
+  },
+  "invitePageExplain": "Your first name is shown to friends who open your link.",
+  "@invitePageExplain": {},
+  "nameErrEmpty": "Enter your first name.",
+  "@nameErrEmpty": {},
+  "nameErrTooLong": "Use 40 characters or fewer.",
+  "@nameErrTooLong": {},
+  "nameErrNoLetter": "Use at least one letter.",
+  "@nameErrNoLetter": {},
+  "nameErrEmailOrLink": "A name can't contain @ or a link.",
+  "@nameErrEmailOrLink": {},
+  "save": "Save",
+  "@save": {},
+  "saved": "Saved",
+  "@saved": {},
+  "saveFailed": "Couldn't save. Check your connection and try again.",
+  "@saveFailed": {},
+  "leaveProgram": "Leave the invite program",
+  "@leaveProgram": {},
+  "leaveConfirmTitle": "Leave the invite program?",
+  "@leaveConfirmTitle": {},
+  "leaveConfirmBody": "Your code stops working for new friends and your name is no longer shown. Rewards already on the way still arrive. You can join again any time with the same code.",
+  "@leaveConfirmBody": {},
+  "leaveConfirm": "Leave",
+  "@leaveConfirm": {},
+  "cancel": "Cancel",
+  "@cancel": {},
+  "leftTitle": "You left the invite program",
+  "@leftTitle": {},
+  "leftBody": "Your code doesn't work for new friends. Rewards already on the way still arrive.",
+  "@leftBody": {},
+  "joinAgain": "Join again",
+  "@joinAgain": {},
+  "welcomeWaiting": "Your welcome gift of {reward} is waiting: {step}.",
+  "@welcomeWaiting": {
+    "description": "Friend's card after adding a code. {step} is the app's activation step.",
+    "placeholders": {
+      "reward": {
+        "type": "String"
+      },
+      "step": {
+        "type": "String"
+      }
+    }
+  },
+  "welcomeWaitingPlain": "Your welcome gift is waiting: {step}.",
+  "@welcomeWaitingPlain": {
+    "placeholders": {
+      "step": {
+        "type": "String"
+      }
+    }
+  },
+  "welcomeDaysLeft": "{count, plural, =1{Last day.} other{{count} days left.}}",
+  "@welcomeDaysLeft": {
+    "description": "After welcomeWaiting: the server's days left to start using the app.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "passItOn": "Pass it on: give a friend {reward} when they join with your code and start using the app.",
+  "@passItOn": {
+    "description": "Shown once to a referred user after their welcome reward.",
+    "placeholders": {
+      "reward": {
+        "type": "String"
+      }
+    }
+  },
+  "passItOnPlain": "Pass it on: invite a friend to {app}.",
+  "@passItOnPlain": {
+    "placeholders": {
+      "app": {
+        "type": "String"
+      }
+    }
+  },
+  "inviteAFriend": "Invite a friend",
+  "@inviteAFriend": {}
 }

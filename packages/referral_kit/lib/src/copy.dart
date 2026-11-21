@@ -113,11 +113,15 @@ class ReferralCopy {
     return null;
   }
 
-  /// Share sheet text in the sharer's language; the code is wrapped in a left-to-right isolate.
+  /// Share sheet text in the sharer's language; the code is wrapped in a left-to-right isolate. Give-first (0.5): it
+  /// leads with what the friend gets ("Here's 30 min in X, on me: …") with the condition in the same sentence, and
+  /// says "I get a bonus too" when the sharer is rewarded differently. With no friend reward: the sharer-only
+  /// sentence ("… and I get a bonus").
   String shareText({required String appName, required String code, required String link}) {
     final c = isolatedCode(code);
     final s = sharerJoined, f = friendJoined;
     if (s != null && f != null && _sameJoinedReward) return l10n.shareTextBoth(appName, c, ruleReward(f), link);
+    if (f != null && (s != null || sharerPaid != null)) return l10n.shareTextEach(appName, c, ruleReward(f), link);
     if (f != null) return l10n.shareTextFriendOnly(appName, c, ruleReward(f), link);
     if (s != null || sharerPaid != null) return l10n.shareTextSharerOnly(appName, c, link);
     return l10n.shareTextPlain(appName, c, link);
@@ -132,6 +136,9 @@ class ReferralCopy {
     if (f != null && sharerJoined != null && _sameJoinedReward) {
       return l10n.shareTextNoLinkBoth(appName, c, ruleReward(f), storeLink);
     }
+    if (f != null && (sharerJoined != null || sharerPaid != null)) {
+      return l10n.shareTextNoLinkEach(appName, c, ruleReward(f), storeLink);
+    }
     if (f != null) return l10n.shareTextNoLinkFriend(appName, c, ruleReward(f), storeLink);
     return l10n.shareTextNoLinkPlain(appName, c, storeLink);
   }
@@ -141,6 +148,86 @@ class ReferralCopy {
 
   /// True when both sides get the same joined reward.
   bool get bothGetSame => friendJoined != null && sharerJoined != null && _sameJoinedReward;
+
+  /// The sharer's joined reward ("30 min"), or null when the terms give the sharer nothing for a friend joining.
+  String? get sharerJoinedReward => sharerJoined == null ? null : ruleReward(sharerJoined!);
+
+  /// The invite screen's headline, give-first (G1): what the friend gets, then what the sharer gets, with the
+  /// condition in the same sentence. Null when no joined rule exists (the screen then shows only "Your invite code").
+  String? inviteHeadline() {
+    final f = friendReward, s = sharerJoinedReward;
+    if (f != null && s != null) return f == s ? l10n.inviteHeadlineBoth(f) : l10n.inviteHeadlineEach(f, s);
+    if (f != null) return l10n.inviteHeadlineFriend(f);
+    if (s != null) return l10n.inviteHeadlineSharer(s);
+    return null;
+  }
+
+  /// The friend's next step as the sharer reads it: the app's [activationStep], or "Start using {app}".
+  String nextStep({required String appName, String? activationStep}) => activationStep ?? l10n.stepStartUsing(appName);
+
+  /// The sharer's line for [count] friends who used the code and have not started yet (`claimed_count`), e.g. "1
+  /// friend used your code. Their next step: Read your first page. When they do it, you both get 4 free chapters."
+  /// The reward part comes from the joined rules; with none, the line stops after the next step. Null for 0 / null.
+  String? waitingLine(int? count, {required String appName, String? activationStep}) {
+    if (count == null || count <= 0) return null;
+    final s = sharerJoinedReward, f = friendReward;
+    final String? reward;
+    if (s != null && f != null) {
+      reward = s == f ? l10n.waitingRewardBoth(count, s) : l10n.waitingRewardEach(count, s, f);
+    } else if (s != null) {
+      reward = l10n.waitingRewardYou(count, s);
+    } else if (f != null) {
+      reward = l10n.waitingRewardFriend(count, f);
+    } else {
+      reward = null;
+    }
+    return [
+      l10n.waitingFriends(count),
+      l10n.waitingNextStep(nextStep(appName: appName, activationStep: activationStep)),
+      ?reward,
+    ].join(' ');
+  }
+
+  /// The boost banner (G8): "Double rewards until Sun, 23 Nov for every friend who adds your code by then." Uses
+  /// the boost's real last day in the user's locale, never a countdown. Null when there is no boost running at
+  /// [now] (the terms' boost has ended, or none).
+  String? boostLine(DateTime now) {
+    final b = terms.boostAt(now);
+    if (b == null) return null;
+    final date = formatBoostDay(b.endsAt, l10n.localeName);
+    final friendOnly = b.forFriend && !b.forSharer;
+    if (b.multiplier == 2) return friendOnly ? l10n.boostFriendDouble(date) : l10n.boostDouble(date);
+    final m = b.multiplier == b.multiplier.roundToDouble() ? '${b.multiplier.round()}' : '${b.multiplier}';
+    return friendOnly ? l10n.boostFriendTimes(m, date) : l10n.boostTimes(m, date);
+  }
+
+  /// A reward the friend gets in `referral_my_claim` (already boosted).
+  String claimReward(MyClaimReward r) => reward(r.kind, r.amount, r.params);
+
+  /// The friend's card while their gift waits (G2): "Your welcome gift of 4 free chapters is waiting: Read your
+  /// first page. 12 days left." Days only when the server sent them.
+  String welcomeWaiting(MyClaim claim, {required String appName, String? activationStep}) {
+    final step = nextStep(appName: appName, activationStep: activationStep);
+    final rewards = claim.rewards.map(claimReward).toList();
+    final head = rewards.isEmpty ? l10n.welcomeWaitingPlain(step) : l10n.welcomeWaiting(rewards.join(', '), step);
+    final d = claim.daysLeft;
+    return d == null || d <= 0 ? head : '$head ${l10n.welcomeDaysLeft(d)}';
+  }
+
+  /// The pass-it-on card after the friend's own welcome reward (G3): what a new friend would get, from the terms.
+  String passItOn({required String appName}) {
+    final f = friendReward;
+    return f == null ? l10n.passItOnPlain(appName) : l10n.passItOn(f);
+  }
+
+  /// The words for a [displayNameProblem] reason; null for none.
+  String? displayNameError(String? problem) => switch (problem) {
+    null => null,
+    'empty' => l10n.nameErrEmpty,
+    'too_long' => l10n.nameErrTooLong,
+    'no_letter' => l10n.nameErrNoLetter,
+    _ => l10n.nameErrEmailOrLink,
+  };
 
   /// "A gift is waiting for you: 4 free chapters" (loss framing only when the friend rule really gives something).
   String giftTitle() {
@@ -226,6 +313,20 @@ String formatDate(DateTime at, String locale) {
       return '${local.year}-$m-$d';
     }
   }
+}
+
+/// The boost's last day, short with the weekday ("Sun, 23 Nov"), in [locale]. [endsAt] is exclusive, so a boost
+/// ending at midnight shows the day before. English when the locale's date data is not loaded.
+String formatBoostDay(DateTime endsAt, String locale) {
+  final last = endsAt.toLocal().subtract(const Duration(microseconds: 1));
+  for (final l in [locale, 'en_GB']) {
+    try {
+      return DateFormat('EEE, d MMM', l).format(last);
+    } catch (_) {
+      // Try the next locale.
+    }
+  }
+  return '${last.year}-${last.month.toString().padLeft(2, '0')}-${last.day.toString().padLeft(2, '0')}';
 }
 
 /// Message for a claim answer, usable without terms (ADR 11.2). `{minutes}` is `retry_after_seconds` rounded up;

@@ -25,6 +25,9 @@ class ReferralTexts {
     this.shareTextNoLink,
     this.unavailable,
     this.signIn,
+    this.waiting,
+    this.inviteHeadline,
+    this.activationStepForFriends,
   });
 
   /// The screen title ("Invite friends").
@@ -72,4 +75,16 @@ class ReferralTexts {
 
   /// The Sign in button shown when signed out (with `onSignIn`).
   final String? signIn;
+
+  /// The sharer's line for friends who used their code and have not started yet (`claimed_count` > 0). [count] is
+  /// the server's number, [nextStep] is [activationStepForFriends] / [activationStep] (or "Start using {app}"), and
+  /// [sharerReward] / [friendReward] are the joined rewards from the terms, null when the terms give none.
+  final String Function(int count, String nextStep, String? sharerReward, String? friendReward)? waiting;
+
+  /// The invite screen's give-first headline. Both rewards are null-able: name only what the terms give.
+  final String? Function(String? friendReward, String? sharerReward)? inviteHeadline;
+
+  /// The activation step as the sharer reads it about a friend ("Read their first page"); [activationStep] when
+  /// null.
+  final String? activationStepForFriends;
 }

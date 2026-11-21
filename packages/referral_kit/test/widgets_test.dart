@@ -55,7 +55,7 @@ void main() {
       await tester.pump();
       expect(shared.single, contains('\u2066ABCD-EFGH\u2069'));
       expect(shared.single, contains('https://example.test/i/ABCDEFGH'));
-      expect(shared.single, contains('we both get 30 min of natural voice'));
+      expect(shared.single, startsWith("Here's 30 min of natural voice in App, on me"));
     });
 
     testWidgets('Copy writes the code and announces "Code copied"', (tester) async {
@@ -82,7 +82,13 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.byKey(const ValueKey('referral-empty')), findsNothing);
       await tester.scrollUntilVisible(find.byKey(const ValueKey('referral-claimed')), 100);
-      expect(find.text('1 friend used your code. Your reward comes when they start using the app.'), findsOneWidget);
+      expect(
+        find.text(
+          '1 friend used your code. Their next step: Start using App. When they do it, you both get 30 min of '
+          'natural voice.',
+        ),
+        findsOneWidget,
+      );
       expect(find.byKey(const ValueKey('referral-joined')), findsNothing, reason: 'no "0 friends joined" line');
     });
 

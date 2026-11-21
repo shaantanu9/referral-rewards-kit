@@ -151,7 +151,7 @@ class ReferralKitLocalizationsHi extends ReferralKitLocalizations {
 
   @override
   String shareTextBoth(String app, String code, String reward, String link) {
-    return 'मैं $app इस्तेमाल कर रहा/रही हूँ। मेरे कोड $code से जुड़ें और हम दोनों को $reward मिलेंगे: $link';
+    return '$app में $reward मेरी तरफ़ से: मेरे कोड $code से जुड़ें, और ऐप इस्तेमाल करना शुरू करते ही हम दोनों को यह मिलेगा। $link';
   }
 
   @override
@@ -161,7 +161,7 @@ class ReferralKitLocalizationsHi extends ReferralKitLocalizations {
 
   @override
   String shareTextFriendOnly(String app, String code, String reward, String link) {
-    return 'मैं $app इस्तेमाल कर रहा/रही हूँ। मेरे कोड $code से जुड़ें और आपको $reward मिलेंगे: $link';
+    return '$app में $reward मेरी तरफ़ से: मेरे कोड $code से जुड़ें, और ऐप इस्तेमाल करना शुरू करते ही आपको यह मिलेगा। $link';
   }
 
   @override
@@ -412,12 +412,12 @@ class ReferralKitLocalizationsHi extends ReferralKitLocalizations {
 
   @override
   String shareTextNoLinkBoth(String app, String code, String reward, String link) {
-    return 'मैं $app इस्तेमाल कर रहा हूँ। इसे लें, मेरा इनवाइट कोड $code जोड़ें और हम दोनों को $reward मिलेगा: $link';
+    return '$app में $reward मेरी तरफ़ से: इसे लें, मेरा इनवाइट कोड $code जोड़ें, और ऐप इस्तेमाल करना शुरू करते ही हम दोनों को यह मिलेगा। $link';
   }
 
   @override
   String shareTextNoLinkFriend(String app, String code, String reward, String link) {
-    return 'मैं $app इस्तेमाल कर रहा हूँ। इसे लें, मेरा इनवाइट कोड $code जोड़ें और आपको $reward मिलेगा: $link';
+    return '$app में $reward मेरी तरफ़ से: इसे लें, मेरा इनवाइट कोड $code जोड़ें, और ऐप इस्तेमाल करना शुरू करते ही आपको यह मिलेगा। $link';
   }
 
   @override
@@ -438,4 +438,223 @@ class ReferralKitLocalizationsHi extends ReferralKitLocalizations {
 
   @override
   String get notInThisVersion => 'इनवाइट ऐप के इस वर्ज़न में नहीं हैं।';
+
+  @override
+  String shareTextEach(String app, String code, String reward, String link) {
+    return '$app में $reward मेरी तरफ़ से: मेरे कोड $code से जुड़ें, और ऐप इस्तेमाल करना शुरू करते ही आपको यह मिलेगा (मुझे भी बोनस मिलेगा)। $link';
+  }
+
+  @override
+  String shareTextNoLinkEach(String app, String code, String reward, String link) {
+    return '$app में $reward मेरी तरफ़ से: इसे लें, मेरा इनवाइट कोड $code जोड़ें, और ऐप इस्तेमाल करना शुरू करते ही आपको यह मिलेगा (मुझे भी बोनस मिलेगा)। $link';
+  }
+
+  @override
+  String inviteHeadlineBoth(String reward) {
+    return 'दोस्त को $reward दें, और आपको भी इतना ही मिलेगा, जब वे आपके कोड से जुड़कर ऐप इस्तेमाल करना शुरू करें';
+  }
+
+  @override
+  String inviteHeadlineEach(String friendReward, String sharerReward) {
+    return 'दोस्त को $friendReward दें और $sharerReward पाएँ, जब वे आपके कोड से जुड़कर ऐप इस्तेमाल करना शुरू करें';
+  }
+
+  @override
+  String inviteHeadlineFriend(String reward) {
+    return 'दोस्त को $reward दें, जब वे आपके कोड से जुड़कर ऐप इस्तेमाल करना शुरू करें';
+  }
+
+  @override
+  String inviteHeadlineSharer(String reward) {
+    return 'जब कोई दोस्त आपके कोड से जुड़कर ऐप इस्तेमाल करना शुरू करे, तो $reward पाएँ';
+  }
+
+  @override
+  String waitingFriends(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count दोस्तों ने आपका कोड इस्तेमाल किया।',
+      one: '1 दोस्त ने आपका कोड इस्तेमाल किया।',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String waitingNextStep(String step) {
+    return 'उनका अगला कदम: $step।';
+  }
+
+  @override
+  String waitingRewardBoth(int count, String reward) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'जो भी दोस्त यह करेगा, उस पर आप दोनों को $reward मिलेगा।',
+      one: 'यह करते ही आप दोनों को $reward मिलेगा।',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String waitingRewardYou(int count, String reward) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'जो भी दोस्त यह करेगा, उस पर आपको $reward मिलेगा।',
+      one: 'यह करते ही आपको $reward मिलेगा।',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String waitingRewardEach(int count, String sharerReward, String friendReward) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'जो भी दोस्त यह करेगा, उस पर आपको $sharerReward और उसे $friendReward मिलेगा।',
+      one: 'यह करते ही आपको $sharerReward और उन्हें $friendReward मिलेगा।',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String waitingRewardFriend(int count, String reward) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'जो भी दोस्त यह करेगा, उसे $reward मिलेगा।',
+      one: 'यह करते ही उन्हें $reward मिलेगा।',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get whatsApp => 'WhatsApp';
+
+  @override
+  String get showQr => 'QR कोड दिखाएँ';
+
+  @override
+  String get qrTitle => 'आपका इनवाइट लिंक';
+
+  @override
+  String get qrHint => 'दोस्त अपने फ़ोन के कैमरे से इसे स्कैन करके आपका इनवाइट खोल सकते हैं।';
+
+  @override
+  String get qrSemantics => 'आपके इनवाइट लिंक का QR कोड';
+
+  @override
+  String get close => 'बंद करें';
+
+  @override
+  String boostDouble(String date) {
+    return '$date तक डबल इनाम, हर उस दोस्त के लिए जो तब तक आपका कोड जोड़े।';
+  }
+
+  @override
+  String boostTimes(String multiplier, String date) {
+    return '$date तक $multiplier× इनाम, हर उस दोस्त के लिए जो तब तक आपका कोड जोड़े।';
+  }
+
+  @override
+  String boostFriendDouble(String date) {
+    return '$date तक डबल वेलकम गिफ़्ट, उन दोस्तों के लिए जो तब तक आपका कोड जोड़ें।';
+  }
+
+  @override
+  String boostFriendTimes(String multiplier, String date) {
+    return '$date तक $multiplier× वेलकम गिफ़्ट, उन दोस्तों के लिए जो तब तक आपका कोड जोड़ें।';
+  }
+
+  @override
+  String get invitePageTitle => 'आपका इनवाइट पेज';
+
+  @override
+  String get showFirstName => 'मेरा पहला नाम दिखाएँ';
+
+  @override
+  String get firstNameLabel => 'पहला नाम';
+
+  @override
+  String get invitePageExplainRewarded =>
+      'आपका पहला नाम उन दोस्तों को दिखता है जो आपका लिंक खोलते हैं, इस नोट के साथ कि उनके जुड़ने पर आपको इनाम मिलता है।';
+
+  @override
+  String get invitePageExplain => 'आपका पहला नाम उन दोस्तों को दिखता है जो आपका लिंक खोलते हैं।';
+
+  @override
+  String get nameErrEmpty => 'अपना पहला नाम लिखें।';
+
+  @override
+  String get nameErrTooLong => '40 या उससे कम अक्षर इस्तेमाल करें।';
+
+  @override
+  String get nameErrNoLetter => 'कम से कम एक अक्षर इस्तेमाल करें।';
+
+  @override
+  String get nameErrEmailOrLink => 'नाम में @ या लिंक नहीं हो सकता।';
+
+  @override
+  String get save => 'सेव करें';
+
+  @override
+  String get saved => 'सेव हो गया';
+
+  @override
+  String get saveFailed => 'सेव नहीं हो सका। कनेक्शन देखें और फिर से कोशिश करें।';
+
+  @override
+  String get leaveProgram => 'इनवाइट प्रोग्राम छोड़ें';
+
+  @override
+  String get leaveConfirmTitle => 'इनवाइट प्रोग्राम छोड़ें?';
+
+  @override
+  String get leaveConfirmBody =>
+      'नए दोस्तों के लिए आपका कोड काम करना बंद कर देगा और आपका नाम नहीं दिखेगा। जो इनाम आने वाले हैं, वे फिर भी मिलेंगे। आप कभी भी उसी कोड के साथ फिर से जुड़ सकते हैं।';
+
+  @override
+  String get leaveConfirm => 'छोड़ें';
+
+  @override
+  String get cancel => 'रद्द करें';
+
+  @override
+  String get leftTitle => 'आपने इनवाइट प्रोग्राम छोड़ दिया है';
+
+  @override
+  String get leftBody => 'नए दोस्तों के लिए आपका कोड काम नहीं करता। जो इनाम आने वाले हैं, वे फिर भी मिलेंगे।';
+
+  @override
+  String get joinAgain => 'फिर से जुड़ें';
+
+  @override
+  String welcomeWaiting(String reward, String step) {
+    return 'आपका $reward का वेलकम गिफ़्ट इंतज़ार कर रहा है: $step।';
+  }
+
+  @override
+  String welcomeWaitingPlain(String step) {
+    return 'आपका वेलकम गिफ़्ट इंतज़ार कर रहा है: $step।';
+  }
+
+  @override
+  String welcomeDaysLeft(int count) {
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '$count दिन बाकी।', one: 'आख़िरी दिन।');
+    return '$_temp0';
+  }
+
+  @override
+  String passItOn(String reward) {
+    return 'आगे बढ़ाएँ: दोस्त को $reward दें, जब वे आपके कोड से जुड़कर ऐप इस्तेमाल करना शुरू करें।';
+  }
+
+  @override
+  String passItOnPlain(String app) {
+    return 'आगे बढ़ाएँ: किसी दोस्त को $app पर इनवाइट करें।';
+  }
+
+  @override
+  String get inviteAFriend => 'दोस्त को इनवाइट करें';
 }

@@ -1,5 +1,42 @@
 # Changelog
 
+## 0.5.0 (2026-11-20)
+
+The growth round (research: `docs/research/referral-growth.md`). Needs server migration 23
+(`20261120000023_referral_growth.sql`) for the boost, the invite page settings and the friend's card; on an older
+server those parts hide themselves and nothing else changes.
+
+- **Give-first copy (changed default text).** `shareTextBoth`, `shareTextFriendOnly`, `shareTextNoLinkBoth` and
+  `shareTextNoLinkFriend` now lead with what the friend gets ("Here's 30 min in X, on me: join with my code … and we
+  both get it once you start using the app."); new `shareTextEach` / `shareTextNoLinkEach` disclose "(I get a bonus
+  too)" when the sharer's reward differs. The sharer-only and plain texts are unchanged. New headline on the invite
+  screen (`ReferralCopy.inviteHeadline`, `texts.inviteHeadline`). Apps that assert the old share sentence in tests
+  must update them.
+- **Waiting line** on `claimedCount` with the friend's next step and the reward (`ReferralCopy.waitingLine`,
+  `texts.waiting`, `texts.activationStepForFriends`), replacing the 0.4 claimed sentence on the invite screen (key
+  `referral-claimed` kept). Strings ported from the superseded `feature/waiting-count` branch; no `waitingCount`
+  field.
+- **WhatsApp button** next to Share (`url_launcher`, `ReferralLauncher`, `whatsAppShareUri`), hidden when it cannot
+  launch; `invite_shared` with `channel: whatsapp_button`, `status: opened | unavailable`.
+- **QR code** sheet of the https invite link (`qr_flutter`, `showReferralQrSheet`, `ReferralQrSheet`); event
+  `invite_qr_shown`.
+- **Boost**: `ReferralTerms.boost` (`ReferralBoost`: `startsAt`, `endsAt`, `multiplier`, `events`, `who`),
+  `boostAt(now)`; `ReferralBoostBanner` with the real last day ("Double rewards until Sun, 22 Nov …"), never a timer.
+- **Invite page settings**: `ReferralInvitePageSettings` (first-name opt-in with the reward disclosure, leave with a
+  confirm); the invite screen's "You left the invite program" + "Join again". `ReferralClient.preferences()`,
+  `setPreferences(...)`, `ReferralPreferences`, `displayNameProblem`, `MyCodeResult.left` (also `reason: left`);
+  event `invite_preferences_changed`.
+- **Friend's card**: `ReferralWelcomeCard` (claimed: the gift, the step, days left; joined: pass it on, once),
+  `ReferralClient.myClaim()`, `MyClaim`, `MyClaimState`, `MyClaimReward` (`amount`, `baseAmount`, `boosted`);
+  events `welcome_card_shown`, `welcome_card_dismissed`.
+- `ReferralPromptPolicy`: `ReferralPromptMoment.welcomeRewardReceived`, `shouldPromptFor` / `markPromptedFor`
+  (once ever, never in the first session).
+- The new RPCs are called "quietly": a server without them does not report `referral_feature_hidden`.
+- New dependencies: `url_launcher: ^6.3.0`, `qr_flutter: ^4.1.0`.
+- New strings in en, hi, id (52 keys, ICU plurals). **hi and id are not reviewed by native speakers.**
+- Tests: models against the real SQL fixtures (`test/fixtures/growth`), copy, widgets (WhatsApp, QR, boost, invite
+  page, welcome card), RTL `ar`, 200 % text at 320 dp.
+
 ## 0.4.0 (2026-11-19)
 
 Needs server migrations 18–20 (`supabase/migrations/20261119*`); without 18 the new counts are null and the screen

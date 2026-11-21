@@ -1,0 +1,16 @@
+{
+  "name": "Priya",
+  "boost": {
+    "ends_at": "2026-11-27T12:38:26.218541+00:00",
+    "multiplier": 2
+  },
+  "valid": true,
+  "friend_rewards": [
+    {
+      "kind": "minutes",
+      "amount": 60,
+      "params": {}
+    }
+  ],
+  "sharer_rewarded": true
+}

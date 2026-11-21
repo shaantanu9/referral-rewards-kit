@@ -9,7 +9,7 @@ Pod::Spec.new do |s|
   s.description      = <<-DESC
 Invite-friends screens and invite-code entry for referral-kit. iOS side: the UIPasteControl platform view.
                        DESC
-  s.homepage         = 'https://github.com/shaantanu9/referral-rewards-kit'
+  s.homepage         = 'https://github.com/shaantanu9/referral-kit'
   s.license          = { :file => '../LICENSE' }
   s.author           = { 'referral-kit contributors' => 'noreply@example.com' }
   s.source           = { :path => '.' }

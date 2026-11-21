@@ -17,7 +17,9 @@ enum ReferralEventName {
   inviteCodeCopied('invite_code_copied', 'referral_code_copied'),
 
   /// The share sheet closed. Props: `status` (`success` | `dismissed` | `unavailable`), `channel` (a small bucket:
-  /// `whatsapp`, `messages`, `mail`, … `other`, `unknown`, `dismissed`; see `shareChannel`), `has_link`.
+  /// `whatsapp`, `messages`, `mail`, … `other`, `unknown`, `dismissed`; see `shareChannel`), `has_link`. From the
+  /// WhatsApp button (0.5): `channel: whatsapp_button`, `status` `opened` (WhatsApp opened; whether the user sent it
+  /// is unknown) or `unavailable`.
   inviteShared('invite_shared', 'referral_invite_shared'),
 
   /// The entry was opened with a code from an invite link or the install referrer. Props: `code_hash`.
@@ -45,6 +47,19 @@ enum ReferralEventName {
   /// A reward card was dismissed (or its action tapped). Props: as [rewardShown], plus `acknowledged` (false when
   /// the ack call failed; the card then comes back next launch).
   rewardAcknowledged('reward_acknowledged', 'referral_reward_acknowledged'),
+
+  /// The "Show QR code" sheet opened with the invite link (0.5). No props.
+  inviteQrShown('invite_qr_shown', null),
+
+  /// The friend's welcome card ([ReferralWelcomeCard]) appeared (0.5). Props: `state` (`claimed` | `joined`).
+  welcomeCardShown('welcome_card_shown', null),
+
+  /// The welcome card closed (0.5). Props: `state`, `action` (`dismiss` | `invite`).
+  welcomeCardDismissed('welcome_card_dismissed', null),
+
+  /// The sharer changed their invite page settings (0.5). Props: `show_name` and/or `participating` (booleans,
+  /// what was saved); `result` (`ok` | `invalid_name` | `under_age` | `anonymous_user` | `failed`). Never the name.
+  invitePreferencesChanged('invite_preferences_changed', null),
 
   /// Referrals are hidden or cannot be used, at most once a day per reason. Props: `reason` (`not_deployed` |
   /// `signed_out` | `no_project` | `offline` | `server_error` | `program_paused` | `code_disabled` |

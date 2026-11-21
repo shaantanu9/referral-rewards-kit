@@ -78,17 +78,19 @@ class ReferralClient {
     report(ReferralEvent(ReferralEventName.inviteLinkOpened, {'code_hash': codeHash(norm)}));
   }
 
-  Future<Object?> _call(String fn, [Map<String, Object?> extra = const {}]) async {
+  /// [quiet]: an RPC newer than the core set (migration 23); a server without it is not reported as
+  /// `referral_feature_hidden`, since the rest of the feature still works.
+  Future<Object?> _call(String fn, [Map<String, Object?> extra = const {}, bool quiet = false]) async {
     final id = await _installIds.installId();
     final Object? result;
     try {
       result = await _rpc(fn, {...extra, 'install_id': id});
     } on ReferralUnavailableException catch (e) {
-      unawaited(reportHidden(e.reason.wire, surface: 'client'));
+      if (!quiet) unawaited(reportHidden(e.reason.wire, surface: 'client'));
       rethrow;
     } catch (e) {
       if (_isNotDeployed(e)) {
-        unawaited(reportHidden(ReferralUnavailableReason.notDeployed.wire, surface: 'client'));
+        if (!quiet) unawaited(reportHidden(ReferralUnavailableReason.notDeployed.wire, surface: 'client'));
         throw const ReferralUnavailableException(ReferralUnavailableReason.notDeployed);
       }
       rethrow;
@@ -118,7 +120,7 @@ class ReferralClient {
     return a;
   }
 
-  /// `referral_my_code`: the caller's active code, created once.
+  /// `referral_my_code`: the caller's active code, created once; `left` (no code) after they left the program.
   Future<MyCodeResult> myCode() async => MyCodeResult.fromJson(await _call('referral_my_code'));
 
   /// `referral_rotate_code`: retires the code and issues a new one, at most once per 30 days (`too_soon`).
@@ -164,4 +166,30 @@ class ReferralClient {
     final n = m['acknowledged'];
     return n is num ? n.toInt() : 0;
   }
+
+  /// `referral_preferences` (migration 23): the sharer's invite-page name and whether they take part. Throws
+  /// [ReferralUnavailableException] (`notDeployed`) on an older server, without reporting it.
+  Future<ReferralPreferences> preferences() async =>
+      ReferralPreferences.fromJson(await _call('referral_preferences', const {}, true));
+
+  /// `referral_preferences_set` (migration 23). Sends only what is given: [showName] and [displayName] for the
+  /// first name on the invite page (an empty [displayName] clears it), [participating] false to leave the invite
+  /// program and true to join again (same code). A refusal comes back as [ReferralPreferences.reason]
+  /// (`under_age`, `anonymous_user`, `invalid_name`); check names first with [displayNameProblem].
+  Future<ReferralPreferences> setPreferences({bool? showName, String? displayName, bool? participating}) async {
+    final name = displayName?.trim();
+    final prefs = <String, Object?>{
+      'show_name': ?showName,
+      if (displayName != null) 'display_name': name!.isEmpty ? null : name,
+      'participating': ?participating,
+    };
+    return ReferralPreferences.fromJson(
+      await _call('referral_preferences_set', {'prefs': prefs}, true),
+      'referral_preferences_set',
+    );
+  }
+
+  /// `referral_my_claim` (migration 23): the caller's own claim as a friend (none, claimed with days left and the
+  /// rewards, joined, expired). Throws [ReferralUnavailableException] on an older server, without reporting it.
+  Future<MyClaim> myClaim() async => MyClaim.fromJson(await _call('referral_my_claim', const {}, true));
 }

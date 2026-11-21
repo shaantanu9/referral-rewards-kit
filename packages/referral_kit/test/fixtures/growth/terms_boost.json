@@ -1,0 +1,42 @@
+{
+  "boost": {
+    "who": [
+      "sharer",
+      "friend"
+    ],
+    "events": [
+      "joined"
+    ],
+    "ends_at": "2026-11-27T12:38:26.218541+00:00",
+    "starts_at": "2026-11-20T12:38:26.218541+00:00",
+    "multiplier": 2
+  },
+  "rules": [
+    {
+      "who": "friend",
+      "kind": "minutes",
+      "event": "joined",
+      "amount": 30,
+      "params": {}
+    },
+    {
+      "who": "sharer",
+      "kind": "entitlement_days",
+      "event": "joined",
+      "amount": 7,
+      "params": {
+        "entitlement_id": "premium"
+      }
+    }
+  ],
+  "enabled": true,
+  "hold_hours": 72,
+  "paid_enabled": true,
+  "claim_days_left": 7,
+  "paid_window_days": 90,
+  "rule_set_version": 1,
+  "claim_window_days": 7,
+  "activate_window_days": 30,
+  "sharer_joins_per_30d": 10,
+  "sharer_paid_per_365d": 6
+}

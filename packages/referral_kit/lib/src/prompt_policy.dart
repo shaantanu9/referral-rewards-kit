@@ -1,5 +1,14 @@
 import 'storage.dart';
 
+/// Moments the kit itself may prompt at, each allowed a fixed number of times (0.5).
+enum ReferralPromptMoment {
+  /// A referred user just got their welcome reward: the pass-it-on card (G3). Once ever, never in the first session.
+  welcomeRewardReceived('welcome_reward_received');
+
+  const ReferralPromptMoment(this.wire);
+  final String wire;
+}
+
 /// When the app may show its one "invite friends" prompt (ADR 11.4).
 ///
 /// - never in the first session;
@@ -75,6 +84,29 @@ class ReferralPromptPolicy {
     if (last != null && now.difference(last) < minInterval) return false;
     return true;
   }
+
+  /// Whether the kit's own prompt for [moment] may show now: not in the first session, not during or after a
+  /// purchase (as [shouldPrompt]), not within [minInterval] of any other prompt, and only once ever per moment. The
+  /// moment itself is the value, so no [reportMomentOfValue] is needed. Call [markPromptedFor] when it shows.
+  Future<bool> shouldPromptFor(ReferralPromptMoment moment) async {
+    if (_session <= 1 || _purchasing || _purchasedThisSession) return false;
+    if (await _store.getString(_momentKey(moment)) != null) return false;
+    final now = _clock();
+    final purchase = await _time(_lastPurchaseKey);
+    if (purchase != null && now.difference(purchase) < purchaseCooldown) return false;
+    final last = await _time(_lastPromptKey);
+    if (last != null && now.difference(last) < minInterval) return false;
+    return true;
+  }
+
+  /// Records that the prompt for [moment] was shown: it never shows again, and it counts as the last prompt.
+  Future<void> markPromptedFor(ReferralPromptMoment moment) async {
+    final at = _clock().toUtc().toIso8601String();
+    await _store.setString(_momentKey(moment), at);
+    await _store.setString(_lastPromptKey, at);
+  }
+
+  static String _momentKey(ReferralPromptMoment m) => 'prompt.moment.${m.wire}';
 
   /// Records that the prompt was shown; the moment of value is used up.
   Future<void> markPrompted() async {

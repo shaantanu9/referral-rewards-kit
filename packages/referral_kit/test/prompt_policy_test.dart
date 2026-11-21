@@ -73,4 +73,35 @@ void main() {
     await session();
     expect(store.values['prompt.sessions'], '2');
   });
+
+  group('moment welcomeRewardReceived', () {
+    const m = ReferralPromptMoment.welcomeRewardReceived;
+    test('never in the first session', () async {
+      final p = await session();
+      expect(await p.shouldPromptFor(m), isFalse);
+    });
+
+    test('allowed once ever, without a separate moment of value', () async {
+      await session();
+      var p = await session();
+      expect(await p.shouldPromptFor(m), isTrue);
+      await p.markPromptedFor(m);
+      expect(await p.shouldPromptFor(m), isFalse);
+      now = now.add(const Duration(days: 400));
+      p = await session();
+      expect(await p.shouldPromptFor(m), isFalse);
+    });
+
+    test('counts as a prompt for the 14-day interval, and respects purchases', () async {
+      await session();
+      var p = await session();
+      await p.markPromptedFor(m);
+      p.reportMomentOfValue();
+      expect(await p.shouldPrompt(), isFalse);
+      store.values.remove('prompt.moment.welcome_reward_received');
+      p = await session();
+      p.reportPurchaseStarted();
+      expect(await p.shouldPromptFor(m), isFalse);
+    });
+  });
 }

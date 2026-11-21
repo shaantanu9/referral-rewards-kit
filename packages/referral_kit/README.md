@@ -31,7 +31,7 @@ dependencies:
   referral_kit:
     git:
       url: https://github.com/shaantanu9/referral-rewards-kit.git
-      ref: referral_kit-v0.3.1                            # a tag; never a moving branch in a release build
+      ref: referral_kit-v0.5.0                            # a tag; never a moving branch in a release build
       path: packages/referral_kit
 ```
 
@@ -224,7 +224,14 @@ logged by hand before 0.3.0, so it switched with no break in its data.
 | `reward_granted` | A granted reward seen in `referral_pending` (once per reward per device) | `kind`, `amount`, `who`, `event` |
 | `reward_shown` | A reward card appeared | `kind`, `event`, `who`, `state` |
 | `reward_acknowledged` | A reward card dismissed | the same, plus `acknowledged` (bool) |
+| `invite_qr_shown` | "Show QR code" opened (0.5) | none |
+| `welcome_card_shown` | `ReferralWelcomeCard` appeared (0.5) | `state` (`claimed` · `joined`) |
+| `welcome_card_dismissed` | The welcome card closed (0.5) | `state`, `action` (`dismiss` · `invite`) |
+| `invite_preferences_changed` | Invite page settings saved, left or rejoined (0.5) | `show_name` and/or `participating` (what was saved), `result` (`ok` · `invalid_name` · `under_age` · `anonymous_user` · `failed`); never the name |
 | `referral_feature_hidden` | Referrals hidden or unusable (once a day per reason) | `reason` (`not_deployed` · `signed_out` · `no_project` · `offline` · `server_error` · `program_paused` · `code_disabled` · `window_closed` · `no_invite_url`, or yours via `client.reportHidden`), `surface` (`client` · `invite` · `entry` · `app`) |
+
+The WhatsApp button (0.5) reports `invite_shared` with `channel: whatsapp_button` and `status` `opened` (WhatsApp
+opened; whether the user sent the message is unknown) or `unavailable`.
 
 `code_claim_result.result` (`claimEventResult(outcome)`, also `outcome.resultName`), one name per outcome:
 `ok`, `invalid` (unknown code), `expired` (window closed), `own_code`, `same_install`, `already_used`, `not_verified`,
@@ -247,6 +254,58 @@ Names before 0.3.0 (`ReferralEvent.legacyWireName`): `referral_invite_viewed` �
 `referral_code_entry_started` → `code_entry_started`, `referral_code_submitted` → `code_submitted`,
 `referral_claim_result` → `code_claim_result`, `referral_reward_shown` → `reward_shown`,
 `referral_reward_acknowledged` → `reward_acknowledged`, `referral_feature_unavailable` → `referral_feature_hidden`.
+
+## Growth (0.5, server migration 23)
+
+Everything below is on by default in `InviteHub` / `InviteFriendsScreen` and hides itself on a server without
+migration 23. Every sentence keeps its condition in the same sentence and names only rewards the terms give.
+
+- **Give-first copy.** The headline and share text lead with what the friend gets: "Give a friend 30 min, and get the
+  same, when they join with your code and start using the app" / "Here's 30 min in X, on me: join with my code …
+  and we both get it once you start using the app." With different rewards: "… (I get a bonus too)". When the friend
+  gets nothing, the sharer-only sentence stays ("… and I get a bonus"). Override with `texts.inviteHeadline`.
+- **Waiting line** on `ReferralStats.claimedCount`: "1 friend used your code. Their next step: Read your first page.
+  When they do it, you both get 4 free chapters." The step is `texts.activationStepForFriends` /
+  `texts.activationStep`; override the whole line with `texts.waiting`.
+- **WhatsApp button** next to Share: `https://wa.me/?text=<share text>`; the user picks the chat, nothing is sent
+  for them. Hidden when the link cannot open (`launcher.canLaunch`). Turn off with `showWhatsApp: false`; inject a
+  `ReferralLauncher` in tests. Android 11+: add to the app's `AndroidManifest.xml` inside `<queries>`:
+
+  ```xml
+  <intent>
+    <action android:name="android.intent.action.VIEW" />
+    <data android:scheme="https" />
+  </intent>
+  ```
+
+- **QR code** ("Show QR code") of the https invite link only, never a code to redeem; hidden without an invite link
+  (`showQrCode: false` to hide it always). Dark modules on white, so it scans in dark mode. `showReferralQrSheet`
+  opens it from your own button.
+- **Boost banner** while `referral_terms().boost` runs: "Double rewards until Sun, 22 Nov for every friend who adds
+  your code by then." (×2 says "Double", other multipliers "3×"), the real last day in the user's locale, never a
+  timer; gone once `ends_at` has passed (`clock` is injectable). `ReferralBoostBanner(terms:)` for other screens.
+- **Your invite page**: "Show my first name" (opt-in, checked like the server: 1–40 characters, a letter, no `@` or
+  link; `displayNameProblem`) with "Your first name is shown to friends who open your link, with a note that you get a
+  reward if they join.", and "Leave the invite program" with a confirm. After leaving the screen says "You left the
+  invite program" with "Join again" (same code). `showInvitePageSettings: false` hides the block.
+- **`ReferralWelcomeCard`** for the friend, on your Home:
+
+  ```dart
+  ReferralWelcomeCard(
+    client: client,
+    store: SharedPreferencesKeyValueStore(),
+    appName: 'Reader',
+    activationStep: 'Read your first page',
+    policy: promptPolicy, // optional: the pass-it-on card is a prompt (welcomeRewardReceived, once ever)
+    onPassItOn: () => openInviteHub(from: 'welcome'),
+  )
+  ```
+
+  Claimed: "Your welcome gift of 60 min is waiting: Read your first page. 12 days left." Joined: once, "Pass it on:
+  give a friend 30 min when they join with your code and start using the app." with "Invite a friend". At most one
+  app session a day per state, dismissible, in-app only.
+- Client: `preferences()`, `setPreferences(showName:, displayName:, participating:)`, `myClaim()`;
+  `MyCodeResult.left`; `ReferralTerms.boost` / `boostAt(now)`.
 
 ## Install referrer (Android) and paste (iOS)
 
@@ -300,6 +359,9 @@ if (await policy.shouldPrompt()) { showInvitePrompt(); await policy.markPrompted
 Never the first session; at most one prompt per 14 days; only after a moment of value in this session; never during a
 purchase, later in that session, or within 24 h after one.
 
+The kit's own moment `ReferralPromptMoment.welcomeRewardReceived` (the pass-it-on card): `shouldPromptFor(moment)` is
+true once ever, never in the first session, with the same purchase and 14-day rules; `markPromptedFor(moment)`.
+
 ## Dependencies
 
 | Package | Licence | Why |
@@ -309,6 +371,8 @@ purchase, later in that session, or within 24 h after one.
 | `play_install_referrer` (>=0.5 <0.7) | BSD-2-Clause | Play Install Referrer API |
 | `share_plus` (>=11 <14) | BSD-3-Clause | System share sheet |
 | `shared_preferences` (^2.3) | BSD-3-Clause | Default `KeyValueStore` |
+| `url_launcher` (^6.3) | BSD-3-Clause | The WhatsApp button (`https://wa.me/?text=`) |
+| `qr_flutter` (^4.1) | BSD-3-Clause | The invite link's QR code |
 | `intl`, `flutter_localizations` | BSD-3-Clause | Plurals, dates |
 
 ## Tests

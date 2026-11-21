@@ -37,8 +37,8 @@ void main() {
     test('share text wraps the code in an isolate', () {
       expect(
         c.shareText(appName: 'App', code: 'ABCDEFGH', link: 'https://x.test/i/ABCDEFGH'),
-        "I'm using App. Join with my code \u2066ABCD-EFGH\u2069 and we both get 30 min of natural voice: "
-        'https://x.test/i/ABCDEFGH',
+        "Here's 30 min of natural voice in App, on me: join with my code \u2066ABCD-EFGH\u2069 and we both get it "
+        'once you start using the app. https://x.test/i/ABCDEFGH',
       );
     });
     test('empty state', () {
@@ -119,7 +119,11 @@ void main() {
       c.rules().single,
       'You get 100 coins and your friend gets 15 min when they sign up and start using the app.',
     );
-    expect(c.shareText(appName: 'A', code: 'ABCDEFGH', link: 'L'), contains('and you get 15 min'));
+    expect(
+      c.shareText(appName: 'A', code: 'ABCDEFGH', link: 'L'),
+      startsWith("Here's 15 min in A, on me: join with my code"),
+    );
+    expect(c.shareText(appName: 'A', code: 'ABCDEFGH', link: 'L'), contains('(I get a bonus too)'));
   });
 
   test('default labels without app labels', () {

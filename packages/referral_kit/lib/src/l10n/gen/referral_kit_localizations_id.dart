@@ -143,7 +143,7 @@ class ReferralKitLocalizationsId extends ReferralKitLocalizations {
 
   @override
   String shareTextBoth(String app, String code, String reward, String link) {
-    return 'Saya memakai $app. Gabung dengan kode saya $code dan kita berdua dapat $reward: $link';
+    return 'Ini $reward di $app dari saya: gabung dengan kode saya $code dan kita berdua mendapatkannya setelah Anda mulai memakai aplikasi. $link';
   }
 
   @override
@@ -153,7 +153,7 @@ class ReferralKitLocalizationsId extends ReferralKitLocalizations {
 
   @override
   String shareTextFriendOnly(String app, String code, String reward, String link) {
-    return 'Saya memakai $app. Gabung dengan kode saya $code dan Anda dapat $reward: $link';
+    return 'Ini $reward di $app dari saya: gabung dengan kode saya $code dan Anda mendapatkannya setelah mulai memakai aplikasi. $link';
   }
 
   @override
@@ -396,12 +396,12 @@ class ReferralKitLocalizationsId extends ReferralKitLocalizations {
 
   @override
   String shareTextNoLinkBoth(String app, String code, String reward, String link) {
-    return 'Aku pakai $app. Unduh, tambahkan kode undanganku $code dan kita berdua dapat $reward: $link';
+    return 'Ini $reward di $app dari saya: unduh, tambahkan kode undangan saya $code dan kita berdua mendapatkannya setelah Anda mulai memakai aplikasi. $link';
   }
 
   @override
   String shareTextNoLinkFriend(String app, String code, String reward, String link) {
-    return 'Aku pakai $app. Unduh, tambahkan kode undanganku $code dan kamu dapat $reward: $link';
+    return 'Ini $reward di $app dari saya: unduh, tambahkan kode undangan saya $code dan Anda mendapatkannya setelah mulai memakai aplikasi. $link';
   }
 
   @override
@@ -422,4 +422,223 @@ class ReferralKitLocalizationsId extends ReferralKitLocalizations {
 
   @override
   String get notInThisVersion => 'Undangan tidak ada di versi aplikasi ini.';
+
+  @override
+  String shareTextEach(String app, String code, String reward, String link) {
+    return 'Ini $reward di $app dari saya: gabung dengan kode saya $code dan Anda mendapatkannya setelah mulai memakai aplikasi (saya juga dapat bonus). $link';
+  }
+
+  @override
+  String shareTextNoLinkEach(String app, String code, String reward, String link) {
+    return 'Ini $reward di $app dari saya: unduh, tambahkan kode undangan saya $code dan Anda mendapatkannya setelah mulai memakai aplikasi (saya juga dapat bonus). $link';
+  }
+
+  @override
+  String inviteHeadlineBoth(String reward) {
+    return 'Beri teman $reward, dan dapatkan yang sama, saat mereka bergabung dengan kode Anda dan mulai memakai aplikasi';
+  }
+
+  @override
+  String inviteHeadlineEach(String friendReward, String sharerReward) {
+    return 'Beri teman $friendReward dan dapatkan $sharerReward saat mereka bergabung dengan kode Anda dan mulai memakai aplikasi';
+  }
+
+  @override
+  String inviteHeadlineFriend(String reward) {
+    return 'Beri teman $reward saat mereka bergabung dengan kode Anda dan mulai memakai aplikasi';
+  }
+
+  @override
+  String inviteHeadlineSharer(String reward) {
+    return 'Dapatkan $reward saat teman bergabung dengan kode Anda dan mulai memakai aplikasi';
+  }
+
+  @override
+  String waitingFriends(int count) {
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '$count teman memakai kode Anda.');
+    return '$_temp0';
+  }
+
+  @override
+  String waitingNextStep(String step) {
+    return 'Langkah berikutnya untuk mereka: $step.';
+  }
+
+  @override
+  String waitingRewardBoth(int count, String reward) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Untuk setiap teman yang melakukannya, Anda berdua mendapat $reward.',
+      one: 'Saat mereka melakukannya, Anda berdua mendapat $reward.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String waitingRewardYou(int count, String reward) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Untuk setiap teman yang melakukannya, Anda mendapat $reward.',
+      one: 'Saat mereka melakukannya, Anda mendapat $reward.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String waitingRewardEach(int count, String sharerReward, String friendReward) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Untuk setiap teman yang melakukannya, Anda mendapat $sharerReward dan dia mendapat $friendReward.',
+      one: 'Saat mereka melakukannya, Anda mendapat $sharerReward dan mereka mendapat $friendReward.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String waitingRewardFriend(int count, String reward) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Setiap teman yang melakukannya mendapat $reward.',
+      one: 'Saat mereka melakukannya, mereka mendapat $reward.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get whatsApp => 'WhatsApp';
+
+  @override
+  String get showQr => 'Tampilkan kode QR';
+
+  @override
+  String get qrTitle => 'Tautan undangan Anda';
+
+  @override
+  String get qrHint => 'Teman memindai ini dengan kamera ponselnya untuk membuka undangan Anda.';
+
+  @override
+  String get qrSemantics => 'Kode QR tautan undangan Anda';
+
+  @override
+  String get close => 'Tutup';
+
+  @override
+  String boostDouble(String date) {
+    return 'Hadiah ganda sampai $date untuk setiap teman yang menambahkan kode Anda sebelum itu.';
+  }
+
+  @override
+  String boostTimes(String multiplier, String date) {
+    return 'Hadiah $multiplier× sampai $date untuk setiap teman yang menambahkan kode Anda sebelum itu.';
+  }
+
+  @override
+  String boostFriendDouble(String date) {
+    return 'Hadiah sambutan ganda sampai $date untuk teman yang menambahkan kode Anda sebelum itu.';
+  }
+
+  @override
+  String boostFriendTimes(String multiplier, String date) {
+    return 'Hadiah sambutan $multiplier× sampai $date untuk teman yang menambahkan kode Anda sebelum itu.';
+  }
+
+  @override
+  String get invitePageTitle => 'Halaman undangan Anda';
+
+  @override
+  String get showFirstName => 'Tampilkan nama depan saya';
+
+  @override
+  String get firstNameLabel => 'Nama depan';
+
+  @override
+  String get invitePageExplainRewarded =>
+      'Nama depan Anda ditampilkan kepada teman yang membuka tautan Anda, dengan catatan bahwa Anda mendapat hadiah jika mereka bergabung.';
+
+  @override
+  String get invitePageExplain => 'Nama depan Anda ditampilkan kepada teman yang membuka tautan Anda.';
+
+  @override
+  String get nameErrEmpty => 'Masukkan nama depan Anda.';
+
+  @override
+  String get nameErrTooLong => 'Gunakan paling banyak 40 karakter.';
+
+  @override
+  String get nameErrNoLetter => 'Gunakan setidaknya satu huruf.';
+
+  @override
+  String get nameErrEmailOrLink => 'Nama tidak boleh berisi @ atau tautan.';
+
+  @override
+  String get save => 'Simpan';
+
+  @override
+  String get saved => 'Tersimpan';
+
+  @override
+  String get saveFailed => 'Tidak dapat menyimpan. Periksa koneksi Anda dan coba lagi.';
+
+  @override
+  String get leaveProgram => 'Keluar dari program undangan';
+
+  @override
+  String get leaveConfirmTitle => 'Keluar dari program undangan?';
+
+  @override
+  String get leaveConfirmBody =>
+      'Kode Anda berhenti berlaku untuk teman baru dan nama Anda tidak lagi ditampilkan. Hadiah yang sedang diproses tetap masuk. Anda bisa bergabung lagi kapan saja dengan kode yang sama.';
+
+  @override
+  String get leaveConfirm => 'Keluar';
+
+  @override
+  String get cancel => 'Batal';
+
+  @override
+  String get leftTitle => 'Anda keluar dari program undangan';
+
+  @override
+  String get leftBody => 'Kode Anda tidak berlaku untuk teman baru. Hadiah yang sedang diproses tetap masuk.';
+
+  @override
+  String get joinAgain => 'Bergabung lagi';
+
+  @override
+  String welcomeWaiting(String reward, String step) {
+    return 'Hadiah sambutan $reward menunggu Anda: $step.';
+  }
+
+  @override
+  String welcomeWaitingPlain(String step) {
+    return 'Hadiah sambutan menunggu Anda: $step.';
+  }
+
+  @override
+  String welcomeDaysLeft(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Tinggal $count hari.',
+      one: 'Hari terakhir.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String passItOn(String reward) {
+    return 'Teruskan: beri teman $reward saat mereka bergabung dengan kode Anda dan mulai memakai aplikasi.';
+  }
+
+  @override
+  String passItOnPlain(String app) {
+    return 'Teruskan: undang teman ke $app.';
+  }
+
+  @override
+  String get inviteAFriend => 'Undang teman';
 }

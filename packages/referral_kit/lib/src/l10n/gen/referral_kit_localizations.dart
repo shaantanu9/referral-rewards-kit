@@ -255,10 +255,10 @@ abstract class ReferralKitLocalizations {
   /// **'A friend you invited subscribed. You got {reward}.'**
   String sharerPaidReward(String reward);
 
-  /// No description provided for @shareTextBoth.
+  /// Give-first share text (0.5): the friend and the sharer get the same joined reward.
   ///
   /// In en, this message translates to:
-  /// **'I\'m using {app}. Join with my code {code} and we both get {reward}: {link}'**
+  /// **'Here\'s {reward} in {app}, on me: join with my code {code} and we both get it once you start using the app. {link}'**
   String shareTextBoth(String app, String code, String reward, String link);
 
   /// No description provided for @shareTextSharerOnly.
@@ -267,10 +267,10 @@ abstract class ReferralKitLocalizations {
   /// **'I\'m using {app}. Join with my code {code} and I get a bonus: {link}'**
   String shareTextSharerOnly(String app, String code, String link);
 
-  /// No description provided for @shareTextFriendOnly.
+  /// Give-first share text: only the friend gets a joined reward.
   ///
   /// In en, this message translates to:
-  /// **'I\'m using {app}. Join with my code {code} and you get {reward}: {link}'**
+  /// **'Here\'s {reward} in {app}, on me: join with my code {code} and you get it once you start using the app. {link}'**
   String shareTextFriendOnly(String app, String code, String reward, String link);
 
   /// No description provided for @shareTextPlain.
@@ -582,13 +582,13 @@ abstract class ReferralKitLocalizations {
   /// No description provided for @shareTextNoLinkBoth.
   ///
   /// In en, this message translates to:
-  /// **'I\'m using {app}. Get it, add my invite code {code} and we both get {reward}: {link}'**
+  /// **'Here\'s {reward} in {app}, on me: get the app, add my invite code {code} and we both get it once you start using the app. {link}'**
   String shareTextNoLinkBoth(String app, String code, String reward, String link);
 
   /// No description provided for @shareTextNoLinkFriend.
   ///
   /// In en, this message translates to:
-  /// **'I\'m using {app}. Get it, add my invite code {code} and you get {reward}: {link}'**
+  /// **'Here\'s {reward} in {app}, on me: get the app, add my invite code {code} and you get it once you start using the app. {link}'**
   String shareTextNoLinkFriend(String app, String code, String reward, String link);
 
   /// No description provided for @shareTextNoLinkPlain.
@@ -620,6 +620,294 @@ abstract class ReferralKitLocalizations {
   /// In en, this message translates to:
   /// **'Invites aren\'t part of this version of the app.'**
   String get notInThisVersion;
+
+  /// Give-first share text: the friend and the sharer get different joined rewards.
+  ///
+  /// In en, this message translates to:
+  /// **'Here\'s {reward} in {app}, on me: join with my code {code} and you get it once you start using the app (I get a bonus too). {link}'**
+  String shareTextEach(String app, String code, String reward, String link);
+
+  /// No description provided for @shareTextNoLinkEach.
+  ///
+  /// In en, this message translates to:
+  /// **'Here\'s {reward} in {app}, on me: get the app, add my invite code {code} and you get it once you start using the app (I get a bonus too). {link}'**
+  String shareTextNoLinkEach(String app, String code, String reward, String link);
+
+  /// Invite screen headline, give-first: both get the same joined reward.
+  ///
+  /// In en, this message translates to:
+  /// **'Give a friend {reward}, and get the same, when they join with your code and start using the app'**
+  String inviteHeadlineBoth(String reward);
+
+  /// No description provided for @inviteHeadlineEach.
+  ///
+  /// In en, this message translates to:
+  /// **'Give a friend {friendReward} and get {sharerReward} when they join with your code and start using the app'**
+  String inviteHeadlineEach(String friendReward, String sharerReward);
+
+  /// No description provided for @inviteHeadlineFriend.
+  ///
+  /// In en, this message translates to:
+  /// **'Give a friend {reward} when they join with your code and start using the app'**
+  String inviteHeadlineFriend(String reward);
+
+  /// No description provided for @inviteHeadlineSharer.
+  ///
+  /// In en, this message translates to:
+  /// **'Get {reward} when a friend joins with your code and starts using the app'**
+  String inviteHeadlineSharer(String reward);
+
+  /// Sharer's invite screen: friends who used the code and have not started yet (claimed_count).
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 friend used your code.} other{{count} friends used your code.}}'**
+  String waitingFriends(int count);
+
+  /// After waitingFriends. {step} is the app's activation step (e.g. 'Read your first page') or stepStartUsing.
+  ///
+  /// In en, this message translates to:
+  /// **'Their next step: {step}.'**
+  String waitingNextStep(String step);
+
+  /// No description provided for @waitingRewardBoth.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{When they do it, you both get {reward}.} other{For each friend who does it, you both get {reward}.}}'**
+  String waitingRewardBoth(int count, String reward);
+
+  /// No description provided for @waitingRewardYou.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{When they do it, you get {reward}.} other{For each friend who does it, you get {reward}.}}'**
+  String waitingRewardYou(int count, String reward);
+
+  /// No description provided for @waitingRewardEach.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{When they do it, you get {sharerReward} and they get {friendReward}.} other{For each friend who does it, you get {sharerReward} and they get {friendReward}.}}'**
+  String waitingRewardEach(int count, String sharerReward, String friendReward);
+
+  /// No description provided for @waitingRewardFriend.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{When they do it, they get {reward}.} other{Each friend who does it gets {reward}.}}'**
+  String waitingRewardFriend(int count, String reward);
+
+  /// Button that opens WhatsApp with the share text; the user picks the chat.
+  ///
+  /// In en, this message translates to:
+  /// **'WhatsApp'**
+  String get whatsApp;
+
+  /// No description provided for @showQr.
+  ///
+  /// In en, this message translates to:
+  /// **'Show QR code'**
+  String get showQr;
+
+  /// No description provided for @qrTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your invite link'**
+  String get qrTitle;
+
+  /// No description provided for @qrHint.
+  ///
+  /// In en, this message translates to:
+  /// **'A friend scans this with their phone camera to open your invite.'**
+  String get qrHint;
+
+  /// No description provided for @qrSemantics.
+  ///
+  /// In en, this message translates to:
+  /// **'QR code of your invite link'**
+  String get qrSemantics;
+
+  /// No description provided for @close.
+  ///
+  /// In en, this message translates to:
+  /// **'Close'**
+  String get close;
+
+  /// Boost banner, multiplier 2, sharer and friend. {date} is the boost's last day, e.g. 'Sun, 23 Nov'. Never a timer.
+  ///
+  /// In en, this message translates to:
+  /// **'Double rewards until {date} for every friend who adds your code by then.'**
+  String boostDouble(String date);
+
+  /// Boost banner, any multiplier but 2.
+  ///
+  /// In en, this message translates to:
+  /// **'{multiplier}× rewards until {date} for every friend who adds your code by then.'**
+  String boostTimes(String multiplier, String date);
+
+  /// Boost banner when only the friend's reward is boosted.
+  ///
+  /// In en, this message translates to:
+  /// **'Double welcome gift until {date} for friends who add your code by then.'**
+  String boostFriendDouble(String date);
+
+  /// No description provided for @boostFriendTimes.
+  ///
+  /// In en, this message translates to:
+  /// **'{multiplier}× welcome gift until {date} for friends who add your code by then.'**
+  String boostFriendTimes(String multiplier, String date);
+
+  /// No description provided for @invitePageTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your invite page'**
+  String get invitePageTitle;
+
+  /// No description provided for @showFirstName.
+  ///
+  /// In en, this message translates to:
+  /// **'Show my first name'**
+  String get showFirstName;
+
+  /// No description provided for @firstNameLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'First name'**
+  String get firstNameLabel;
+
+  /// Disclosure under the first-name toggle when the sharer is rewarded (FTC 16 CFR 255.5).
+  ///
+  /// In en, this message translates to:
+  /// **'Your first name is shown to friends who open your link, with a note that you get a reward if they join.'**
+  String get invitePageExplainRewarded;
+
+  /// No description provided for @invitePageExplain.
+  ///
+  /// In en, this message translates to:
+  /// **'Your first name is shown to friends who open your link.'**
+  String get invitePageExplain;
+
+  /// No description provided for @nameErrEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your first name.'**
+  String get nameErrEmpty;
+
+  /// No description provided for @nameErrTooLong.
+  ///
+  /// In en, this message translates to:
+  /// **'Use 40 characters or fewer.'**
+  String get nameErrTooLong;
+
+  /// No description provided for @nameErrNoLetter.
+  ///
+  /// In en, this message translates to:
+  /// **'Use at least one letter.'**
+  String get nameErrNoLetter;
+
+  /// No description provided for @nameErrEmailOrLink.
+  ///
+  /// In en, this message translates to:
+  /// **'A name can\'t contain @ or a link.'**
+  String get nameErrEmailOrLink;
+
+  /// No description provided for @save.
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get save;
+
+  /// No description provided for @saved.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved'**
+  String get saved;
+
+  /// No description provided for @saveFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t save. Check your connection and try again.'**
+  String get saveFailed;
+
+  /// No description provided for @leaveProgram.
+  ///
+  /// In en, this message translates to:
+  /// **'Leave the invite program'**
+  String get leaveProgram;
+
+  /// No description provided for @leaveConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Leave the invite program?'**
+  String get leaveConfirmTitle;
+
+  /// No description provided for @leaveConfirmBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Your code stops working for new friends and your name is no longer shown. Rewards already on the way still arrive. You can join again any time with the same code.'**
+  String get leaveConfirmBody;
+
+  /// No description provided for @leaveConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Leave'**
+  String get leaveConfirm;
+
+  /// No description provided for @cancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get cancel;
+
+  /// No description provided for @leftTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'You left the invite program'**
+  String get leftTitle;
+
+  /// No description provided for @leftBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Your code doesn\'t work for new friends. Rewards already on the way still arrive.'**
+  String get leftBody;
+
+  /// No description provided for @joinAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'Join again'**
+  String get joinAgain;
+
+  /// Friend's card after adding a code. {step} is the app's activation step.
+  ///
+  /// In en, this message translates to:
+  /// **'Your welcome gift of {reward} is waiting: {step}.'**
+  String welcomeWaiting(String reward, String step);
+
+  /// No description provided for @welcomeWaitingPlain.
+  ///
+  /// In en, this message translates to:
+  /// **'Your welcome gift is waiting: {step}.'**
+  String welcomeWaitingPlain(String step);
+
+  /// After welcomeWaiting: the server's days left to start using the app.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{Last day.} other{{count} days left.}}'**
+  String welcomeDaysLeft(int count);
+
+  /// Shown once to a referred user after their welcome reward.
+  ///
+  /// In en, this message translates to:
+  /// **'Pass it on: give a friend {reward} when they join with your code and start using the app.'**
+  String passItOn(String reward);
+
+  /// No description provided for @passItOnPlain.
+  ///
+  /// In en, this message translates to:
+  /// **'Pass it on: invite a friend to {app}.'**
+  String passItOnPlain(String app);
+
+  /// No description provided for @inviteAFriend.
+  ///
+  /// In en, this message translates to:
+  /// **'Invite a friend'**
+  String get inviteAFriend;
 }
 
 class _ReferralKitLocalizationsDelegate extends LocalizationsDelegate<ReferralKitLocalizations> {

@@ -1,0 +1,61 @@
+{
+  "days": [
+    {
+      "day": "2026-11-14",
+      "paid": 0,
+      "joined": 0,
+      "claimed": 0,
+      "expired": 0
+    },
+    {
+      "day": "2026-11-15",
+      "paid": 0,
+      "joined": 0,
+      "claimed": 0,
+      "expired": 0
+    },
+    {
+      "day": "2026-11-16",
+      "paid": 0,
+      "joined": 0,
+      "claimed": 0,
+      "expired": 0
+    },
+    {
+      "day": "2026-11-17",
+      "paid": 0,
+      "joined": 0,
+      "claimed": 1,
+      "expired": 1
+    },
+    {
+      "day": "2026-11-18",
+      "paid": 0,
+      "joined": 0,
+      "claimed": 0,
+      "expired": 0
+    },
+    {
+      "day": "2026-11-19",
+      "paid": 0,
+      "joined": 1,
+      "claimed": 1,
+      "expired": 0
+    },
+    {
+      "day": "2026-11-20",
+      "paid": 0,
+      "joined": 0,
+      "claimed": 1,
+      "expired": 0
+    }
+  ],
+  "totals": {
+    "paid": 0,
+    "joined": 1,
+    "claimed": 3,
+    "expired": 1,
+    "boosted_rewards": 2
+  },
+  "median_hours_to_join": 26.5
+}

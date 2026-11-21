@@ -156,7 +156,7 @@ class ReferralKitLocalizationsEn extends ReferralKitLocalizations {
 
   @override
   String shareTextBoth(String app, String code, String reward, String link) {
-    return 'I\'m using $app. Join with my code $code and we both get $reward: $link';
+    return 'Here\'s $reward in $app, on me: join with my code $code and we both get it once you start using the app. $link';
   }
 
   @override
@@ -166,7 +166,7 @@ class ReferralKitLocalizationsEn extends ReferralKitLocalizations {
 
   @override
   String shareTextFriendOnly(String app, String code, String reward, String link) {
-    return 'I\'m using $app. Join with my code $code and you get $reward: $link';
+    return 'Here\'s $reward in $app, on me: join with my code $code and you get it once you start using the app. $link';
   }
 
   @override
@@ -417,12 +417,12 @@ class ReferralKitLocalizationsEn extends ReferralKitLocalizations {
 
   @override
   String shareTextNoLinkBoth(String app, String code, String reward, String link) {
-    return 'I\'m using $app. Get it, add my invite code $code and we both get $reward: $link';
+    return 'Here\'s $reward in $app, on me: get the app, add my invite code $code and we both get it once you start using the app. $link';
   }
 
   @override
   String shareTextNoLinkFriend(String app, String code, String reward, String link) {
-    return 'I\'m using $app. Get it, add my invite code $code and you get $reward: $link';
+    return 'Here\'s $reward in $app, on me: get the app, add my invite code $code and you get it once you start using the app. $link';
   }
 
   @override
@@ -443,4 +443,223 @@ class ReferralKitLocalizationsEn extends ReferralKitLocalizations {
 
   @override
   String get notInThisVersion => 'Invites aren\'t part of this version of the app.';
+
+  @override
+  String shareTextEach(String app, String code, String reward, String link) {
+    return 'Here\'s $reward in $app, on me: join with my code $code and you get it once you start using the app (I get a bonus too). $link';
+  }
+
+  @override
+  String shareTextNoLinkEach(String app, String code, String reward, String link) {
+    return 'Here\'s $reward in $app, on me: get the app, add my invite code $code and you get it once you start using the app (I get a bonus too). $link';
+  }
+
+  @override
+  String inviteHeadlineBoth(String reward) {
+    return 'Give a friend $reward, and get the same, when they join with your code and start using the app';
+  }
+
+  @override
+  String inviteHeadlineEach(String friendReward, String sharerReward) {
+    return 'Give a friend $friendReward and get $sharerReward when they join with your code and start using the app';
+  }
+
+  @override
+  String inviteHeadlineFriend(String reward) {
+    return 'Give a friend $reward when they join with your code and start using the app';
+  }
+
+  @override
+  String inviteHeadlineSharer(String reward) {
+    return 'Get $reward when a friend joins with your code and starts using the app';
+  }
+
+  @override
+  String waitingFriends(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count friends used your code.',
+      one: '1 friend used your code.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String waitingNextStep(String step) {
+    return 'Their next step: $step.';
+  }
+
+  @override
+  String waitingRewardBoth(int count, String reward) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'For each friend who does it, you both get $reward.',
+      one: 'When they do it, you both get $reward.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String waitingRewardYou(int count, String reward) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'For each friend who does it, you get $reward.',
+      one: 'When they do it, you get $reward.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String waitingRewardEach(int count, String sharerReward, String friendReward) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'For each friend who does it, you get $sharerReward and they get $friendReward.',
+      one: 'When they do it, you get $sharerReward and they get $friendReward.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String waitingRewardFriend(int count, String reward) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Each friend who does it gets $reward.',
+      one: 'When they do it, they get $reward.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get whatsApp => 'WhatsApp';
+
+  @override
+  String get showQr => 'Show QR code';
+
+  @override
+  String get qrTitle => 'Your invite link';
+
+  @override
+  String get qrHint => 'A friend scans this with their phone camera to open your invite.';
+
+  @override
+  String get qrSemantics => 'QR code of your invite link';
+
+  @override
+  String get close => 'Close';
+
+  @override
+  String boostDouble(String date) {
+    return 'Double rewards until $date for every friend who adds your code by then.';
+  }
+
+  @override
+  String boostTimes(String multiplier, String date) {
+    return '$multiplier× rewards until $date for every friend who adds your code by then.';
+  }
+
+  @override
+  String boostFriendDouble(String date) {
+    return 'Double welcome gift until $date for friends who add your code by then.';
+  }
+
+  @override
+  String boostFriendTimes(String multiplier, String date) {
+    return '$multiplier× welcome gift until $date for friends who add your code by then.';
+  }
+
+  @override
+  String get invitePageTitle => 'Your invite page';
+
+  @override
+  String get showFirstName => 'Show my first name';
+
+  @override
+  String get firstNameLabel => 'First name';
+
+  @override
+  String get invitePageExplainRewarded =>
+      'Your first name is shown to friends who open your link, with a note that you get a reward if they join.';
+
+  @override
+  String get invitePageExplain => 'Your first name is shown to friends who open your link.';
+
+  @override
+  String get nameErrEmpty => 'Enter your first name.';
+
+  @override
+  String get nameErrTooLong => 'Use 40 characters or fewer.';
+
+  @override
+  String get nameErrNoLetter => 'Use at least one letter.';
+
+  @override
+  String get nameErrEmailOrLink => 'A name can\'t contain @ or a link.';
+
+  @override
+  String get save => 'Save';
+
+  @override
+  String get saved => 'Saved';
+
+  @override
+  String get saveFailed => 'Couldn\'t save. Check your connection and try again.';
+
+  @override
+  String get leaveProgram => 'Leave the invite program';
+
+  @override
+  String get leaveConfirmTitle => 'Leave the invite program?';
+
+  @override
+  String get leaveConfirmBody =>
+      'Your code stops working for new friends and your name is no longer shown. Rewards already on the way still arrive. You can join again any time with the same code.';
+
+  @override
+  String get leaveConfirm => 'Leave';
+
+  @override
+  String get cancel => 'Cancel';
+
+  @override
+  String get leftTitle => 'You left the invite program';
+
+  @override
+  String get leftBody => 'Your code doesn\'t work for new friends. Rewards already on the way still arrive.';
+
+  @override
+  String get joinAgain => 'Join again';
+
+  @override
+  String welcomeWaiting(String reward, String step) {
+    return 'Your welcome gift of $reward is waiting: $step.';
+  }
+
+  @override
+  String welcomeWaitingPlain(String step) {
+    return 'Your welcome gift is waiting: $step.';
+  }
+
+  @override
+  String welcomeDaysLeft(int count) {
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '$count days left.', one: 'Last day.');
+    return '$_temp0';
+  }
+
+  @override
+  String passItOn(String reward) {
+    return 'Pass it on: give a friend $reward when they join with your code and start using the app.';
+  }
+
+  @override
+  String passItOnPlain(String app) {
+    return 'Pass it on: invite a friend to $app.';
+  }
+
+  @override
+  String get inviteAFriend => 'Invite a friend';
 }

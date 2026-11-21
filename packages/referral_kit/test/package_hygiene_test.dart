@@ -12,8 +12,10 @@ void main() {
       'package:flutter_secure_storage/',
       'package:intl/',
       'package:play_install_referrer/',
+      'package:qr_flutter/',
       'package:share_plus/',
       'package:shared_preferences/',
+      'package:url_launcher/',
       'package:referral_kit/',
     ];
     final bad = <String>[];

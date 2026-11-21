@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import '../client.dart';
 import '../copy.dart';
 import '../events.dart';
+import '../launcher.dart';
 import '../models.dart';
 import '../pending_claim.dart';
 import '../share.dart';
@@ -78,6 +79,10 @@ class InviteHub extends StatefulWidget {
     this.padding = const EdgeInsets.only(bottom: 24),
     this.pastePlatform,
     this.clock = DateTime.now,
+    this.launcher = const UrlLauncherReferralLauncher(),
+    this.showWhatsApp = true,
+    this.showQrCode = true,
+    this.showInvitePageSettings = true,
     @Deprecated('The friend part always shows the server count; use texts.deadline to change its words.')
     this.showWindow = true,
   });
@@ -150,6 +155,15 @@ class InviteHub extends StatefulWidget {
   final TargetPlatform? pastePlatform;
   final DateTime Function() clock;
   final bool showWindow;
+
+  /// See [InviteFriendsScreen.launcher] (the WhatsApp button).
+  final ReferralLauncher launcher;
+
+  /// See [InviteFriendsScreen.showWhatsApp], [InviteFriendsScreen.showQrCode] and
+  /// [InviteFriendsScreen.showInvitePageSettings].
+  final bool showWhatsApp;
+  final bool showQrCode;
+  final bool showInvitePageSettings;
 
   @override
   State<InviteHub> createState() => InviteHubState();
@@ -235,6 +249,11 @@ class InviteHubState extends State<InviteHub> {
               onSignIn: widget.onSignIn,
               embedded: true,
               onLoaded: _scrollSoon,
+              launcher: widget.launcher,
+              showWhatsApp: widget.showWhatsApp,
+              showQrCode: widget.showQrCode,
+              showInvitePageSettings: widget.showInvitePageSettings,
+              clock: widget.clock,
             ),
           ),
         if (both) const Divider(height: 1, indent: 16, endIndent: 16),
@@ -295,4 +314,7 @@ ReferralTexts _withEntryTitle(ReferralTexts t, String entryTitle) => ReferralTex
   shareTextNoLink: t.shareTextNoLink,
   unavailable: t.unavailable,
   signIn: t.signIn,
+  waiting: t.waiting,
+  inviteHeadline: t.inviteHeadline,
+  activationStepForFriends: t.activationStepForFriends,
 );

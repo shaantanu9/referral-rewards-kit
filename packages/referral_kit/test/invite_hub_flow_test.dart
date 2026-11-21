@@ -89,7 +89,7 @@ void main() {
     await tester.pumpAndSettle();
     expect(shared.single, contains('ABCD-EFGH'));
     expect(shared.single, contains('https://apps.apple.com/app/id1'));
-    expect(shared.single, contains('we both get 30 min'));
+    expect(shared.single, startsWith("Here's 30 min"));
     expect(events.where((e) => e.wireName == 'invite_shared').single.props['has_link'], false);
     // The screen reports once a day that it runs without an invite page.
     expect(events.where((e) => e.wireName == 'referral_feature_hidden').single.props, {
