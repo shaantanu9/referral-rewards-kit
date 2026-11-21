@@ -4,6 +4,7 @@
 \set preset_quiz `cat supabase/app-config/presets/quiz.json`
 \set preset_habit `cat supabase/app-config/presets/habit.json`
 \set preset_retention `cat supabase/app-config/presets/retention.json`
+\set preset_referral `cat supabase/app-config/presets/referral.json`
 begin;
 
 create temp table u (name text primary key, id uuid not null);
@@ -30,11 +31,15 @@ select tests.ok((public.rewards_admin_import(:'preset_reader'::jsonb, false) ->>
 select tests.ok((public.rewards_admin_import(:'preset_quiz'::jsonb, false) ->> 'applied')::boolean, 'quiz preset applied');
 select tests.ok((public.rewards_admin_import(:'preset_habit'::jsonb, false) ->> 'applied')::boolean, 'habit preset applied');
 select tests.ok((public.rewards_admin_import(:'preset_retention'::jsonb, false) ->> 'applied')::boolean, 'retention preset applied');
+select tests.ok((public.rewards_admin_import(:'preset_referral'::jsonb, false) ->> 'applied')::boolean, 'referral ladder preset applied');
 select tests.ok(jsonb_array_length(public.rewards_admin_import(:'preset_reader'::jsonb, true) -> 'changes') = 0,
                 'importing the same preset again changes nothing');
 reset role;
-select tests.ok((select count(*) from rewards.programs) = 36 and (select count(*) from rewards.rules where active) = 25,
-                'all programs and rules of the four presets exist');
+select tests.ok((select count(*) from rewards.programs) = 37 and (select count(*) from rewards.rules where active) = 30,
+                'all programs and rules of the five presets exist');
+select tests.ok((select config ->> 'event' = 'referral_joined' and not config ? 'head_start' from rewards.programs where key = 'referral_ladder')
+                and (select array_agg(r.threshold order by r.threshold) = '{1,3,10}' from rewards.rules r
+                      where r.program_key = 'referral_ladder' and r.active), 'referral ladder: referral_joined at 1, 3 and 10, no head start');
 
 -- export round trip -----------------------------------------------------------------------------------------------------
 select tests.act_as('authenticated', pg_temp.uid('admin'));

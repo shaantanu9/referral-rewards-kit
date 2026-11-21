@@ -5,9 +5,12 @@
 -- Postgres grants EXECUTE on every new function to PUBLIC, and Supabase grants new functions in `public` to anon,
 -- authenticated and service_role. So every helper an app or the kit creates is callable through PostgREST
 -- (`POST /rest/v1/rpc/<name>`) until someone revokes it. Expected result:
---   verdict = 'expected'            the eight referral client RPCs, for authenticated only
+--   verdict = 'expected'            the twelve referral client RPCs for authenticated, and the invite page's
+--                                   public.referral_invite_preview(text) also for anon (migration 23)
 --   verdict = 'expected_admin'      a referral admin RPC (public.referral_admin_*) for authenticated: security definer
---                                   with search_path = '' whose body calls referral.require_admin()
+--                                   with search_path = '' whose body calls referral.require_admin(). Eleven:
+--                                   overview, referrals, user, rewards, retry_reward, check_activation, log
+--                                   (migration 21), funnel (23), boosts, boost_create, boost_end (24)
 --   verdict = 'expected_rewards'    a rewards RPC (public.rewards_*, not rewards_svc_*) for authenticated: security
 --                                   definer with search_path = '' (each checks auth.uid() / rewards.require_admin())
 --   verdict = 'kit_exposed'         a referral-kit or rewards function an API role can call that it must not: FIX NOW
@@ -25,7 +28,9 @@ with api(role_name) as (values ('anon'), ('authenticated')),
 client_rpcs(sig) as (values
   ('public.referral_my_code(text)'), ('public.referral_rotate_code(text)'), ('public.referral_claim(text,text)'),
   ('public.referral_terms(text)'), ('public.referral_check_activation(text)'), ('public.referral_stats(text)'),
-  ('public.referral_pending(text)'), ('public.referral_ack(uuid[],text)')),
+  ('public.referral_pending(text)'), ('public.referral_ack(uuid[],text)'),
+  ('public.referral_preferences(text)'), ('public.referral_preferences_set(text,jsonb)'),
+  ('public.referral_my_claim(text)'), ('public.referral_invite_preview(text)')),
 fn as (
   select p.oid, n.oid as nsoid, n.nspname, p.proname, p.prosecdef, p.proacl,
          n.nspname || '.' || p.proname || '(' ||
@@ -58,6 +63,7 @@ select c.sig as function_signature,
        c.prosecdef as security_definer,
        case
          when c.kit and c.role_name = 'authenticated' and c.sig in (select sig from client_rpcs) then 'expected'
+         when c.kit and c.role_name = 'anon' and c.sig = 'public.referral_invite_preview(text)' then 'expected'
          when c.kit and c.role_name = 'authenticated' and c.nspname = 'public' and c.proname like 'referral\_admin\_%'
               and c.prosecdef and coalesce(c.proconfig @> array['search_path=""'], false)
               and position('referral.require_admin()' in c.prosrc) > 0 then 'expected_admin'

@@ -1,7 +1,7 @@
 {
   "format": "rewards-config",
   "version": 1,
-  "about": "Habit / wellness app: daily practice streak with a daily goal, weekly quests, weekend bonus, comeback, Premium days at 30 days. Follow-ups: streak-at-risk and comeback notifications, a Sunday recap.",
+  "about": "Habit / wellness app: daily practice streak with a daily goal, weekly quests, weekend bonus, comeback, Premium days at 30 days. Follow-ups: streak-at-risk and comeback notifications, a Sunday recap. Streak repair: a missed day can be repaired the next day with 2 practices; badges at 66 and 100 days (habits took a median 66 days, Lally 2010).",
   "settings": {},
   "event_types": [
     {
@@ -27,7 +27,9 @@
         "event": "practice_done",
         "daily_goal": 2,
         "weekly_free_freezes": 1,
-        "max_freezes": 3
+        "max_freezes": 3,
+        "repair_days": 1,
+        "repair_count": 2
       }
     },
     {
@@ -140,6 +142,26 @@
       "amount": 7,
       "params": {
         "entitlement_id": "premium"
+      }
+    },
+    {
+      "program": "practice",
+      "threshold": 66,
+      "repeat": "once",
+      "kind": "badge",
+      "amount": 1,
+      "params": {
+        "badge": "habit_formed"
+      }
+    },
+    {
+      "program": "practice",
+      "threshold": 100,
+      "repeat": "once",
+      "kind": "badge",
+      "amount": 1,
+      "params": {
+        "badge": "hundred_days"
       }
     },
     {

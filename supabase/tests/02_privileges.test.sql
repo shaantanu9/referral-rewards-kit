@@ -41,9 +41,12 @@ select tests.ok(
   not exists (
     select 1 from kit_functions f
     where f.nspname = 'public' and f.proname like 'referral\_%' and f.proname not like 'referral\_svc\_%'
-      and (has_function_privilege('anon', f.oid, 'EXECUTE')
+      and ((has_function_privilege('anon', f.oid, 'EXECUTE') and f.proname <> 'referral_invite_preview')
            or not has_function_privilege('authenticated', f.oid, 'EXECUTE'))),
-  'user wrappers: authenticated, never anon');
+  'user wrappers: authenticated, never anon (except the invite preview, migration 23)');
+
+select tests.ok(has_function_privilege('anon', 'public.referral_invite_preview(text)', 'EXECUTE'),
+  'the invite page''s preview (migration 23) is callable by anon');
 
 -- Every security definer function in the kit pins search_path.
 select tests.ok(

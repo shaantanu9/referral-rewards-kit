@@ -1,0 +1,57 @@
+{
+  "format": "rewards-config",
+  "version": 1,
+  "about": "Referral ladder for an app that runs both kits: a milestone on the referral kit's referral_joined event (one per friend who started using the app), rewarded at 1, 3 and 10 friends with modest rewards stated up front; no head start, and each user's own off switch applies. Goal gradient: effort rises as a reward gets near (Kivetz, Urminsky & Zheng 2006). No referral-specific test of reward tiers exists (Robinhood-style ladders are an option, not a proven default), so this preset is off unless the app imports it.",
+  "settings": {},
+  "event_types": [],
+  "programs": [
+    {
+      "key": "referral_ladder",
+      "kind": "milestone",
+      "sort": 20,
+      "public": {
+        "title": "Friends who joined"
+      },
+      "config": {
+        "event": "referral_joined",
+        "levels": [
+          1,
+          3,
+          10
+        ]
+      }
+    }
+  ],
+  "rules": [
+    {
+      "program": "referral_ladder",
+      "threshold": 1,
+      "repeat": "once",
+      "kind": "badge",
+      "amount": 1,
+      "params": {
+        "badge": "first_friend"
+      }
+    },
+    {
+      "program": "referral_ladder",
+      "threshold": 3,
+      "repeat": "once",
+      "kind": "entitlement_days",
+      "amount": 7,
+      "params": {
+        "entitlement_id": "premium"
+      }
+    },
+    {
+      "program": "referral_ladder",
+      "threshold": 10,
+      "repeat": "once",
+      "kind": "entitlement_days",
+      "amount": 14,
+      "params": {
+        "entitlement_id": "premium"
+      }
+    }
+  ]
+}

@@ -137,6 +137,8 @@ end $$;
 select tests.ok((select kind = 'coins' and amount = 50 and state = 'granted' and grant_key is null and target_expires_at is null
                    and attempt_token is null
                  from referral.rewards where id = (select fb from fr)), 'fallback: the reward became the fallback kind');
+select tests.ok((select base_amount = 50 and boost_id is null from referral.rewards where id = (select fb from fr)),
+                'fallback: base_amount follows the fallback amount and it carries no boost (migration 25)');
 select tests.ok((select params -> 'fallback_from' = '{"kind":"entitlement_days","amount":7,"grant_key":"entitlement:premium","reason":"lifetime"}'
                    and params ->> 'note' = 'x'
                  from referral.rewards where id = (select fb from fr)), 'fallback: the original reward is kept in params.fallback_from');
