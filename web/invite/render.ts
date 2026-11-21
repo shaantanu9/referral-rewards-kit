@@ -10,6 +10,20 @@ export interface InviteConfig {
   siteUrl: string; // https://example.com (no trailing slash)
   ogImageUrl: string; // absolute URL of a 1200×630 image
   termsPath?: string; // default /terms
+  // Invite preview (growth design §6, ADR 12): the sharer's first name (only when they opted in), the friend's reward
+  // and a running boost. Leave both out and the page never calls anything.
+  supabaseUrl?: string; // https://<ref>.supabase.co, used by fetchInvitePreview and by index.html on a static host
+  anonKey?: string; // the project's anon / publishable key (public by design; never the service role key)
+  // Wording per language and reward kind, the same labels the app uses: { en: { minutes: { one: "{n} min of X",
+  // other: "{n} min of X" } } }. A kind without a label in the page's language gives a neutral sentence instead.
+  rewardLabels?: Partial<Record<Lang, Record<string, PluralLabel>>>;
+  timeZone?: string; // IANA zone for the boost's end date when rendered on the server, default UTC
+}
+
+/** "{n}" is replaced with the amount, formatted for the page's language. */
+export interface PluralLabel {
+  one: string;
+  other: string;
 }
 
 export type Lang = "en" | "hi" | "id";
@@ -25,7 +39,31 @@ export interface Strings {
   playNote: string; // "On Android the code is filled in for you."
   terms: string;
   invalid: string; // "This invite link is not complete. Ask your friend for their code."
+  preview?: PreviewStrings; // without it the page ignores any preview (languages added before 0.5 keep working)
 }
+
+/** Lines shown from referral_invite_preview. "{name}", "{app}", "{reward}", "{date}", "{n}" are filled in. */
+export interface PreviewStrings {
+  invitedBy: string; // "{name} invited you to {app}"
+  disclosure: string; // "{name} gets a reward if you join." (FTC 16 CFR 255.5: next to the name)
+  disclosureAnon: string; // "Your friend gets a reward if you join."
+  leadNamed: string; // "Add this code when you sign up:"
+  friendReward: string; // "You get {reward} when you start using the app."
+  friendRewardNeutral: string; // "You get a welcome reward when you start using the app."
+  boostDouble: string; // "Double rewards until {date}"
+  boostTimes: string; // "{n}× rewards until {date}"
+}
+
+/** The JSON of public.referral_invite_preview(code) (growth design §4.3). */
+export type InvitePreview =
+  | {
+    valid: true;
+    name: string | null;
+    friend_rewards: { kind: string; amount: number; params?: Record<string, unknown> }[];
+    sharer_rewarded: boolean;
+    boost: { ends_at: string; multiplier: number } | null;
+  }
+  | { valid: false };
 
 // The code alphabet of the kit (ADR 11.7): 8 characters, no O, 0, I, 1, L.
 const CODE_RE = /^[ABCDEFGHJKMNPQRSTUVWXYZ2-9]{8}$/;
@@ -37,6 +75,7 @@ export function normaliseCode(input: string): string {
   return input
     .normalize("NFKC")
     .replace(
+      // deno-lint-ignore no-control-regex
       /[\u0009-\u000D\u0020\u00A0\u00AD\u061C\u1680\u180E\u2000-\u200F\u2010-\u2015\u2028\u2029\u202A-\u202F\u205F\u2060-\u206F\u2212\u3000\uFEFF-]/g,
       "",
     )
@@ -81,9 +120,179 @@ export function playUrl(cfg: InviteConfig, code: string | null): string {
   return code ? `${base}&referrer=${encodeURIComponent(`code=${code}`)}` : base;
 }
 
+// ---------------------------------------------------------------------------------------------------------------
+// Invite preview (growth design §4.3, §6)
+// ---------------------------------------------------------------------------------------------------------------
+
+/**
+ * A name typed by a user, made safe to show: control, bidi and line-separator characters removed (a U+202E override
+ * could reorder the sentence around it), whitespace collapsed, at most 40 characters. "" when nothing is left.
+ * The caller still HTML-escapes it and puts it in a bidi isolate.
+ */
+export function cleanName(name: string): string {
+  const cleaned = name.normalize("NFC").replace(/[\t\n\v\f\r\u0085\u2028\u2029]/g, " ").replace(
+    // deno-lint-ignore no-control-regex
+    /[\u0000-\u001F\u007F-\u009F\u061C\u200E\u200F\u202A-\u202E\u2066-\u2069\u2028\u2029\uFEFF]/g,
+    "",
+  )
+    .replace(/\s+/g, " ").trim();
+  return [...cleaned].slice(0, 40).join("").trim();
+}
+
+/** The preview JSON checked field by field; anything malformed is null, so the page falls back to the plain one. */
+export function parsePreview(x: unknown): InvitePreview | null {
+  if (!x || typeof x !== "object") return null;
+  const o = x as Record<string, unknown>;
+  if (o.valid === false) return { valid: false };
+  if (o.valid !== true) return null;
+  const rewards = Array.isArray(o.friend_rewards) ? o.friend_rewards : [];
+  const friend_rewards = rewards.filter((r): r is { kind: string; amount: number; params?: Record<string, unknown> } =>
+    !!r && typeof r === "object" && typeof (r as Record<string, unknown>).kind === "string" &&
+    typeof (r as Record<string, unknown>).amount === "number" &&
+    Number.isFinite((r as Record<string, unknown>).amount) &&
+    ((r as Record<string, unknown>).amount as number) > 0
+  ).map((r) => ({ kind: r.kind, amount: r.amount, params: r.params }));
+  const b = o.boost as Record<string, unknown> | null | undefined;
+  const boost = b && typeof b === "object" && typeof b.ends_at === "string" && !isNaN(Date.parse(b.ends_at)) &&
+      typeof b.multiplier === "number" && b.multiplier > 1 && b.multiplier <= 5
+    ? { ends_at: b.ends_at, multiplier: b.multiplier }
+    : null;
+  const name = typeof o.name === "string" ? cleanName(o.name) || null : null;
+  return { valid: true, name, friend_rewards, sharer_rewarded: o.sharer_rewarded === true, boost };
+}
+
+/**
+ * Calls public.referral_invite_preview on the server (anon role). Null on any problem: no config, a bad code, an HTTP
+ * error, a timeout (2 s by default) or malformed JSON. The page must render without it.
+ */
+export async function fetchInvitePreview(
+  supabaseUrl: string,
+  anonKey: string,
+  code: string,
+  fetchImpl: typeof fetch = fetch,
+  timeoutMs = 2000,
+): Promise<InvitePreview | null> {
+  const c = normaliseCode(code);
+  if (!supabaseUrl || !anonKey || !validCode(c)) return null;
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), timeoutMs);
+  try {
+    const headers: Record<string, string> = { "content-type": "application/json", apikey: anonKey };
+    // A legacy anon key is a JWT and goes in Authorization too; a new publishable key (sb_publishable_…) does not.
+    if (anonKey.startsWith("eyJ")) headers.authorization = `Bearer ${anonKey}`;
+    const res = await fetchImpl(`${supabaseUrl.replace(/\/+$/, "")}/rest/v1/rpc/referral_invite_preview`, {
+      method: "POST",
+      headers,
+      body: JSON.stringify({ code: c }),
+      signal: ctrl.signal,
+    });
+    if (!res.ok) {
+      await res.body?.cancel();
+      return null;
+    }
+    return parsePreview(await res.json());
+  } catch {
+    return null;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+const LOCALES: Record<Lang, string> = { en: "en-GB", hi: "hi-IN", id: "id-ID" };
+const locale = (lang: Lang) => LOCALES[lang] ?? lang;
+
+/** "60 min of X" from the app's labels, or null when a kind has no label in this language. */
+export function rewardText(
+  rewards: { kind: string; amount: number }[],
+  labels: Record<string, PluralLabel> | undefined,
+  lang: Lang,
+): string | null {
+  if (!rewards.length || !labels) return null;
+  const plural = new Intl.PluralRules(locale(lang));
+  const num = new Intl.NumberFormat(locale(lang));
+  const parts: string[] = [];
+  for (const r of rewards) {
+    const l = Object.hasOwn(labels, r.kind) ? labels[r.kind] : undefined;
+    if (!l) return null;
+    parts.push((plural.select(r.amount) === "one" ? l.one : l.other).replaceAll("{n}", num.format(r.amount)));
+  }
+  return new Intl.ListFormat(locale(lang), { type: "conjunction" }).format(parts);
+}
+
+/** "Sun, 22 Nov": the last day the boost runs (ends_at is exclusive), in the given zone. Same as the app's banner. */
+export function boostDate(endsAt: string, lang: Lang, timeZone = "UTC"): string {
+  const last = new Date(Date.parse(endsAt) - 1);
+  const f = new Intl.DateTimeFormat(locale(lang), { weekday: "short", day: "numeric", month: "short", timeZone });
+  if (lang !== "en") return f.format(last);
+  const part = (t: string) => f.formatToParts(last).find((x) => x.type === t)?.value ?? "";
+  return `${part("weekday")}, ${part("day")} ${part("month")}`;
+}
+
+/** Fills {name} (escaped, in a bidi isolate) and the other placeholders (escaped) in one pass. */
+function fillHtml(template: string, vars: Record<string, string>): string {
+  return escapeHtml(template).replace(/\{(name|app|reward|date|n)\}/g, (m, k: string) => {
+    if (!(k in vars)) return m;
+    return k === "name" ? `<bdi>${escapeHtml(vars[k])}</bdi>` : escapeHtml(vars[k]);
+  });
+}
+
+interface PreviewLines {
+  headline?: string; // HTML
+  disclosure?: string; // HTML
+  reward?: string; // HTML
+  boost?: string; // HTML
+  lead?: string; // HTML
+}
+
+function previewLines(
+  p: InvitePreview | null,
+  cfg: InviteConfig,
+  s: Strings,
+  lang: Lang,
+  now: Date,
+): PreviewLines {
+  const ps = s.preview;
+  if (!ps || !p || !p.valid) return {};
+  const out: PreviewLines = {};
+  const app = cfg.appName;
+  if (p.name) {
+    out.headline = fillHtml(ps.invitedBy, { name: p.name, app });
+    out.lead = fillHtml(ps.leadNamed, { app });
+  }
+  if (p.sharer_rewarded) {
+    out.disclosure = p.name ? fillHtml(ps.disclosure, { name: p.name, app }) : fillHtml(ps.disclosureAnon, { app });
+  }
+  if (p.friend_rewards.length) {
+    const r = rewardText(p.friend_rewards, cfg.rewardLabels?.[lang], lang);
+    out.reward = r === null ? fillHtml(ps.friendRewardNeutral, { app }) : fillHtml(ps.friendReward, { reward: r, app });
+  }
+  if (p.boost && Date.parse(p.boost.ends_at) > now.getTime()) {
+    const date = boostDate(p.boost.ends_at, lang, cfg.timeZone ?? "UTC");
+    const m = p.boost.multiplier;
+    out.boost = m === 2
+      ? fillHtml(ps.boostDouble, { date })
+      : fillHtml(ps.boostTimes, { date, n: new Intl.NumberFormat(locale(lang)).format(m) });
+  }
+  return out;
+}
+
+/** JSON for a <script type="application/json"> block: nothing in it can close the script or start a comment. */
+export function scriptJson(x: unknown): string {
+  return JSON.stringify(x).replace(/</g, "\\u003c").replace(/>/g, "\\u003e").replace(/&/g, "\\u0026")
+    .replace(/\u2028/g, "\\u2028").replace(/\u2029/g, "\\u2029");
+}
+
+export interface RenderOptions {
+  /** The referral_invite_preview JSON for this code, fetched on the server (fetchInvitePreview). */
+  preview?: InvitePreview | null;
+  now?: Date;
+}
+
 /**
  * The invite page. `code` null (or invalid) renders the page without a code and with the `invalid` line, never an
- * error page, and never echoes the raw input.
+ * error page, and never echoes the raw input. With a valid `preview` it adds the sharer's name (when they opted in)
+ * with the reward disclosure, the friend's reward and a running boost; without one, or `valid: false`, the plain page.
+ * The page's title and Open Graph tags never carry the name: chat apps cache link previews.
  */
 export function renderInvite(
   template: string,
@@ -91,14 +300,41 @@ export function renderInvite(
   s: Strings,
   lang: Lang,
   rawCode: string | null,
+  opts: RenderOptions = {},
 ): string {
   const code = rawCode === null ? null : normaliseCode(rawCode);
   const ok = code !== null && validCode(code);
   const app = escapeHtml(cfg.appName);
+  const preview = ok ? parsePreview(opts.preview) : null;
+  const pl = previewLines(preview, cfg, s, lang, opts.now ?? new Date());
+  // The browser fetches the preview itself only on a static host: no preview given here and the keys configured.
+  const browserFetch = opts.preview === undefined && !!cfg.supabaseUrl && !!cfg.anonKey && !!s.preview;
+  const data = browserFetch
+    ? {
+      url: cfg.supabaseUrl!.replace(/\/+$/, "") + "/rest/v1/rpc/referral_invite_preview",
+      key: cfg.anonKey,
+      lang,
+      locale: locale(lang),
+      app: cfg.appName,
+      s: s.preview,
+      labels: cfg.rewardLabels?.[lang] ?? {},
+    }
+    : {};
+  const title = escapeHtml(fill(s.title, cfg.appName));
   const v: Record<string, string> = {
     LANG: lang,
-    TITLE: escapeHtml(fill(s.title, cfg.appName)),
-    LEAD: escapeHtml(fill(ok ? s.lead : s.invalid, cfg.appName)),
+    TITLE: title,
+    HEADLINE: pl.headline ?? title,
+    DISCLOSURE: pl.disclosure ?? "",
+    DISCLOSURE_HIDDEN: pl.disclosure ? "" : "hidden",
+    REWARD: pl.reward ?? "",
+    REWARD_HIDDEN: pl.reward ? "" : "hidden",
+    BOOST: pl.boost ?? "",
+    BOOST_HIDDEN: pl.boost ? "" : "hidden",
+    LEAD: pl.lead ?? escapeHtml(fill(ok ? s.lead : s.invalid, cfg.appName)),
+    LEAD_OK: escapeHtml(fill(s.lead, cfg.appName)),
+    OG_DESCRIPTION: escapeHtml(fill(ok ? s.lead : s.invalid, cfg.appName)),
+    PREVIEW_DATA: scriptJson(data),
     CODE: ok ? escapeHtml(code!) : "",
     CODE_DISPLAY: ok ? escapeHtml(displayCode(code!)) : "",
     CODE_SPOKEN: ok ? escapeHtml(code!.split("").join(" ")) : "",

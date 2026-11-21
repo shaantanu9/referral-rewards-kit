@@ -1,6 +1,7 @@
 // The invite link's preview image (og:image, 1200×630) for one app: its name, an invite line and its colour.
 // One static image per app and language, never one per code (a code in a preview image would be cached and shared by
-// chat apps). Pure function + a small CLI; turn the SVG into the PNG that chat apps need with any SVG renderer, e.g.
+// chat apps), and never the sharer's name (WhatsApp caches link previews, so a name would outlive the sharer's opt-out:
+// the name is only ever in the page body, see render.ts). Pure function + a small CLI; turn the SVG into the PNG that chat apps need with any SVG renderer, e.g.
 //   deno run --allow-write=. web/invite/og.ts --app "Example" --accent "#0f766e" --out og.svg
 //   magick -density 96 og.svg og.png        (ImageMagick; or rsvg-convert, Inkscape, a browser screenshot)
 // then upload og.png and set `ogImageUrl` in the invite config to its absolute https URL.

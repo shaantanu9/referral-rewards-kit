@@ -7,6 +7,8 @@ import {
   textOn,
   wrap,
 } from "./og.ts";
+import { renderInvite } from "./render.ts";
+import { STRINGS } from "./strings.ts";
 
 const ok = (c: unknown, m = "expected true") => {
   if (!c) throw new Error(m);
@@ -86,6 +88,47 @@ Deno.test("og: works for Hindi text", () => {
   });
   ok(svg.includes('xml:lang="hi"') && svg.includes("उदाहरण पर"));
   ok(svg.includes(">उ</text>"), "initial is the first character");
+});
+
+Deno.test("og: the sharer's name never reaches the preview image or the cached link preview tags", async () => {
+  // The image takes no name at all; the page's og:/twitter: tags stay generic even with a named preview.
+  const svg = renderOgSvg({ appName: "Example", lang: "en" });
+  ok(!svg.includes("Priya"), "name in the image");
+  const template = await Deno.readTextFile(
+    new URL("./index.html", import.meta.url),
+  );
+  const html = renderInvite(
+    template,
+    {
+      appName: "Example",
+      appStoreUrl: "https://apps.apple.com/app/id000000000",
+      playPackage: "com.example.app",
+      siteUrl: "https://example.test",
+      ogImageUrl: "https://example.test/og.png",
+    },
+    STRINGS.en,
+    "en",
+    "ABCDEFGH",
+    {
+      preview: {
+        valid: true,
+        name: "Priya",
+        friend_rewards: [{ kind: "minutes", amount: 60 }],
+        sharer_rewarded: true,
+        boost: null,
+      },
+    },
+  );
+  ok(html.includes("<bdi>Priya</bdi>"), "name is on the page");
+  const tags = html.match(
+    /<meta (property="og:|name="twitter:)[^>]*>|<title>[^<]*<\/title>/g,
+  ) ?? [];
+  ok(tags.length >= 6, `found ${tags.length} tags`);
+  ok(tags.every((t) => !t.includes("Priya")), "name in a cached tag");
+  ok(
+    html.includes('content="https://example.test/og.png"'),
+    "one static image per app",
+  );
 });
 
 function eqColour(a: string, b: string) {

@@ -1,6 +1,7 @@
 // Referrals: who invited whom, where each referral is, every reward and why one failed (referral migration 21).
-// Overview (tiles, funnel, chart, top sharers, rules) and the list with filters, details and actions. One person's
-// page, problem rewards and the admin log are in view_referral_user.js.
+// Three views: Overview (tiles, funnel, chart, top sharers, rules, the list with filters, details and actions), Funnel
+// and Boosts (view_referral_growth.js). One person's page, problem rewards and the admin log are in
+// view_referral_user.js.
 import { act, barChart, h, loading, mount, table } from "./dom.js";
 import {
   fmtNum,
@@ -14,8 +15,43 @@ import {
   rewardLine,
 } from "./lib.js";
 import { renderReferralLog, renderReferralProblems, renderReferralUser } from "./view_referral_user.js";
+import { renderReferralBoosts, renderReferralFunnel } from "./view_referral_growth.js";
+
+const VIEWS = [
+  ["overview", "Overview", renderReferralOverview],
+  ["funnel", "Funnel", renderReferralFunnel],
+  ["boosts", "Boosts", renderReferralBoosts],
+];
+let view = "overview"; // kept while the page is open, so coming back to Referrals shows the same view
 
 export async function renderReferrals(el, api) {
+  const body = h("div");
+  const tabs = h(
+    "div",
+    { class: "tabs", role: "group", "aria-label": "Referral views" },
+    VIEWS.map(([id, label]) =>
+      h("button", {
+        "aria-pressed": String(id === view),
+        onclick: () => {
+          view = id;
+          for (const b of tabs.children) b.setAttribute("aria-pressed", String(b.dataset.id === view));
+          show();
+        },
+        "data-id": id,
+      }, label)
+    ),
+  );
+  // A fresh box per switch: a slow answer for the view left behind lands in a detached box, not over this one.
+  const show = () => {
+    const box = h("div");
+    mount(body, box);
+    return (VIEWS.find(([id]) => id === view) ?? VIEWS[0])[2](box, api);
+  };
+  mount(el, tabs, body);
+  await show();
+}
+
+async function renderReferralOverview(el, api) {
   let days = 30;
   const overview = h("div");
   const list = h("div");
@@ -261,7 +297,7 @@ export function personLink(p, openPerson) {
   return h("button", { class: "link", title: p.id, onclick: () => openPerson(p.email ?? p.id) }, p.email ?? p.id);
 }
 
-function tile(label, value, kind) {
+export function tile(label, value, kind) {
   return h(
     "div",
     { class: `tile ${kind ?? ""}` },

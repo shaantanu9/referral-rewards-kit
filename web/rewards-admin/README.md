@@ -1,11 +1,11 @@
 # Rewards admin page
 
-Updated: 2026-11-19\
+Updated: 2026-11-20\
 The dashboard for the rewards engine: overview, programs and rules, quiz bank, user lookup, Instagram review, failed
 rewards, settings (incl. the ads switch), copy a setup between apps, audit log. Static files, no build step, on the
 admin API ([rewards-api.md §2–7](../../docs/rewards-api.md)).
 
-Status: **tested locally in demo mode (22 Deno tests; Referrals section clicked through 2026-11-19; every section and action clicked through in Chromium at desktop
+Status: **tested locally in demo mode (26 Deno tests; Referrals section clicked through 2026-11-19, its Funnel and Boosts views 2026-11-20 at 1280 and 390 px; every section and action clicked through in Chromium at desktop
 and phone width, no console errors); never run against a live project.**
 
 ## Try it now (no project)
@@ -38,7 +38,7 @@ a busy machine during testing.
 | Section    | Calls                                                                                    | Notes                                                                |
 | ---------- | ---------------------------------------------------------------------------------------- | -------------------------------------------------------------------- |
 | Overview   | `rewards_admin_analytics`                                                                | 7 / 30 / 90 days; counts only                                        |
-| Referrals  | `referral_admin_overview`, `_referrals`, `_user`, `_rewards`, `_retry_reward`, `_check_activation`, `_log` | Referral kit migration 21. Every referral with both people's emails, states, dates and rewards; search by email, id or code; a person's page; failing rewards with Retry now |
+| Referrals  | `referral_admin_overview`, `_referrals`, `_user`, `_rewards`, `_retry_reward`, `_check_activation`, `_log`, `_funnel`, `_boosts`, `_boost_create`, `_boost_end` | Referral kit migrations 21, 23, 24. Three views. Overview: every referral with both people's emails, states, dates and rewards; search by email, id or code; a person's page; failing rewards with Retry now. Funnel: 30 / 90 days by claim day, conversion, median time to start. Boosts: list with status, schedule one, End (a scheduled one is deleted, a running one stops now; never extended) |
 | Programs   | `rewards_admin_config`, `save_program`, `add_rule`, `set_rule_active`, `save_event_type` | New programs start switched off; rules are added, never edited       |
 | Quiz bank  | `rewards_admin_quiz_list`, `quiz_save`, `quiz_stats`                                     | Add one, edit, hide, paste many as CSV; hardest questions            |
 | Users      | `rewards_admin_user`, `rewards_admin_track`, `rewards_admin_grant`                       | Test events; give a reward (note goes to the audit log)              |
@@ -53,7 +53,7 @@ a busy machine during testing.
 
 `index.html` (shell, theme tokens, light and dark) · `app.js` (project, sign-in, routing) · `api.js` (supabase-js 2.45.4
 from jsDelivr, or the demo) · `demo.js` (in-memory admin API) · `dom.js` (text-only DOM helpers) · `lib.js` (pure
-helpers) · `view_*.js` (sections) · `lib_test.js` (`deno test --allow-read=. web/rewards-admin/` from the repo root).
+helpers) · `lib_growth.js` (funnel and boost helpers) · `view_*.js` (sections) · `lib_test.js` (`deno test --allow-read=. web/rewards-admin/` from the repo root).
 
 ## Security notes
 

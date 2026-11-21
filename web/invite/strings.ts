@@ -1,5 +1,5 @@
 // Invite page wording (ADR 11.3: en, hi, id at launch; apps add more). "{app}" is replaced with the app name.
-// Hindi and Indonesian need a native speaker's review before launch (docs/TODO.md).
+// Hindi and Indonesian need a native speaker's review before launch (docs/TODO.md), the preview lines (0.5) included.
 import type { Lang, Strings } from "./render.ts";
 
 export const STRINGS: Record<Lang, Strings> = {
@@ -14,6 +14,16 @@ export const STRINGS: Record<Lang, Strings> = {
     playNote: "On Android the code is filled in for you after installing.",
     terms: "Invite program terms",
     invalid: "This invite link is not complete. Ask your friend for their code, or get {app} below.",
+    preview: {
+      invitedBy: "{name} invited you to {app}",
+      disclosure: "{name} gets a reward if you join.",
+      disclosureAnon: "Your friend gets a reward if you join.",
+      leadNamed: "Add this code when you sign up:",
+      friendReward: "You get {reward} when you start using the app.",
+      friendRewardNeutral: "You get a welcome reward when you start using the app.",
+      boostDouble: "Double rewards until {date}",
+      boostTimes: "{n}× rewards until {date}",
+    },
   },
   hi: {
     title: "{app}: आपको आमंत्रण मिला है",
@@ -26,6 +36,16 @@ export const STRINGS: Record<Lang, Strings> = {
     playNote: "Android पर इंस्टॉल के बाद कोड अपने आप भर जाता है।",
     terms: "आमंत्रण प्रोग्राम की शर्तें",
     invalid: "यह आमंत्रण लिंक अधूरा है। अपने दोस्त से उनका कोड माँगें, या नीचे से {app} डाउनलोड करें।",
+    preview: {
+      invitedBy: "{name} ने आपको {app} पर बुलाया है",
+      disclosure: "आपके जुड़ने पर {name} को इनाम मिलेगा।",
+      disclosureAnon: "आपके जुड़ने पर आपके दोस्त को इनाम मिलेगा।",
+      leadNamed: "साइन अप करते समय यह कोड डालें:",
+      friendReward: "ऐप इस्तेमाल करना शुरू करने पर आपको {reward} मिलेगा।",
+      friendRewardNeutral: "ऐप इस्तेमाल करना शुरू करने पर आपको स्वागत इनाम मिलेगा।",
+      boostDouble: "{date} तक दोगुने इनाम",
+      boostTimes: "{date} तक {n}× इनाम",
+    },
   },
   id: {
     title: "{app}: kamu diundang",
@@ -38,5 +58,15 @@ export const STRINGS: Record<Lang, Strings> = {
     playNote: "Di Android, kode terisi otomatis setelah dipasang.",
     terms: "Ketentuan program undangan",
     invalid: "Tautan undangan ini tidak lengkap. Minta kode ke temanmu, atau unduh {app} di bawah.",
+    preview: {
+      invitedBy: "{name} mengundangmu ke {app}",
+      disclosure: "{name} mendapat hadiah jika kamu bergabung.",
+      disclosureAnon: "Temanmu mendapat hadiah jika kamu bergabung.",
+      leadNamed: "Masukkan kode ini saat mendaftar:",
+      friendReward: "Kamu mendapat {reward} saat mulai menggunakan aplikasi.",
+      friendRewardNeutral: "Kamu mendapat hadiah sambutan saat mulai menggunakan aplikasi.",
+      boostDouble: "Hadiah dobel sampai {date}",
+      boostTimes: "Hadiah {n}× sampai {date}",
+    },
   },
 };
