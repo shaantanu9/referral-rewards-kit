@@ -105,4 +105,23 @@ void main() {
     );
     expect(find.text('Join'), findsOneWidget);
   });
+
+  testWidgets('demo: the 0.7 choices hide the streak, and the milestone shows its head start and level', (t) async {
+    await t.pumpWidget(DemoApp(server: FakeServer(surpriseChance: 0)));
+    await t.pump(const Duration(milliseconds: 400));
+    expect(find.text('2-day streak'), findsOneWidget);
+    expect(find.text('Includes 1 chapter from us to get you going'), findsOneWidget);
+    expect(find.text('Level 2 · Explorer'), findsOneWidget);
+    await t.tap(find.text('Follow-ups'));
+    await t.pumpAndSettle(const Duration(milliseconds: 100));
+    await t.pump(const Duration(milliseconds: 400));
+    await t.ensureVisible(find.text('Show streaks'));
+    await t.tap(find.text('Show streaks'));
+    await t.pump(const Duration(milliseconds: 400));
+    await t.pump(const Duration(milliseconds: 400));
+    await t.tap(find.text('Default look'));
+    await t.pumpAndSettle(const Duration(milliseconds: 100));
+    await t.pump(const Duration(milliseconds: 400));
+    expect(find.text('2-day streak'), findsNothing);
+  });
 }

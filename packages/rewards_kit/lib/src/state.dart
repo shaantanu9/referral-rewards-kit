@@ -1,6 +1,7 @@
 /// The whole `rewards_state` object and the `rewards_track` result (ADR 0002 §11).
 library;
 
+import 'fair_play_models.dart';
 import 'json.dart';
 import 'models.dart';
 import 'programs.dart';
@@ -26,6 +27,7 @@ class RewardsState {
     this.friends = const [],
     this.quizzes = const [],
     this.surprises = const [],
+    this.choices = RewardsChoices.none,
   });
 
   factory RewardsState.fromJson(Object? json) {
@@ -46,6 +48,7 @@ class RewardsState {
       friends: listOf(m['friends'], FriendStreakState.fromJson),
       quizzes: listOf(m['quizzes'], QuizState.fromJson),
       surprises: SurpriseOdd.listFrom(m['surprises']),
+      choices: RewardsChoices.fromJson(m['choices']),
     );
   }
 
@@ -78,6 +81,9 @@ class RewardsState {
 
   /// Odds of every surprise rule (`params.chance`) in a live program (ADR 0002 §18.6). Empty when none.
   final List<SurpriseOdd> surprises;
+
+  /// The user's streak / surprise / timer choices (0.7). All on (nothing off) from an older server.
+  final RewardsChoices choices;
 
   ProgramInfo? program(String key) => _find(programs, (p) => p.key == key);
   StreakState? streak(String program) => _find(streaks, (s) => s.program == program);
@@ -117,6 +123,7 @@ class RewardsState {
     List<FriendStreakState>? friends,
     List<QuizState>? quizzes,
     List<SurpriseOdd>? surprises,
+    RewardsChoices? choices,
   }) => RewardsState(
     enabled: enabled ?? this.enabled,
     serverTime: serverTime ?? this.serverTime,
@@ -133,6 +140,7 @@ class RewardsState {
     friends: friends ?? this.friends,
     quizzes: quizzes ?? this.quizzes,
     surprises: surprises ?? this.surprises,
+    choices: choices ?? this.choices,
   );
 }
 

@@ -6,6 +6,7 @@ import 'client.dart';
 import 'clock.dart';
 import 'errors.dart';
 import 'events.dart';
+import 'fair_play_models.dart';
 import 'league_models.dart';
 import 'models.dart';
 import 'programs.dart';
@@ -64,6 +65,15 @@ class RewardsController extends ChangeNotifier {
   /// arrived meanwhile are shown now by every `RewardToastListener` with `holdUntilMoment: true`.
   void celebrateNow() {
     if (!_moments.isClosed) _moments.add(null);
+  }
+
+  /// Applies the user's streak / surprise / timer [choices] (0.7) at once, e.g. after `FollowupSettings` saved
+  /// them, then reloads so each streak's `hidden` follows. Does nothing when they did not change.
+  Future<void> applyChoices(RewardsChoices choices) async {
+    if (_state.choices == choices) return;
+    _state = _state.copyWith(choices: choices);
+    _notify();
+    if (_loaded) await refresh();
   }
 
   /// The last history loaded by [loadHistory] for [program] (null key = the first streak), or null.

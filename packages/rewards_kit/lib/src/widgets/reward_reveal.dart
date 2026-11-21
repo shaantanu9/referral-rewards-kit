@@ -17,6 +17,10 @@ import '../theme.dart';
 /// With reduced motion (`MediaQuery.disableAnimationsOf`) there is no shake: it opens at once. It shows only what
 /// was won, never what could have been ("almost", "so close" or the range's top are never shown). [onOpened] and
 /// the `rewards_reveal_opened` event fire once.
+///
+/// A grant made while the user had surprises off (0.7, [RewardGrant.isFixed]) is not a gamble, so it is not shown as
+/// one: no closed gift, no shake and no haptic; it shows the reward line at once ([onOpened] and the event still fire
+/// once, after the first frame).
 class RewardReveal extends StatefulWidget {
   const RewardReveal({
     super.key,
@@ -63,6 +67,15 @@ class _RewardRevealState extends State<RewardReveal> with TickerProviderStateMix
   @override
   void initState() {
     super.initState();
+    if (widget.grant.isFixed && widget.builder == null) {
+      _started = true;
+      _opened = true;
+      _pop.value = 1;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _announce();
+      });
+      return;
+    }
     if (widget.autoOpen) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) _start();
@@ -87,6 +100,10 @@ class _RewardRevealState extends State<RewardReveal> with TickerProviderStateMix
     if (_opened || !mounted) return;
     setState(() => _opened = true);
     if (pop) unawaited(_pop.forward());
+    _announce();
+  }
+
+  void _announce() {
     widget.onOpened?.call();
     reportRewardsEvent(
       widget.onEvent,

@@ -113,7 +113,13 @@ class _LeagueBoardState extends State<LeagueBoard> {
                 style: FilledButton.styleFrom(backgroundColor: t.accent, foregroundColor: t.onAccent),
               ),
             ] else ...[
-              Countdown(endsAt: l.endsAt, clock: c.clock, prefix: x.weekEndsIn, style: muted),
+              Countdown(
+                endsAt: l.endsAt,
+                clock: c.clock,
+                prefix: x.weekEndsIn,
+                style: muted,
+                hidden: c.state.choices.timersOff,
+              ),
               if (l.lastWeek != null) ...[
                 const SizedBox(height: 4),
                 Text(x.lastWeek(l.lastWeek!.rank, l.lastWeek!.score), style: muted),

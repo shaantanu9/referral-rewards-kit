@@ -10,7 +10,8 @@ import 'base.dart';
 import 'countdown.dart';
 
 /// A time window: "Happy hour: ends in 49m 59s" while open, "Happy hour: starts in 2h 00m" before. Both times are
-/// the server's; at either edge the state is reloaded for the next window.
+/// the server's; at either edge the state is reloaded for the next window. With timers off (0.7
+/// `state.choices.timersOff`) an open window shows just its name and a coming one shows nothing.
 class WindowBadge extends StatefulWidget {
   const WindowBadge({
     super.key,
@@ -58,6 +59,8 @@ class _WindowBadgeState extends State<WindowBadge> {
       final deadline = open ? w.endsAt : w.startsAt;
       if (deadline == null) return const SizedBox.shrink();
       final color = open ? t.accent : t.muted;
+      final noTimer = c.state.choices.timersOff;
+      if (noTimer && !open) return Countdown(endsAt: deadline, clock: c.clock, onExpired: _edge, hidden: true);
       return Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         decoration: BoxDecoration(
@@ -75,7 +78,7 @@ class _WindowBadgeState extends State<WindowBadge> {
                 clock: c.clock,
                 onExpired: _edge,
                 builder: (context, left) => Text(
-                  '$name: ${open ? x.windowEndsIn : x.windowStartsIn} ${formatLeft(left)}',
+                  noTimer ? name : '$name: ${open ? x.windowEndsIn : x.windowStartsIn} ${formatLeft(left)}',
                   style: t.bodyStyle?.copyWith(color: t.onSurface),
                 ),
               ),

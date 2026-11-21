@@ -12,7 +12,13 @@ class FakeFollowups {
     'emails_off': true,
     'reminder_time': null,
     'muted_groups': <String>[],
+    'streaks_off': false,
+    'surprises_off': false,
+    'timers_off': false,
   };
+
+  /// The 0.7 choices, as `rewards_state().choices` returns them.
+  Map<String, Object?> get choices => {for (final k in RewardsChoices.keys) k: prefs[k] == true};
 
   /// The kinds of reminder the user can switch off one by one (ADR 0002 §18.8), with their labels.
   static const groups = {'comeback': 'Comeback reminders', 'recap': 'Sunday recap'};
@@ -37,12 +43,13 @@ class FakeFollowups {
     'plan': prefs['notifications_off'] == true
         ? <Object?>[]
         : [
-            _item(
-              'streak_at_risk',
-              now.add(const Duration(hours: 20)),
-              'Your streak is waiting for today.',
-              'comeback',
-            ),
+            if (prefs['streaks_off'] != true)
+              _item(
+                'streak_at_risk',
+                now.add(const Duration(hours: 20)),
+                'Your streak is waiting for today.',
+                'comeback',
+              ),
             _item('inactive2', lastActivity.add(const Duration(days: 2)), 'Your next step is still here.', 'comeback'),
             _item('weekly_recap', now.add(const Duration(days: 6)), 'Your week is ready to look back on.', 'recap'),
           ].where((i) => !_muted.contains(i['group'])).toList(),

@@ -25,7 +25,7 @@ import 'window_badge.dart';
 ///
 /// When the state has surprise rules (`state.surprises`), one "Surprises" card ([SurpriseOdds]) with every odds line
 /// sits right under the inbox, so the odds are seen before anything is earned. [showSurprises] false hides it
-/// (then show the odds somewhere else yourself).
+/// (then show the odds somewhere else yourself). It is not shown while the user switched surprises off (0.7).
 class RewardsHub extends StatelessWidget {
   const RewardsHub({
     super.key,
@@ -117,7 +117,8 @@ class RewardsHub extends StatelessWidget {
       final children = <Widget>[
         ?header,
         RewardInbox(controller: controller, texts: texts),
-        if (showSurprises && controller.state.surprises.isNotEmpty) SurpriseOdds(controller: controller, texts: texts),
+        if (showSurprises && controller.state.surprises.isNotEmpty && !controller.state.choices.surprisesOff)
+          SurpriseOdds(controller: controller, texts: texts),
         for (final p in controller.state.programs) _program(context, p),
       ];
       final column = Padding(

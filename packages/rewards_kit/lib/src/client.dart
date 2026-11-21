@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'errors.dart';
 import 'events.dart';
+import 'fair_play_models.dart';
 import 'followup_models.dart';
 import 'json.dart';
 import 'league_models.dart';
@@ -235,8 +236,8 @@ class RewardsClient {
 
   /// Reads the user's follow-up choices, or saves [patch] first and returns the result. Keys: `notifications_off`,
   /// `emails_off`, `reminder_time` (a [TimeOfDay] or "HH:MM"; sent as "HH:MM", null clears it), `muted_groups` (a
-  /// list of group names, 0.5; sent as a list of non-empty strings, left out when it is not a list). Other keys are
-  /// not sent. Reports `rewards_followup_prefs_changed` once per saved key. The result is kept as
+  /// list of group names, 0.5; sent as a list of non-empty strings, left out when it is not a list), and (0.7)
+  /// `streaks_off`, `surprises_off`, `timers_off` (booleans, [RewardsChoices.keys]). Other keys are not sent. Reports `rewards_followup_prefs_changed` once per saved key. The result is kept as
   /// [lastFollowupPrefs].
   Future<FollowupPrefs> followupPrefs([Map<String, Object?> patch = const {}]) => _followupPrefs(patch, const {});
 
@@ -247,6 +248,9 @@ class RewardsClient {
           e.key: switch (e.key) {
             FollowupPrefs.reminderTimeKey => _reminderTimeWire(e.value),
             FollowupPrefs.mutedGroupsKey => parseMutedGroups(e.value).toList(),
+            RewardsChoices.streaksOffKey ||
+            RewardsChoices.surprisesOffKey ||
+            RewardsChoices.timersOffKey => boolOr(e.value),
             _ => e.value,
           },
     };

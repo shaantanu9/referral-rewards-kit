@@ -7,6 +7,7 @@ import 'package:flutter/foundation.dart' show listEquals, setEquals;
 // ignore: deprecated_member_use
 import 'package:flutter/material.dart' show TimeOfDay;
 
+import 'fair_play_models.dart';
 import 'json.dart';
 
 /// One notification the engine planned. Schedule it with the app's own notification plugin under [id].
@@ -114,7 +115,8 @@ class FollowupGroup {
 }
 
 /// `rewards_followup_prefs`: what the user chose. Every key of a patch is one of [notificationsOffKey],
-/// [emailsOffKey], [reminderTimeKey], [mutedGroupsKey].
+/// [emailsOffKey], [reminderTimeKey], [mutedGroupsKey], or (0.7) `streaks_off`, `surprises_off`, `timers_off`
+/// ([RewardsChoices.keys]).
 class FollowupPrefs {
   const FollowupPrefs({
     this.notificationsOff = false,
@@ -122,6 +124,7 @@ class FollowupPrefs {
     this.reminderTime,
     this.mutedGroups = const {},
     this.groups = const [],
+    this.choices = RewardsChoices.none,
   });
 
   factory FollowupPrefs.fromJson(Map<String, Object?> m) => FollowupPrefs(
@@ -130,13 +133,14 @@ class FollowupPrefs {
     reminderTime: parseReminderTime(m[reminderTimeKey]),
     mutedGroups: parseMutedGroups(m[mutedGroupsKey]),
     groups: _groups(m['groups']),
+    choices: RewardsChoices.fromJson(m),
   );
 
   static const notificationsOffKey = 'notifications_off';
   static const emailsOffKey = 'emails_off';
   static const reminderTimeKey = 'reminder_time';
   static const mutedGroupsKey = 'muted_groups';
-  static const keys = {notificationsOffKey, emailsOffKey, reminderTimeKey, mutedGroupsKey};
+  static const keys = {notificationsOffKey, emailsOffKey, reminderTimeKey, mutedGroupsKey, ...RewardsChoices.keys};
 
   /// No follow-up notifications at all.
   final bool notificationsOff;
@@ -153,6 +157,9 @@ class FollowupPrefs {
   /// The kinds of notification follow-ups the app runs, one switch each (0.5). Empty from an older server.
   final List<FollowupGroup> groups;
 
+  /// Streaks, surprises and timers on or off (0.7). All on from an older server.
+  final RewardsChoices choices;
+
   /// The patch that mutes or unmutes [group], computed from this value's [mutedGroups].
   Map<String, Object?> groupMutedPatch(String group, bool muted) => {
     mutedGroupsKey: [
@@ -168,12 +175,14 @@ class FollowupPrefs {
     TimeOfDay? reminderTime,
     Set<String>? mutedGroups,
     List<FollowupGroup>? groups,
+    RewardsChoices? choices,
   }) => FollowupPrefs(
     notificationsOff: notificationsOff ?? this.notificationsOff,
     emailsOff: emailsOff ?? this.emailsOff,
     reminderTime: reminderTime ?? this.reminderTime,
     mutedGroups: mutedGroups ?? this.mutedGroups,
     groups: groups ?? this.groups,
+    choices: choices ?? this.choices,
   );
 
   /// This value with [patch] applied the way the server applies it (unknown keys ignored); a new `muted_groups`
@@ -186,8 +195,16 @@ class FollowupPrefs {
       reminderTime: patch.containsKey(reminderTimeKey) ? parseReminderTime(patch[reminderTimeKey]) : reminderTime,
       mutedGroups: muted,
       groups: [for (final g in groups) g.copyWith(muted: muted.contains(g.group))],
+      choices: RewardsChoices(
+        streaksOff: _flag(patch, RewardsChoices.streaksOffKey, choices.streaksOff),
+        surprisesOff: _flag(patch, RewardsChoices.surprisesOffKey, choices.surprisesOff),
+        timersOff: _flag(patch, RewardsChoices.timersOffKey, choices.timersOff),
+      ),
     );
   }
+
+  static bool _flag(Map<String, Object?> patch, String key, bool current) =>
+      patch.containsKey(key) ? boolOr(patch[key]) : current;
 
   static List<FollowupGroup> _groups(Object? v) {
     final out = <FollowupGroup>[], seen = <String>{};
@@ -206,7 +223,8 @@ class FollowupPrefs {
       other.emailsOff == emailsOff &&
       other.reminderTime == reminderTime &&
       setEquals(other.mutedGroups, mutedGroups) &&
-      listEquals(other.groups, groups);
+      listEquals(other.groups, groups) &&
+      other.choices == choices;
 
   @override
   int get hashCode => Object.hash(
@@ -215,11 +233,12 @@ class FollowupPrefs {
     reminderTime,
     Object.hashAllUnordered(mutedGroups),
     Object.hashAll(groups),
+    choices,
   );
 
   @override
   String toString() =>
-      'FollowupPrefs($notificationsOff, $emailsOff, ${formatReminderTime(reminderTime)}, $mutedGroups, $groups)';
+      'FollowupPrefs($notificationsOff, $emailsOff, ${formatReminderTime(reminderTime)}, $mutedGroups, $groups, $choices)';
 }
 
 /// `muted_groups` as a set of non-empty group names; anything that is not a list, and any item that is not a

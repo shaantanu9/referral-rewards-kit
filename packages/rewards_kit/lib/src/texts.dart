@@ -1,5 +1,6 @@
 import 'models.dart';
 import 'surprise_models.dart';
+import 'texts_fair_play.dart';
 import 'texts_followups.dart';
 import 'texts_leagues.dart';
 import 'texts_reveal.dart';
@@ -10,7 +11,8 @@ import 'texts_v2.dart';
 /// [reward] is where an app names them; the default knows `entitlement_days`, `minutes`, `badge`, `streak_freeze`
 /// and falls back to "amount kind" (`5 coins`); a reward with `params.amount_range` reads "5–50 coins". The 0.2
 /// widgets read [quiz] and [programs], the 0.3 surprise widgets [reveal], the 0.4
-/// `FollowupSettings` [followups], the 0.6 `LeagueBoard` [leagues] and `RewardsRecapCard` [recapCard].
+/// `FollowupSettings` [followups], the 0.6 `LeagueBoard` [leagues] and `RewardsRecapCard` [recapCard], and the 0.7
+/// choices, streak repair, personal best, head start and levels [fairPlay].
 class RewardsTexts {
   const RewardsTexts({
     String Function(RewardSpec reward)? reward,
@@ -53,6 +55,7 @@ class RewardsTexts {
     this.followups = const FollowupTexts(),
     this.leagues = const LeagueTexts(),
     this.recapCard = const RecapCardTexts(),
+    this.fairPlay = const FairPlayTexts(),
   }) : _reward = reward,
        _streakDays = streakDays,
        _nextIn = nextIn,
@@ -116,6 +119,9 @@ class RewardsTexts {
 
   /// The shareable recap card.
   final RecapCardTexts recapCard;
+
+  /// Streak / surprise / timer choices, streak repair, personal best, head start and levels (0.7).
+  final FairPlayTexts fairPlay;
 
   String reward(RewardSpec r) {
     final f = _reward;

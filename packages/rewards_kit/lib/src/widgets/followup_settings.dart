@@ -1,9 +1,12 @@
+import 'dart:async';
+
 // material_ui needs Flutter 3.47+; kept until the minimum Flutter is raised.
 // ignore: deprecated_member_use
 import 'package:flutter/material.dart';
 
 import '../controller.dart';
 import '../errors.dart';
+import '../fair_play_models.dart';
 import '../followup_models.dart';
 import '../texts.dart';
 import '../theme.dart';
@@ -17,6 +20,11 @@ typedef FollowupPrefsSave = Future<String?> Function(Map<String, Object?> patch)
 /// time (opens `showTimePicker`). Loads the choices after the first frame and saves each change at once; a failed save
 /// is undone and shows a short line.
 ///
+/// With [showChoices] (0.7, needs server migration 20261120000022) a second section, "How rewards look", has three
+/// switches: "Show streaks", "Surprise rewards" (off = fixed rewards) and "Show timers" (`streaks_off`,
+/// `surprises_off`, `timers_off`, strings in `RewardsTexts.fairPlay`). A saved choice is applied to the controller at
+/// once (`controller.applyChoices`), so every widget follows it.
+///
 /// Pass `onChanged: (_) => scheduler.replanNow()` so the phone's notifications follow the new choices.
 class FollowupSettings extends StatefulWidget {
   const FollowupSettings({
@@ -27,6 +35,7 @@ class FollowupSettings extends StatefulWidget {
     this.defaultReminderTime = const TimeOfDay(hour: 19, minute: 0),
     this.onChanged,
     this.builder,
+    this.showChoices = false,
   });
 
   final RewardsController controller;
@@ -37,6 +46,9 @@ class FollowupSettings extends StatefulWidget {
 
   /// Where the time picker starts when the user has not picked a time.
   final TimeOfDay defaultReminderTime;
+
+  /// Shows the streak / surprise / timer switches (0.7). Default false: the card is as before.
+  final bool showChoices;
 
   /// Called after every successful save with what the server now holds.
   final ValueChanged<FollowupPrefs>? onChanged;
@@ -95,6 +107,7 @@ class _FollowupSettingsState extends State<FollowupSettings> {
     try {
       final p = await widget.controller.client.followupPrefs(patch);
       if (mounted) setState(() => _prefs = p);
+      if (patch.keys.any(RewardsChoices.keys.contains)) unawaited(widget.controller.applyChoices(p.choices));
       widget.onChanged?.call(p);
       return null;
     } catch (e) {
@@ -112,6 +125,26 @@ class _FollowupSettingsState extends State<FollowupSettings> {
   Future<void> _pickTime(FollowupPrefs p) async {
     final picked = await showTimePicker(context: context, initialTime: p.reminderTime ?? widget.defaultReminderTime);
     if (picked != null && mounted) await _save({FollowupPrefs.reminderTimeKey: picked});
+  }
+
+  List<Widget> _choices(FollowupPrefs p, RewardsTheme t) {
+    final x = widget.texts.fairPlay;
+    final c = p.choices;
+    final muted = t.bodyStyle?.copyWith(color: t.muted);
+    Widget toggle(String title, String hint, bool off, String key) => SwitchListTile(
+      contentPadding: EdgeInsets.zero,
+      title: Text(title, style: t.bodyStyle),
+      subtitle: Text(hint, style: muted),
+      value: !off,
+      onChanged: (on) => _save({key: !on}),
+    );
+    return [
+      const SizedBox(height: 12),
+      Text(x.choicesTitle, style: t.titleStyle),
+      toggle(x.showStreaks, x.showStreaksHint, c.streaksOff, RewardsChoices.streaksOffKey),
+      toggle(x.surprises, x.surprisesHint, c.surprisesOff, RewardsChoices.surprisesOffKey),
+      toggle(x.showTimers, x.showTimersHint, c.timersOff, RewardsChoices.timersOffKey),
+    ];
   }
 
   @override
@@ -169,6 +202,7 @@ class _FollowupSettingsState extends State<FollowupSettings> {
                 trailing: Text(p.reminderTime?.format(context) ?? x.reminderTimeDefault, style: muted),
                 onTap: () => _pickTime(p),
               ),
+              if (widget.showChoices) ..._choices(p, t),
             ],
             if (_reason != null) Text(widget.texts.error(_reason!), style: t.bodyStyle?.copyWith(color: t.warning)),
             if (p == null && !_loading && _reason != null) TextButton(onPressed: _load, child: Text(x.retry)),

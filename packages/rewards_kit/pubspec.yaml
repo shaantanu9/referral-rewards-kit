@@ -2,7 +2,7 @@ name: rewards_kit
 description: >-
   Rewards for Flutter apps on Supabase: streaks, milestones, daily quizzes, quests, timed offers, leagues and
   follow-ups, granted exactly once by the server, with themeable widgets.
-version: 0.6.3
+version: 0.7.0
 homepage: https://www.myind.ai
 repository: https://github.com/shaantanu9/referral-rewards-kit
 issue_tracker: https://github.com/shaantanu9/referral-rewards-kit/issues

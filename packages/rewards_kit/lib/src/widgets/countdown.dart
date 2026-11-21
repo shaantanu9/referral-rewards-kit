@@ -7,7 +7,8 @@ import '../texts.dart';
 
 /// A live countdown to a server deadline (ADR 0002 §8). Ticks every second on the server-corrected [clock], never
 /// shows a negative time, and calls [onExpired] once when it reaches zero. It never invents a deadline: no [endsAt],
-/// nothing shown.
+/// nothing shown. With [hidden] (the user switched timers off, `state.choices.timersOff`) it shows nothing either,
+/// but still calls [onExpired] at the deadline so the widget around it stays right.
 class Countdown extends StatefulWidget {
   const Countdown({
     super.key,
@@ -17,6 +18,7 @@ class Countdown extends StatefulWidget {
     this.builder,
     this.style,
     this.prefix,
+    this.hidden = false,
   });
 
   final DateTime? endsAt;
@@ -29,6 +31,9 @@ class Countdown extends StatefulWidget {
 
   /// Text before the time, e.g. "Ends in".
   final String? prefix;
+
+  /// Show nothing (0.7 `timers_off`); [onExpired] still fires. Default false.
+  final bool hidden;
 
   @override
   State<Countdown> createState() => _CountdownState();
@@ -62,7 +67,7 @@ class _CountdownState extends State<Countdown> {
 
   void _tick() {
     if (!mounted) return;
-    setState(() {});
+    if (!widget.hidden) setState(() {});
     _check();
   }
 
@@ -85,7 +90,7 @@ class _CountdownState extends State<Countdown> {
   @override
   Widget build(BuildContext context) {
     final left = widget.clock.left(widget.endsAt);
-    if (left == null) return const SizedBox.shrink();
+    if (left == null || widget.hidden) return const SizedBox.shrink();
     final b = widget.builder;
     if (b != null) return b(context, left);
     final p = widget.prefix;

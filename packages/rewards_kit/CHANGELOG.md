@@ -1,5 +1,41 @@
 # Changelog
 
+## 0.7.0 (2026-11-20)
+
+Fair play and progress (reference: `docs/rewards-api.md`, "Fair play and progress"). Needs server migration 20261120000022; on an older server every
+new field is missing, so nothing changes: all choices read as on, there is no repair, record, head start or level.
+
+- Choices: `RewardsChoices` (`streaksOff`, `surprisesOff`, `timersOff`) on `RewardsState.choices` (from
+  `rewards_state().choices`) and on `FollowupPrefs.choices`. The prefs setter (`client.followupPrefs(patch)`, RPC
+  `rewards_followup_prefs`) now sends `streaks_off`, `surprises_off`, `timers_off` as booleans.
+  `controller.applyChoices(choices)` applies them at once and reloads.
+- `FollowupSettings(showChoices: true)`: a "How rewards look" section with three switches, "Show streaks",
+  "Surprise rewards" (off = fixed rewards) and "Show timers". A saved choice reaches every widget at once. Default
+  false, so the card is as before.
+- Streaks off: `StreakCard` and `DailyGoalRing` show nothing while a streak is `hidden` or `streaks_off` is set (the
+  streak keeps counting on the server).
+- Timers off: no countdown on `StreakCard` (the plain "do it today" line instead), `OfferBanner`, `QuestList`,
+  `QuizCard`, `LeagueBoard`; `WindowBadge` shows just the name of an open window and nothing for a coming one.
+  `Countdown(hidden: true)` shows nothing and still calls `onExpired`. `RechargeMeter` and `SocialTagTask` keep their
+  times (they say when something the user is waiting for arrives, not a deadline on them).
+- Surprises off: `SurpriseOdds` and the hub's odds card are hidden; `StreakCard` and `MilestoneProgress` name a
+  mystery or range reward by what it will really give (`RewardSpec.fixed`: the most likely entry, the midpoint) and
+  show no odds. A grant with `params.fixed` (`RewardGrant.isFixed`) is never revealed as a gamble: `shouldReveal` is
+  false (a snackbar, not the gift dialog), and `RewardReveal` shows it opened at once, with no shake or haptic.
+- Streak repair: `StreakState.repair` (`StreakRepair`: `restoresTo`, `until`, `needed`, `done`, `left`) and
+  `repairedAt` (`repairedRecently(now)`). `StreakCard` shows "Do 1 more today to bring back your 20-day streak" with
+  the time left (no time while timers are off), and "Your 21-day streak is back" for a day after a repair.
+- Personal best: `StreakState.bestDayCount` and `recordToday`; `StreakCard` shows a "New personal best: 4 today" chip.
+- Milestones: `MilestoneState.headStart` (already in `count`) and `level` (`MilestoneLevel`: `number`, `name`, `at`,
+  `nextAt`, `progress(count)`). `MilestoneProgress` names the head start (the program's `public.head_start_label`,
+  or `headStartLabel`, else "Includes a head start of 2 from us") and shows "Level 3 · Explorer" and "4 of 8 to the
+  next level".
+- Texts: `RewardsTexts.fairPlay` (`FairPlayTexts`), every string overridable.
+- Code: streak and milestone state moved to `progress_models.dart` (still exported by `models.dart` and the
+  package); new `fair_play_models.dart`, `texts_fair_play.dart`.
+- Example: the Follow-ups tab has the three switches; the milestone has a head start and levels; with surprises off
+  every third chapter pays a fixed 27 coins.
+
 ## 0.6.3 (2026-11-19)
 
 - Fix: on Flutter 3.50, `FollowupSettings` threw "ListTile background color or ink splashes may be invisible" in

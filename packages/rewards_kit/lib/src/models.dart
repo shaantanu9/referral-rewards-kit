@@ -4,6 +4,8 @@ library;
 
 import 'json.dart';
 
+export 'progress_models.dart';
+
 /// Program kinds (ADR 0002 §4). [unknown] covers a kind a newer server adds.
 enum ProgramKind {
   streak('streak'),
@@ -67,6 +69,29 @@ class RewardSpec {
   /// `params.amount_range` `[min, max]` (§18.6): the amount is drawn between them; [amount] is the max. Null when
   /// missing or malformed (not two whole numbers with 0 ≤ min ≤ max).
   (int, int)? get amountRange => optRange(params['amount_range']);
+
+  /// What this reward gives when the user switched surprises off (0.7): a `mystery` its most likely outcome (the
+  /// first one on a tie), an `amount_range` its midpoint rounded down; anything else itself.
+  RewardSpec get fixed {
+    if (isMystery && odds.isNotEmpty) {
+      var best = odds.first;
+      for (final o in odds) {
+        if (o.chance > best.chance) best = o;
+      }
+      return RewardSpec(kind: best.kind, amount: best.amount, threshold: threshold, params: best.params);
+    }
+    final range = amountRange;
+    if (range == null) return this;
+    return RewardSpec(
+      kind: kind,
+      amount: (range.$1 + range.$2) ~/ 2,
+      threshold: threshold,
+      params: {
+        for (final e in params.entries)
+          if (e.key != 'amount_range' && e.key != 'chance') e.key: e.value,
+      },
+    );
+  }
 
   @override
   bool operator ==(Object other) =>
@@ -190,9 +215,12 @@ class RewardGrant {
   /// The `[min, max]` the amount was drawn from (`params.range`), or null.
   (int, int)? get range => optRange(params['range']);
 
+  /// Given while the user had surprises off (0.7, `params.fixed`): a plain reward, never shown as a gamble.
+  bool get isFixed => boolOr(params['fixed']);
+
   /// True when the grant deserves the reveal rather than a toast: its params have `surprise`, `mystery` or `range`
-  /// (ADR 0002 §18.6).
-  bool get shouldReveal => isSurprise || isMystery || _set(params['range']);
+  /// (ADR 0002 §18.6), and it is not [isFixed].
+  bool get shouldReveal => !isFixed && (isSurprise || isMystery || _set(params['range']));
 
   static bool _set(Object? v) => v != null && v != false && v != 'false';
 
@@ -241,108 +269,4 @@ class ProgramInfo {
   final DateTime? startsAt;
   final DateTime? endsAt;
   final Map<String, Object?> public;
-}
-
-/// A daily streak (ADR 0002 §6.1). [endsTodayAt] is local midnight tonight (the streak is at risk after it when
-/// today is not done); [breaksAt] is when it really resets, counting freezes.
-class StreakState {
-  const StreakState({
-    required this.program,
-    this.current = 0,
-    this.longest = 0,
-    this.todayDone = false,
-    this.freezes = 0,
-    this.endsTodayAt,
-    this.breaksAt,
-    this.nextReward,
-    this.dailyGoal = 1,
-    this.todayCount = 0,
-    this.weeklyFreeFreezesLeft = 0,
-  });
-
-  factory StreakState.fromJson(Map<String, Object?> m) {
-    final done = boolOr(m['today_done']);
-    final goal = intOr(m['daily_goal'], 1);
-    return StreakState(
-      program: str(m['program']),
-      current: intOr(m['current']),
-      longest: intOr(m['longest']),
-      todayDone: done,
-      freezes: intOr(m['freezes']),
-      endsTodayAt: time(m['ends_today_at']),
-      breaksAt: time(m['breaks_at']),
-      nextReward: m['next_reward'] is Map ? RewardSpec.fromJson(optMap(m['next_reward'])) : null,
-      dailyGoal: goal < 1 ? 1 : goal,
-      // An older server sends no count: a done day counts as the goal reached.
-      todayCount: optInt(m['today_count']) ?? (done ? (goal < 1 ? 1 : goal) : 0),
-      weeklyFreeFreezesLeft: intOr(m['weekly_free_freezes_left']),
-    );
-  }
-
-  final String program;
-  final int current;
-  final int longest;
-  final bool todayDone;
-  final int freezes;
-  final DateTime? endsTodayAt;
-  final DateTime? breaksAt;
-
-  /// Null when nothing is left to earn.
-  final RewardSpec? nextReward;
-
-  /// Matching events needed for a day to count (`config.daily_goal`, at least 1).
-  final int dailyGoal;
-
-  /// Matching events so far today (local day).
-  final int todayCount;
-
-  /// Missed days still forgiven for free this ISO week, before earned [freezes] are spent.
-  final int weeklyFreeFreezesLeft;
-
-  /// 0..1 towards today's [dailyGoal]; 1 once [todayDone].
-  double get goalProgress => todayDone ? 1 : (todayCount / dailyGoal).clamp(0, 1).toDouble();
-
-  /// Days still to go to [nextReward], or null when unknown (no reward, or a threshold not above [current]).
-  int? get daysToNextReward {
-    final t = nextReward?.threshold;
-    if (t == null || t <= current) return null;
-    return t - current;
-  }
-
-  /// True when today is not done, there is a streak to lose, and [endsTodayAt] is within [within] of [now]
-  /// (a server-corrected time: `ServerClock.now()`).
-  bool atRisk(DateTime now, {Duration within = const Duration(hours: 4)}) {
-    final end = endsTodayAt;
-    if (todayDone || current <= 0 || end == null) return false;
-    final left = end.difference(now);
-    return left <= within;
-  }
-}
-
-/// Milestone progress (ADR 0002 §6.2): how many events counted, and the next reward.
-class MilestoneState {
-  const MilestoneState({required this.program, this.count = 0, this.nextReward});
-
-  factory MilestoneState.fromJson(Map<String, Object?> m) => MilestoneState(
-    program: str(m['program']),
-    count: intOr(m['count']),
-    nextReward: m['next_reward'] is Map ? RewardSpec.fromJson(optMap(m['next_reward'])) : null,
-  );
-
-  final String program;
-  final int count;
-
-  /// Null when nothing is left to earn.
-  final RewardSpec? nextReward;
-
-  /// The next threshold, or null when there is none.
-  int? get target => nextReward?.threshold;
-
-  /// 0..1 towards [target]; 1 when nothing is left to earn.
-  double get progress {
-    final t = target;
-    if (nextReward == null) return 1;
-    if (t == null || t <= 0) return 0;
-    return (count / t).clamp(0, 1).toDouble();
-  }
 }

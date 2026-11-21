@@ -8,7 +8,8 @@ import '../texts.dart';
 import '../theme.dart';
 import 'base.dart';
 
-/// Today's progress towards a streak's daily goal ("1/2"), a check once the day counts.
+/// Today's progress towards a streak's daily goal ("1/2"), a check once the day counts. Shows nothing while the
+/// streak is `hidden` or streaks are switched off (0.7).
 class DailyGoalRing extends StatelessWidget {
   const DailyGoalRing({
     super.key,
@@ -35,7 +36,7 @@ class DailyGoalRing extends StatelessWidget {
     builder: (context) {
       final st = controller.state;
       final s = program == null ? (st.streaks.isEmpty ? null : st.streaks.first) : st.streak(program!);
-      if (s == null) return const SizedBox.shrink();
+      if (s == null || s.hidden || st.choices.streaksOff) return const SizedBox.shrink();
       final b = builder;
       if (b != null) return b(context, s);
       final t = RewardsTheme.of(context);

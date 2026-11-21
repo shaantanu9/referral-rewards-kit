@@ -7,7 +7,8 @@ Flutter side of the rewards engine ([ADR 0002](https://github.com/shaantanu9/ref
 quests, recharges, time windows, friend streaks, an activity heatmap, recaps and rewarded ads through RevenueCat, and
 since 0.3 surprise rewards with a reveal, and since 0.4 follow-ups that bring people back (notifications planned by the
 engine, scheduled by the app; since 0.5 with one off switch per kind of reminder), and since 0.6 opt-in weekly leagues
-and a shareable year recap card.
+and a shareable year recap card, and since 0.7 fair play and progress: the user's own choices about streaks,
+surprises and timers, streak repair, personal bests, head starts and levels.
 One state call, one track call, and widgets whose look is entirely yours.
 
 <p>
@@ -22,7 +23,7 @@ The admin dashboard that comes with it (`web/rewards-admin`, a static page):
 
 <img src="https://raw.githubusercontent.com/shaantanu9/referral-rewards-kit/main/packages/rewards_kit/screenshots/08-admin-dashboard.png" width="820" alt="Rewards admin dashboard">
 
-Status: **0.6.3, tested with fakes (`flutter test`); not yet run against a live project or on a phone.** It
+Status: **0.7.0, tested with fakes (`flutter test`); not yet run against a live project or on a phone.** It
 matches the server in `supabase/migrations/*_rewards_*` (ADR 0002 §18; SQL tests 13–28); the 0.4 / 0.5 follow-up calls
 match the contract in ADR 0002 §18.7 and §18.8.
 
@@ -321,6 +322,34 @@ Guardrails, kept by the engine for every app (the app cannot loosen them):
   last; every email has a one-click unsubscribe.
 - **Ask first.** Schedule only for users who allowed notifications (the OS permission is the app's to ask, after the
   first moment of value), and keep `FollowupSettings` reachable from the app's settings.
+
+## Fair play and progress (0.7)
+
+Each user can switch streaks, surprises and timers off (needs server migration 20261120000022). Show the switches
+with `FollowupSettings(showChoices: true)`, or save them yourself:
+
+```dart
+await rewards.client.followupPrefs({'streaks_off': true, 'surprises_off': false, 'timers_off': true});
+await rewards.applyChoices(rewards.client.lastFollowupPrefs!.choices); // every widget follows at once
+final c = rewards.state.choices;                                         // streaksOff, surprisesOff, timersOff
+```
+
+| Choice | Server | Widgets |
+|---|---|---|
+| `streaks_off` | keeps counting; each streak has `hidden: true`; no "streak at risk" reminder | `StreakCard`, `DailyGoalRing` show nothing |
+| `surprises_off` | no chance bonus; a mystery gives its most likely entry, a range its midpoint; the grant says `params.fixed` | no odds cards; rewards named by what they give; fixed grants shown plainly, never as a gift to open |
+| `timers_off` | stored only | no countdowns or deadline chips (`Countdown(hidden: …)`) |
+
+Progress, all from fields the server sends (and absent on an older server):
+
+- **Streak repair** (`streak.repair`): "Do 1 more today to bring back your 20-day streak" on `StreakCard`, with the
+  time left; "Your 21-day streak is back" the day after a repair (`repairedAt`).
+- **Personal best** (`bestDayCount`, `recordToday`): a "New personal best: 4 today" chip on a record day.
+- **Head start** (`milestone.head_start`, already in `count`): `MilestoneProgress` says why, from the program's
+  `public.head_start_label` (or `MilestoneProgress(headStartLabel: …)`).
+- **Levels** (`milestone.level`): "Level 3 · Explorer" and "4 of 8 to the next level".
+
+Every string is in `RewardsTexts(fairPlay: FairPlayTexts(...))`.
 
 ## Rewarded ads through RevenueCat
 

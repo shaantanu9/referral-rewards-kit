@@ -7,6 +7,8 @@ import 'fake_league.dart';
 /// A tiny stand-in for the database: a streak (daily goal 2), a "read 5 chapters" milestone, a 30-minute offer with
 /// stock, an Instagram task that verifies after you press "Simulate Meta webhook", a 4-question daily quiz, and a
 /// surprise bonus: each chapter read pays 5–50 coins with [surpriseChance] (30 %), at most 3 a day (ADR 0002 §18.6).
+/// 0.7: the milestone starts with a head start of 1 and has levels; a third event in a day is a personal best; the
+/// Reminders tab's choices hide the streak, turn the surprise into a fixed 27 coins, and hide the timers.
 class FakeServer {
   FakeServer({this.surpriseChance = 0.3, Random? random}) : random = random ?? Random();
 
@@ -15,7 +17,7 @@ class FakeServer {
   final Random random;
   int surprisesToday = 0;
   static const surpriseDailyCap = 3;
-  int streak = 2, longest = 4, chapters = 3, stock = 7, seq = 0, todayCount = 0;
+  int streak = 2, longest = 4, chapters = 3, stock = 7, seq = 0, todayCount = 0, bestDay = 2;
   bool todayDone = false, claimed = false;
   final quiz = FakeQuiz();
   String social = 'none';
@@ -52,7 +54,17 @@ class FakeServer {
           if (streak == 3) grants.add(_grant('daily', 'coins', 20));
         }
         chapters++;
-        if (surprisesToday < surpriseDailyCap && random.nextDouble() < surpriseChance) {
+        final fixed = followups.prefs['surprises_off'] == true;
+        if (fixed && chapters % 3 == 0) {
+          // Like the engine with surprises off: no draw, the range's midpoint, marked fixed.
+          grants.add(
+            _grant('reader', 'coins', 27)
+              ..['params'] = {
+                'range': [5, 50],
+                'fixed': true,
+              },
+          );
+        } else if (!fixed && surprisesToday < surpriseDailyCap && random.nextDouble() < surpriseChance) {
           surprisesToday++;
           grants.add(
             _grant('reader', 'coins', 5 + random.nextInt(46))
@@ -146,6 +158,10 @@ class FakeServer {
       'freezes': 1,
       'ends_today_at': midnight.toIso8601String(),
       'next_reward': streak < 7 ? {'threshold': 7, 'kind': 'coins', 'amount': 50} : null,
+      'hidden': followups.prefs['streaks_off'] == true,
+      'best_day_count': todayCount > bestDay ? todayCount : bestDay,
+      'record_today': todayCount > bestDay,
+      'repair': null,
     };
   }
 
@@ -157,7 +173,7 @@ class FakeServer {
       {
         'key': 'reader',
         'kind': 'milestone',
-        'public': {'title': 'Read 5 chapters'},
+        'public': {'title': 'Read 5 chapters', 'head_start_label': 'Includes 1 chapter from us to get you going'},
       },
       {
         'key': 'welcome',
@@ -172,6 +188,13 @@ class FakeServer {
       {
         'program': 'reader',
         'count': chapters,
+        'head_start': 1,
+        'level': {
+          'number': chapters < 3 ? 1 : (chapters < 6 ? 2 : 3),
+          'name': chapters < 3 ? 'Reader' : (chapters < 6 ? 'Explorer' : 'Bookworm'),
+          'at': chapters < 3 ? 1 : (chapters < 6 ? 3 : 6),
+          'next_at': chapters < 3 ? 3 : (chapters < 6 ? 6 : null),
+        },
         'next_reward': chapters < 5
             ? {
                 'threshold': 5,
@@ -219,6 +242,7 @@ class FakeServer {
     ],
     'inbox': inbox,
     'badges': [],
+    'choices': followups.choices,
   };
 }
 
