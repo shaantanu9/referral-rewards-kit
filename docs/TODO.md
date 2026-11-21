@@ -1,9 +1,12 @@
 # To do
 
-Updated: 2026-11-20
+Updated: 2026-11-22
 What is planned and not built yet, and what has not been proven outside tests. Build order: [build-plan.md](build-plan.md). Known problems: [ISSUES.md](ISSUES.md).
 
 ## Proof on the real thing
+
+- [ ] referral_kit 0.5 / rewards_kit 0.7 on a live project: apply migrations 22–25, run one boost week from the admin
+      page, see an opted-in first name on the invite page, a friend's welcome card, and a streak repaired on a phone.
 
 - [ ] Apply migrations 18–20 to each app's live project (renumbered after its latest), then on two phones: A shares,
       B signs up with the link → A's invite screen and Home show "1 friend used your code" at once; B starts → A sees

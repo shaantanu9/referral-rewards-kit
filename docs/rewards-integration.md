@@ -125,7 +125,7 @@ queue, problems, audit log. Every admin change is logged with who did it.
 
 | Symptom | Cause | Fix |
 |---|---|---|
-| Only the first user ever gets a streak reward | A hand-made grant key without the user id (first app, 2026-11-13) | Use the engine: its key always holds the user id |
+| Only the first user ever gets a streak reward | A hand-made grant key without the user id (the first app, 2026-11-13) | Use the engine: its key always holds the user id |
 | A rule change pays everyone again | Rule id in the key | The engine keys by (program, threshold, kind, user, cycle), so a new version never pays twice |
 | Hook runs but nothing is credited, `permission denied` in `last_error` | The hook's owner cannot reach the app's table | Create the hook as the role that owns the app's tables (the migration role) |
 | Quiz finished, no event | Trigger `when` not met, or event type missing | `rewards_admin_user` shows event counts; check the `when` clause and `event_types` |
@@ -137,7 +137,7 @@ queue, problems, audit log. Every admin change is logged with who did it.
 
 1. Apply migrations `20261114000007..11` after the 0.1 ones.
 2. As an admin: `rewards_admin_import(<preset or exported file>, true)` → read the change list →
-   `rewards_admin_import(<same>, false)`. Presets: `supabase/app-config/presets/reader.json` (reader-app style),
+   `rewards_admin_import(<same>, false)`. Presets: `supabase/app-config/presets/reader.json` (the first app's style),
    `quiz.json`, `habit.json`. To copy app A to app B: `rewards_admin_export(true)` on A, import on B.
 3. Rename the reward kinds to the app's own (`chapters`, `minutes`, `coins`…) in the file before importing, and
    make `rewards_app.app_reward_grant` pay them.

@@ -17,6 +17,8 @@ Proof levels: **test** = widget/unit test against the fake server; **SQL** = mig
 | S2 | shares | the system share sheet with the link (or code + store link before the invite page exists) | `inviteLink`, `storeLink`, `share_plus` | `invite_shared` / `invite_code_copied` | Share / Copy | test; share channel not on a phone |
 | S3 | a friend signs up with the code | "1 friend used your code. Your reward comes when they start using the app." on **Home** and the invite screen | `ReferralStats.claimedCount` (migration 18) | — | Demo "A friend signs up with your code" | test, SQL; not live (TODO P0) |
 | S4 | the friend starts using the app (the app's activation hook) | the reward card on Home; "1 friend joined" | `ReferralRewardCard` (re-asks on resume), `referral_pending`, `referral_ack`, `joinedCount` | `reward_granted`, `reward_shown`, `reward_acknowledged` | Demo "A friend starts using the app" | test, SQL; not live |
+| S1b | (0.5) sees a running boost, WhatsApp, QR, and "Your invite page" | "Double rewards until Sun, 22 Nov for every friend who adds your code by then."; WhatsApp next to Share; Show QR code; first-name toggle; Leave the invite program | `referral_terms.boost`, `ReferralLauncher` (`wa.me`), `qr_flutter`, `referral_preferences(_set)` (migration 23) | `invite_shared` (`channel: whatsapp_button`), `invite_qr_shown`, `invite_preferences_changed` | demo switches "Boost week running", "Invite page live" | test, SQL; WhatsApp and QR not on a phone |
+| S3b | (0.5) a friend used the code and has not started | "1 friend used your code. Their next step: {step}. When they do it, you both get 30 min." | `claimedCount` + `ReferralCopy` | — | Home and invite screen | test |
 | S5 | the friend pays (paid rule) | a pending, then granted reward (RevenueCat grant, after `hold_hours`) | `referral` function `/webhook` + `/worker` | `reward_granted` | — (server only) | SQL, function story test; not live (TODO P0) |
 
 ## 2. The friend
@@ -24,6 +26,7 @@ Proof levels: **test** = widget/unit test against the fake server; **SQL** = mig
 | # | The friend… | Sees | Kit piece / server | Event | Starter app | Proof |
 |---|---|---|---|---|---|---|
 | F1 | taps the shared link `https://<site>/i/<CODE>` without the app | the invite page: code, Copy, App Store / Google Play | `web/invite` (`render.ts`); the Play link carries `referrer=code%3D<CODE>` | — | — | test (`render_test.ts`) |
+| F1b | (0.5) opens the link of a sharer who turned on "Show my first name" | "Priya invited you to {app}", "Priya gets a reward if you join." (FTC disclosure, not editable by the sharer), the friend's gift and a running boost | `referral_invite_preview` (anon, read-only), `render.ts` / `index.html` | — | — | test (`render_test.ts`), SQL |
 | F2a | installs from Google Play and opens the app | (nothing yet: the code is kept) | `InstallReferrerCodeReader.readOnce` → `queue.keep(code, source: 'install_referrer')` in `ReferralSetup.start()` | `invite_link_opened` | at start | test (fake referrer); not on a phone (M-checks) |
 | F2b | has the app and taps the link | the app opens on code entry | App Links / Associated Domains → route `/i/<CODE>` → `codeFromInviteLink` → `queue.keep` | `invite_link_opened` | `InviteLinkScreen`; Demo "Open an invite link" | test (`handlePushRoute`); App Link not on a phone |
 | F2c | installs from the App Store (iOS has no install referrer) | types or pastes the code they copied on the page | `InviteCodeEntry` with `UIPasteControl` (no paste prompt) | `code_entry_started`, `code_submitted` (`typed` / `pasted`) | "Got a code from a friend?" | test; paste not on a phone |
@@ -33,6 +36,9 @@ Proof levels: **test** = widget/unit test against the fake server; **SQL** = mig
 | F5′ | chooses another code, or leaves | Home keeps a quiet card: Add code / Not now | `queue.clearLinkCode()` on Not now | — | waiting card | test |
 | F6 | is offline when tapping | a line that the code is kept and sent later (string `offlineQueued`) | `PendingClaimQueue` + `PendingClaimRetrier` (resume, sign-in stream) | `code_claim_result` (`via: retry`, `trigger`) | retrier with the sign-in stream | package tests |
 | F7 | starts using the app (activation) | the welcome gift on Home | `referral_check_activation`, `ReferralRewardCard` | `reward_granted`, `reward_shown` | Demo "You start using the app" | test, SQL; not live |
+
+| F8 | (0.5) has claimed and not started | "Your welcome gift of 30 min is waiting: {step}. 12 days left." (in-app card, at most once a day, never a push) | `referral_my_claim`, `ReferralWelcomeCard` | `welcome_card_shown`, `welcome_card_dismissed` | Home | test, SQL |
+| F9 | (0.5) got the welcome gift | once: "Pass it on: give a friend 30 min when they join with your code and start using the app." → Invite hub | `ReferralWelcomeCard` (joined), `ReferralPromptMoment.welcomeRewardReceived` | `welcome_card_shown` | Home | test |
 
 ## 3. Rules the journey keeps
 
@@ -57,6 +63,9 @@ All on real phones or a live project; tracked in [TODO.md](TODO.md) P0/P1:
 - Paid rewards through real RevenueCat (S5).
 
 ## What changed
+
+- 2026-11-20 (0.5 growth): S1b, S3b, F1b, F8, F9 added from the referral growth research and compliance re-check
+  ([referral-growth.md](research/referral-growth.md), [referral-compliance.md](research/referral-compliance.md)).
 
 - 2026-11-20: first version, written with the starter app's journey work (F2a, F2b, F3–F5′ and S3 added to the
   starter; before, it showed only S1, S2, S4, F5 and F7).

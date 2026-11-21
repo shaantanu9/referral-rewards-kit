@@ -22,7 +22,7 @@ Every screen, with what it shows: [docs/showcase.md](docs/showcase.md).
 
 Status: **built and tested locally; not yet proven on real phones or against a live RevenueCat project.** Design:
 [ADR 0001](docs/adr/0001-referral-kit.md). Add it to an app: [integration guide](docs/integration.md) (`flutter pub add referral_kit`, or a git dependency
-on tag `referral_kit-v0.3.1`, one SQL file from [the template](supabase/app-config/template.sql), one `InviteHub`,
+on tag `referral_kit-v0.5.0`, one SQL file from [the template](supabase/app-config/template.sql), one `InviteHub`,
 `onEvent` to your analytics), or start from the [starter app](examples/starter_app). Before release:
 [test plan](docs/test-plan.md) and [store review](docs/store-review.md). Go live: [checklist](docs/go-live.md).
 

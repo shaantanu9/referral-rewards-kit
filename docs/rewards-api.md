@@ -1,6 +1,6 @@
 # Rewards API reference
 
-Updated: 2026-11-14
+Updated: 2026-11-20
 Every endpoint of the rewards engine, for building the user app and a small admin dashboard (setup, checks,
 analytics). Design: [ADR 0002](adr/0002-rewards-engine.md) · setup: [rewards integration](rewards-integration.md) ·
 Flutter client: [packages/rewards_kit](../packages/rewards_kit/README.md).
@@ -326,3 +326,51 @@ once per week (grant key `…:w<YYYYMMDD>`).
 `rewards_svc_expire_social()` (called by `/worker` every 15 minutes) now also closes ended weeks; an error there is a
 warning and never stops social expiry. Export / import carry league programs and rules like any program.
 `rewards_recap(from_day, to_day)` (0.2) is unchanged; rewards_kit 0.6.0 adds `RewardsRecapCard` for it.
+
+## Fair play and progress (0.7, migration `20261120000022`)
+
+Why each option exists, with the papers and the EU Digital Fairness Act proposal:
+the maintainers' research notes (sections 7–9, not in this repo).
+
+### Choices a user can switch off
+
+`rewards_followup_prefs(patch)` also takes and returns `streaks_off`, `surprises_off`, `timers_off` (booleans, default
+false). `rewards_state()` returns them as `"choices": {"streaks_off", "surprises_off", "timers_off"}`.
+
+| Choice | Server | App (rewards_kit 0.7) |
+|---|---|---|
+| `streaks_off` | Streaks keep counting (switching back is fair); each streak in the state has `"hidden": true`; no `streak_at_risk` follow-up is planned | Streak cards and reminders hidden |
+| `surprises_off` | No `chance` bonus is drawn; a `mystery` gives its most likely entry; an `amount_range` gives its midpoint (rounded down); those grants carry `params.fixed: true`; `surprises` (odds) is `[]` | Odds and mystery reveal hidden |
+| `timers_off` | Stored only | Countdowns and deadline chips hidden |
+
+### Streak options
+
+| Config | Meaning |
+|---|---|
+| `repair_days` (1–7, off when absent) | After a missed day nothing covered, the streak can be repaired on any of the next `repair_days` days |
+| `repair_count` (2–10, default 2) | Matching events needed on one day to repair. Repair restores the lost length plus the days since, the old cycle (no reward paid twice) and `longest`; rewards the restored length passes are paid; the gap shows as covered in the history |
+
+Each streak object adds:
+
+```json
+{"hidden": false, "repair": {"restores_to": 21, "needed": 2, "done": 1, "until": "…"}, "repaired_at": null,
+ "best_day_count": 4, "record_today": false}
+```
+
+`repair` is null when nothing can be repaired. `best_day_count` is the most matching events on one local day (counted
+from 0.7); `record_today` is true when today beat an earlier best (≥ 2 events; never on the first day).
+
+### Milestone options
+
+| Config | Meaning |
+|---|---|
+| `head_start` (≥ 1) | The count starts here (endowed progress). Give a reason in `public.head_start_label`. Thresholds at or below it never pay, so keep it under the lowest one |
+| `count: "sum:<prop>"` | Adds the event's numeric prop (rounded; missing, non-number or below 1 adds nothing) instead of 1. Rules pay when a threshold is crossed |
+| `sum_max` (default 1000) | The most one event can add |
+| `levels` (1–50 rising whole numbers) | Level = how many are reached; names from `public.level_names` |
+
+Each milestone object adds `"head_start": 2` and `"level": {"number": 1, "name": "Starter", "at": 20, "next_at": 60}`
+(null without `levels`).
+
+Not built on purpose: paid repair, points that drain each missed day, streak wagers with paid currency
+(maintainers' research notes, section 8).

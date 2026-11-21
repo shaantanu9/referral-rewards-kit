@@ -40,4 +40,4 @@ Related: [build plan](build-plan.md) · [integration](integration.md) · [ISSUES
    `refunded_late` and one abuse mark is added; nothing is clawed back.
 6. Set `allow_sandbox = false` again.
 
-Record the dates and results in `docs/ISSUES.md` (🟡 → ✅ rows).
+Record the dates and results in `docs/ISSUES.md` (🟡 → ✅ rows) and `WORKLOG.md`.

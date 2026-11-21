@@ -1,11 +1,12 @@
 # Issues
 
-Updated: 2026-11-20
+Updated: 2026-11-22
 Every problem found, its cause, fix and proof. Newest first. Status: ✅ fixed and proven · 🟡 fixed, not proven on
 the real thing · 🔧 being fixed · ❌ open. Planned work lives in [TODO.md](TODO.md).
 
 | Status | Issue | Cause | Solution | Proof |
 |---|---|---|---|---|
+| ❌ | SQL test `20_rewards_kinds` ("a new day pays the task again") fails when `scripts/test-db.sh` runs between local midnight and the UTC midnight (e.g. 00:00–05:30 IST) | The test shifts rows by Postgres `current_date` (the session time zone) while the quest period is the user's day (UTC by default), so the two disagree for those hours. Test-only: the engine is not affected | Until fixed: `PGTZ=UTC scripts/test-db.sh`. Fix: set the session time zone to UTC in the script (or compute the period like the engine does) | 2026-11-22 00:11 IST: fails; same tree with `PGTZ=UTC`: 1091 passed. CI runs in UTC |
 | 🟡 | The starter app (the copy every app starts from) showed only half the journey: an invite link never reached it, a link or install-referrer code was not kept before sign-in, no "Use code …" after sign-in, the sharer never saw "1 friend used your code" on Home | The starter was written for 0.3.0 and not updated with 0.4.0 (`keep`, `linkCode`, `claimedCount`) | Route `/i/<CODE>` + `InviteLinkScreen`, `ReferralSetup.start()` (install referrer), sign-in stream for the retrier and Home, waiting-code card with Not now, sharer line on Home, Android App Links filter; [user-journey.md](user-journey.md) | `examples/starter_app` `journey_test.dart` (5) + `flow_test.dart` (2) pass. Not on a phone, no real App Link domain |
 | ✅ | (found while fixing the above) After adding a code from the invite-link screen, Home still showed the waiting card | Home reloaded only after its own `push`; a link's screen comes from the router | `RouteObserver` + `didPopNext` reload | `journey_test.dart` first test failed before, passes after |
 | 🟡 | An admin could not see referrals at all: who invited whom, where each one is, which rewards failed and why | The kit had no admin functions or page for referrals (only rewards) | Migration 21: `referral_admin_*` behind `referral.require_admin()` (hook, default `rewards.admins`), action log; admin page section Referrals | SQL test 32 (35 checks: non-admin and anon refused, emails, paging on equal times, retry, log, privacy); 22 Deno tests; clicked through in demo at 1280 and 390 px. Not against a live project |

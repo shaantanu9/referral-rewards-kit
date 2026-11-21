@@ -2,7 +2,7 @@
 
 Updated: 2026-11-14 (package 0.3.0)
 From zero to working invites in a new app, in order. About one day per app, most of it owner steps (secrets,
-dashboards, store forms). Built from the first app's integration (2026-11-12/13); every gotcha it hit is
+dashboards, store forms). Built from the first app's integration; every gotcha it hit is
 in [Gotchas](#gotchas).
 Related: [ADR 0001](adr/0001-referral-kit.md) · [go-live checklist](go-live.md) · [store review](store-review.md) ·
 [privacy text](privacy.md) · [test plan](test-plan.md) · [Flutter package](../packages/referral_kit/README.md) ·
@@ -29,7 +29,7 @@ dependencies:
   referral_kit:
     git:
       url: https://github.com/shaantanu9/referral-rewards-kit.git
-      ref: referral_kit-v0.3.1
+      ref: referral_kit-v0.5.0
       path: packages/referral_kit
 ```
 
@@ -259,6 +259,20 @@ Paste [privacy.md](privacy.md) into the privacy policy (replace the `<…>` part
 [store review §4–5](store-review.md). If you forward the funnel events to an analytics service, add "Usage Data →
 Product Interaction (Analytics)" to the Apple label and "App interactions (Analytics)" to Play Data safety, and say so
 in the policy; the events carry no code, user id or install id.
+
+Since 0.5 (compliance re-check, [referral-compliance.md](research/referral-compliance.md)):
+
+- **Web deletion too.** Google Play requires a web page where users can ask for account deletion, listed in Data
+  safety. That path must call `referral.delete_user(uid)` just like the in-app one.
+- **Not for children's apps.** Don't install the kit in an Apple Kids Category app or an app in Google Play's Families
+  programme. Set `minimum_age` to 18 for India. Your `app_referral_age_ok` should use the store's age signal where the
+  store gives one (US state app-store age laws).
+- **India.** Show the DPDP notice in [privacy.md](privacy.md) once before a user in India first uses or shares a code.
+  The in-app "Leave the invite program" switch (`InviteHub`'s invite page block) is the withdrawal.
+- **UK and Germany.** A rewarded share can still count as your marketing (ICO "instigating", BGH I ZR 208/12). The kit
+  keeps the risk low: the user picks the chat, can edit the text, and the kit never collects a friend's contact or
+  sends anything to friends. Don't add an "enter your friend's email" field.
+- **Don't gate it behind a subscription.** Free users must be able to share and earn (UK DMCC Act, pyramid rules).
 
 ## 12. Store review
 
