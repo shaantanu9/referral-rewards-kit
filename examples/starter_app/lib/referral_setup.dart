@@ -77,8 +77,15 @@ class ReferralSetup {
     return code;
   }
 
+  /// Demo only (fake server): pretend the invite page is live at the placeholder host the Android App Link filter
+  /// names, so "Show QR code" and link sharing can be tried. Off by default: Share then sends the code and store link.
+  bool demoInvitePage = false;
+
   /// The invite link for a code, or null while there is no invite page.
-  Uri? inviteLink(String code) => inviteBase.isEmpty ? null : Uri.parse('$inviteBase/$code');
+  Uri? inviteLink(String code) {
+    final base = inviteBase.isEmpty && fake != null && demoInvitePage ? 'https://invite.example.com/i' : inviteBase;
+    return base.isEmpty ? null : Uri.parse('$base/$code');
+  }
 
   void _forward(ReferralEvent e) {
     debugPrint(

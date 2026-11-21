@@ -6,7 +6,10 @@
 //   You share:     Invite friends → Share / Copy → "A friend signs up with your code" → Home says "1 friend used your
 //                  code" → "A friend starts using the app" → your reward card and "1 friend joined".
 //   A friend:      switch "Signed in" off → "Open an invite link" → Sign in → "Use code H4PZ-8WNE" → Add code →
-//                  "Almost yours" → "You start using the app" → the gift on Home.
+//                  "Almost yours" → Home: "Your welcome gift … is waiting" → "You start using the app" → the gift on
+//                  Home and, once, "Pass it on".
+//   Growth (0.5):  the invite screen's boost banner, WhatsApp next to Share, "Show QR code", the waiting line,
+//                  and "Your invite page" (first name, leave the program, join again).
 // The Events list shows what your analytics would receive.
 import 'dart:async';
 
@@ -154,6 +157,18 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
         padding: const EdgeInsets.symmetric(vertical: 8),
         children: [
           _waitingLinkCode(),
+          // The friend's own progress (code added → "Your welcome gift … is waiting", started → "Pass it on", once).
+          // In-app only. CHANGE: pass your ReferralPromptPolicy as `policy` so the pass-it-on card is never shown in
+          // the first session and counts as a prompt.
+          ReferralWelcomeCard(
+            key: ValueKey('welcome-$_cardKey'),
+            client: s.client,
+            store: s.store,
+            appName: 'Reader',
+            activationStep: 'Read your first page',
+            labels: rewardLabels,
+            onPassItOn: () => _openInvite(from: 'welcome'),
+          ),
           // Rewards that landed, once per device; "Invite friends" as the next step. CHANGE: key it by user id so a
           // sign-out and sign-in as someone else starts clean.
           ReferralRewardCard(
@@ -281,6 +296,23 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
         fake.deployed = v;
         _refresh();
       },
+    ),
+    SwitchListTile(
+      key: const ValueKey('demo-boost'),
+      title: const Text('Boost week running (×2)'),
+      subtitle: const Text('The invite screen shows the real last day; codes added now get double'),
+      value: fake.boost,
+      onChanged: (v) {
+        fake.boost = v;
+        _refresh();
+      },
+    ),
+    SwitchListTile(
+      key: const ValueKey('demo-invite-page'),
+      title: const Text('Invite page live'),
+      subtitle: const Text('Share sends the link, and "Show QR code" appears'),
+      value: s.demoInvitePage,
+      onChanged: (v) => setState(() => s.demoInvitePage = v),
     ),
     SwitchListTile(
       key: const ValueKey('demo-signed-in'),

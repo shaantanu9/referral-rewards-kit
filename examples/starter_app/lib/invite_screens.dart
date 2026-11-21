@@ -62,7 +62,11 @@ class _InviteScreenState extends State<InviteScreen> {
       storeLink: storeLink,
       labels: rewardLabels,
       codeCache: s.store,
-      texts: const ReferralTexts(activationStep: 'Read your first page', almostActionLabel: 'Start reading'),
+      texts: const ReferralTexts(
+        activationStep: 'Read your first page',
+        activationStepForFriends: 'Read their first page',
+        almostActionLabel: 'Start reading',
+      ),
       // CHANGE: go to the first real use (the activation step), e.g. the reader.
       onAlmostAction: () => Navigator.of(context).pop(),
       onSignIn: () => signIn(context, s),

@@ -14,7 +14,7 @@ void main() {
   late List<String> events;
 
   setUp(() {
-    fake = FakeReferralServer()..latency = Duration.zero;
+    fake = FakeReferralServer(boost: false)..latency = Duration.zero;
     setup = ReferralSetup(
       fake: fake,
       store: MemoryKeyValueStore(),

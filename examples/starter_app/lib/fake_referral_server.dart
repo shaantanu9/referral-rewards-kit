@@ -1,5 +1,6 @@
 // A stand-in for the kit's Supabase functions, so the whole flow runs with no server. It answers the same RPC names
-// with the same JSON shapes (supabase/migrations/20261112000002…, 000003…, 000009…). A real app replaces it with
+// with the same JSON shapes (supabase/migrations/20261112000002…, 000003…, 000009…, and the growth RPCs of
+// 20261120000023: the boost in the terms, preferences, leaving, the friend's own claim). A real app replaces it with
 // `(fn, params) => Supabase.instance.client.rpc(fn, params: params)` or `ReferralHttpRpc` (lib/referral_setup.dart).
 // It also plays the app's sign-in (a real app has its own auth) and the other people in the story: a friend who signs
 // up with your code, then starts using the app.
@@ -29,7 +30,23 @@ class FakeReferralServer {
     _signIns.add(v);
   }
 
-  FakeReferralServer({bool signedIn = true}) : _signedIn = signedIn;
+  FakeReferralServer({bool signedIn = true, this.boost = true}) : _signedIn = signedIn;
+
+  /// A boost week (×2 for both sides) is running, ending in 3 days at local midnight. Rewards for codes added while
+  /// it runs are doubled, also when the friend starts after it ends (the boost applies by claim time).
+  bool boost;
+  DateTime get boostEndsAt {
+    final d = DateTime.now().add(const Duration(days: 3));
+    return DateTime(d.year, d.month, d.day);
+  }
+
+  /// The sharer's invite page settings (`referral_preferences`).
+  bool showName = false;
+  String? displayName;
+  bool left = false;
+
+  /// Whether the friend's code was added while the boost ran.
+  bool _claimBoosted = false;
 
   /// The server's count of days left to add a code (the kit's `claim_days_left`).
   int claimDaysLeft = 3;
@@ -72,9 +89,45 @@ class FakeReferralServer {
     if (!signedIn) throw const ReferralUnavailableException(ReferralUnavailableReason.signedOut);
     switch (fn) {
       case 'referral_my_code':
-        return {'code': myCode, 'reason': 'ok'};
+        return left ? {'code': null, 'reason': 'left', 'left': true} : {'code': myCode, 'reason': 'ok'};
       case 'referral_terms':
-        return {..._terms, 'claim_days_left': claimed ? null : claimDaysLeft};
+        return {
+          ..._terms,
+          'claim_days_left': claimed ? null : claimDaysLeft,
+          'boost': boost
+              ? {
+                  'starts_at': DateTime.now().subtract(const Duration(days: 4)).toUtc().toIso8601String(),
+                  'ends_at': boostEndsAt.toUtc().toIso8601String(),
+                  'multiplier': 2,
+                  'events': ['joined'],
+                  'who': ['sharer', 'friend'],
+                }
+              : null,
+        };
+      case 'referral_preferences':
+        return _prefs();
+      case 'referral_preferences_set':
+        return _setPrefs((params['prefs'] as Map).cast<String, Object?>());
+      case 'referral_my_claim':
+        if (!claimed) return {'state': 'none'};
+        if (_granted.any((r) => r['who'] == 'friend')) {
+          return {'state': 'joined', 'joined_at': DateTime.now().toUtc().toIso8601String()};
+        }
+        return {
+          'state': 'claimed',
+          'claimed_at': DateTime.now().toUtc().toIso8601String(),
+          'activate_by': DateTime.now().add(const Duration(days: 30)).toUtc().toIso8601String(),
+          'days_left': 30,
+          'rewards': [
+            {
+              'kind': 'chapters',
+              'amount': _amount(_claimBoosted),
+              'base_amount': 4,
+              'params': {},
+              'boosted': _claimBoosted,
+            },
+          ],
+        };
       case 'referral_claim':
         return _claim(normaliseCode(params['code'] as String?));
       case 'referral_stats':
@@ -111,34 +164,57 @@ class FakeReferralServer {
     if (claimed) return {'reason': 'already_referred'};
     if (code != friendCode) return {'reason': 'unknown_code'};
     claimed = true;
+    _claimBoosted = boost;
     return {'reason': 'ok', 'days_left': 30};
+  }
+
+  int _amount(bool boosted) => boosted ? 8 : 4;
+
+  Map<String, Object?> _prefs() => {'show_name': showName, 'display_name': displayName, 'participating': !left};
+
+  /// The same checks as the SQL: known keys only, names 1–40 characters with a letter and no `@` or `://`.
+  Map<String, Object?> _setPrefs(Map<String, Object?> prefs) {
+    if (prefs.containsKey('display_name')) {
+      final name = prefs['display_name'] as String?;
+      if (name != null && displayNameProblem(name) != null) return {'reason': 'invalid_name'};
+      displayName = name?.trim();
+    }
+    if (prefs['show_name'] is bool) showName = prefs['show_name']! as bool;
+    if (prefs['participating'] is bool) left = !(prefs['participating']! as bool);
+    return _prefs();
   }
 
   /// The friend (this user, after adding a code) starts using the app: the friend's reward lands.
   bool youStartUsing() {
     if (!claimed || _granted.any((r) => r['who'] == 'friend')) return false;
-    _grant('friend');
+    _grant('friend', boosted: _claimBoosted);
     return true;
   }
 
   /// A friend signs up with your code: nothing is earned yet, but you see "1 friend used your code".
-  void aFriendSignsUp() => claimedFriends++;
+  void aFriendSignsUp() {
+    claimedFriends++;
+    _friendBoosts.add(boost);
+  }
+
+  /// Per friend who signed up: whether their code was added during the boost.
+  final List<bool> _friendBoosts = [];
 
   /// A friend who used your code starts using the app (the app's activation hook): your reward lands.
   void aFriendStarts() {
     if (claimedFriends > 0) claimedFriends--;
     joinedFriends++;
-    _grant('sharer');
+    _grant('sharer', boosted: _friendBoosts.isEmpty ? boost : _friendBoosts.removeAt(0));
   }
 
   void dispose() => unawaited(_signIns.close());
 
-  void _grant(String who) => _granted.add({
+  void _grant(String who, {bool boosted = false}) => _granted.add({
     'id': '00000000-0000-4000-8000-${(_nextId++).toString().padLeft(12, '0')}',
     'who': who,
     'event': 'joined',
     'kind': 'chapters',
-    'amount': 4,
+    'amount': _amount(boosted),
     'params': null,
   });
 }

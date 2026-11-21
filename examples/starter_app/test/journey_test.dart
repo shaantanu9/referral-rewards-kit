@@ -29,7 +29,7 @@ void main() {
   );
 
   setUp(() {
-    fake = FakeReferralServer(signedIn: false)..latency = Duration.zero;
+    fake = FakeReferralServer(signedIn: false, boost: false)..latency = Duration.zero;
     store = MemoryKeyValueStore();
     events = [];
   });
