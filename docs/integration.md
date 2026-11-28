@@ -29,7 +29,7 @@ dependencies:
   referral_kit:
     git:
       url: https://github.com/shaantanu9/referral-rewards-kit.git
-      ref: referral_kit-v0.5.0
+      ref: referral_kit-v0.6.0
       path: packages/referral_kit
 ```
 

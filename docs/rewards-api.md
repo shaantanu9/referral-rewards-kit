@@ -1,6 +1,6 @@
 # Rewards API reference
 
-Updated: 2026-11-20
+Updated: 2026-11-27
 Every endpoint of the rewards engine, for building the user app and a small admin dashboard (setup, checks,
 analytics). Design: [ADR 0002](adr/0002-rewards-engine.md) · setup: [rewards integration](rewards-integration.md) ·
 Flutter client: [packages/rewards_kit](../packages/rewards_kit/README.md).

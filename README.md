@@ -4,6 +4,11 @@
 
 Built and maintained by [Myind](https://www.myind.ai).
 
+[![Built with Myind](https://www.myind.ai/referral-kit/badge.svg)](https://www.myind.ai/referral-kit)
+
+The top-level screens show a small "Built with Myind" link by default; `showAttribution: false` removes it, free. We'd
+love it if you keep it or add the badge: [NOTICE.md](NOTICE.md). Get your app featured: [SHOWCASE.md](SHOWCASE.md).
+
 Invite friends, earn rewards: an open-source referral flow for Flutter apps on Supabase with RevenueCat billing.
 
 - A user shares a code; when an invited friend starts using the app, both can get an in-app reward.
@@ -22,7 +27,7 @@ Every screen, with what it shows: [docs/showcase.md](docs/showcase.md).
 
 Status: **built and tested locally; not yet proven on real phones or against a live RevenueCat project.** Design:
 [ADR 0001](docs/adr/0001-referral-kit.md). Add it to an app: [integration guide](docs/integration.md) (`flutter pub add referral_kit`, or a git dependency
-on tag `referral_kit-v0.5.0`, one SQL file from [the template](supabase/app-config/template.sql), one `InviteHub`,
+on tag `referral_kit-v0.6.0`, one SQL file from [the template](supabase/app-config/template.sql), one `InviteHub`,
 `onEvent` to your analytics), or start from the [starter app](examples/starter_app). Before release:
 [test plan](docs/test-plan.md) and [store review](docs/store-review.md). Go live: [checklist](docs/go-live.md).
 
@@ -54,6 +59,7 @@ the app and a dashboard: [rewards-api.md](docs/rewards-api.md).
 | Admin page (static, demo mode) | `web/rewards-admin` | 17 Deno |
 | Rewarded-ad live check (RevenueCat + AdMob) | `examples/rewards_ads_check` | 3 + APK build |
 | Follow-up notifications + device timezone check | `examples/rewards_notifications_check` | 5 + APK build |
+
 
 Run the database tests: `scripts/test-db.sh` (Postgres 15+ on PATH, or `PGBIN=...`).
 

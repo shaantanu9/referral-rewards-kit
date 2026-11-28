@@ -16,8 +16,9 @@ Thanks for helping. Issues and pull requests are welcome.
 | Flutter packages | `flutter analyze && flutter test` in `packages/referral_kit` or `packages/rewards_kit` |
 | Invite page | `deno test --allow-read=. web/invite` from the repo root |
 | Admin page | `deno test --allow-read=. web/rewards-admin` from the repo root |
+| JS packages | `pnpm install && pnpm -r typecheck && pnpm -r test` in `js/` |
 
-CI (`.github/workflows/ci.yml`) runs all of them, plus a secret scan.
+CI (`.github/workflows/ci.yml`) runs all of them except the JS packages, plus a secret scan.
 
 ## Rules the code follows
 

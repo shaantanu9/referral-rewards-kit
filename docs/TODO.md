@@ -1,6 +1,6 @@
 # To do
 
-Updated: 2026-11-22
+Updated: 2026-11-28
 What is planned and not built yet, and what has not been proven outside tests. Build order: [build-plan.md](build-plan.md). Known problems: [ISSUES.md](ISSUES.md).
 
 ## Proof on the real thing
@@ -34,6 +34,10 @@ Everything below passes its local tests and CI, but nothing has yet run against 
 - [ ] A league week closing through `/worker`; the referral give-up, banked-per-entitlement and lifetime-fallback
       paths against real RevenueCat.
 
+- [ ] The "Built with Myind" link (referral_kit 0.6.0, rewards_kit 0.8.1, the JS screens) on a phone and in a browser:
+      it opens outside the app with the `utm_*` values, and `showAttribution: false` removes it.
+- [ ] The JS ports in a real React, Next.js and React Native app (only their tests and the `js/examples` demos run).
+
 ## Open decisions
 
 - [ ] Recap card: `rewards_recap` reads `rewards.events`, which is deleted after `events_retention_days` (90). A
@@ -43,14 +47,16 @@ Everything below passes its local tests and CI, but nothing has yet run against 
 
 ## Planned
 
-- [ ] Release referral_kit 0.4.0 and rewards_kit 0.6.3 (tags, pub.dev); then move the docs' tag references
-      (README, integration guide, fresh-app quickstart) from 0.3.1 / 0.6.1.
+- [ ] Tag referral_kit 0.6.0 and rewards_kit 0.8.1 (`referral_kit-v0.6.0`, `rewards_kit-v0.8.1`; the docs already
+      point at them). Both are `publish_to: none` for now, so pub.dev keeps 0.5.0 / 0.7.0 until they are published.
+- [ ] The JS packages (`js/packages/*`) are `"private": true`: decide when to publish them on npm, and add `js/` to CI
+      (`pnpm -r typecheck`, `pnpm -r test`, `pnpm -r build`).
 - [x] Starter app shows the whole journey (2026-11-20, [user-journey.md](user-journey.md)): keep on link and install referrer, `/i/<CODE>` route, sign-in → "Use code …", retrier with a sign-in stream, `claimedCount` on Home. Apps still need it.
 - [ ] Move `codeFromInviteLink` (starter `lib/invite_link.dart`) into the package next release, so apps don't copy it.
 - [ ] Starter app on a phone with a real invite domain: Android App Link (assetlinks) and iOS Associated Domains (entitlement added in Xcode) opening `/i/<CODE>` cold and warm.
 - [ ] Apps: call `queue.keep(code)` on invite-link and install-referrer arrival, open code entry after sign-in when
       `queue.linkCode()` is set; route `/i/<CODE>`; wire a retrier
-      with a sign-in stream (PostmeeAI has none); App Links `/i/` on Android; show `claimedCount` on Home.
+      with a sign-in stream (some apps have none); App Links `/i/` on Android; show `claimedCount` on Home.
 - [ ] Built-in Kotlin for the Android plugin (drop `kotlin-android` / `kotlinOptions`): needs the minimum raised to
       Flutter 3.44 / Dart 3.12 first (owner decision; the apps build on 3.41.5).
 - [ ] Move to `package:material_ui` once the minimum Flutter is 3.47+.
