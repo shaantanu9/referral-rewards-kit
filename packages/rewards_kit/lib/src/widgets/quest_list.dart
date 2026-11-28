@@ -54,7 +54,7 @@ class QuestList extends StatelessWidget {
                   endsAt: q.endsAt,
                   clock: controller.clock,
                   prefix: x.questResetsIn,
-                  hidden: controller.state.choices.timersOff,
+                  hidden: controller.state.hideTimers,
                   style: muted,
                   onExpired: controller.refresh,
                 ),

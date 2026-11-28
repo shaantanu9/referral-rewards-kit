@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import '../controller.dart';
 import '../quiz_controller.dart';
 import '../texts.dart';
+import 'myind_attribution.dart';
 import 'quiz_views.dart';
 
 /// The whole quiz flow on one screen: rules → question with its countdown bar → right / wrong → … → score and
@@ -24,6 +25,8 @@ class QuizScreen extends StatefulWidget {
     this.imageBuilder,
     this.onDone,
     this.builder,
+    this.showAttribution = true,
+    this.attributionVariant = 1,
   });
 
   final RewardsController controller;
@@ -45,6 +48,13 @@ class QuizScreen extends StatefulWidget {
 
   /// Your own look for the whole screen body, rebuilt on every quiz change.
   final Widget Function(BuildContext context, QuizController quiz)? builder;
+
+  /// The small "Rewards by Myind" link at the bottom of the default body ([MyindAttribution]); not added to a
+  /// [builder] body. Free to turn off: false hides it.
+  final bool showAttribution;
+
+  /// Which link text ([MyindAttribution.variant]); default 1, "Rewards by Myind".
+  final int attributionVariant;
 
   /// A route to the default screen.
   static Route<void> route({
@@ -114,6 +124,7 @@ class _QuizScreenState extends State<QuizScreen> {
             onPlaySound: widget.onPlaySound,
             imageBuilder: widget.imageBuilder,
             onDone: _done,
+            footer: widget.showAttribution ? MyindAttribution(variant: widget.attributionVariant) : null,
           );
         },
       ),

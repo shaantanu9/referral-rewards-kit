@@ -2,6 +2,12 @@
 
 Built and maintained by [Myind](https://www.myind.ai).
 
+[![Built with Myind](https://www.myind.ai/referral-kit/badge.svg)](https://www.myind.ai/referral-kit)
+
+[Site](https://www.myind.ai/referral-kit) · [Showcase](https://www.myind.ai/referral-kit/showcase) ·
+[Docs](https://github.com/shaantanu9/referral-rewards-kit/tree/main/docs) · [pub.dev](https://pub.dev/packages/rewards_kit) ·
+[GitHub](https://github.com/shaantanu9/referral-rewards-kit) · React / Next.js / React Native ports: in progress
+
 Flutter side of the rewards engine ([ADR 0002](https://github.com/shaantanu9/referral-rewards-kit/blob/main/docs/adr/0002-rewards-engine.md)): daily streaks, milestones
 (quizzes passed, chapters read, friends invited), Instagram tag rewards, timed offers, and since 0.2 a daily quiz,
 quests, recharges, time windows, friend streaks, an activity heatmap, recaps and rewarded ads through RevenueCat, and
@@ -23,7 +29,7 @@ The admin dashboard that comes with it (`web/rewards-admin`, a static page):
 
 <img src="https://raw.githubusercontent.com/shaantanu9/referral-rewards-kit/main/packages/rewards_kit/screenshots/08-admin-dashboard.png" width="820" alt="Rewards admin dashboard">
 
-Status: **0.7.0, tested with fakes (`flutter test`); not yet run against a live project or on a phone.** It
+Status: **0.8.0, tested with fakes (`flutter test`); not yet run against a live project or on a phone.** It
 matches the server in `supabase/migrations/*_rewards_*` (ADR 0002 §18; SQL tests 13–28); the 0.4 / 0.5 follow-up calls
 match the contract in ADR 0002 §18.7 and §18.8.
 
@@ -351,6 +357,31 @@ Progress, all from fields the server sends (and absent on an older server):
 
 Every string is in `RewardsTexts(fairPlay: FairPlayTexts(...))`.
 
+## Extension hooks (0.8.1)
+
+Generic places where another package (yours, or a separate add-on) adds its own server fields, events and widgets
+without forking this one. Nothing changes for an app that does not use them.
+
+- **Raw server JSON**: `RewardsState.raw`, `TrackResult.raw`, `StreakState.raw`, `FollowupPlanItem.raw`,
+  `FollowupPrefs.raw`. Keep your own parsed view with the state in `RewardsState.extras` (kept by `copyWith`, empty
+  again after the next load).
+- **Hidden sections**: `RewardsState.hidden` (`RewardsSection.timers`, `.surprises`, `.leagues`). The widgets read
+  `state.hideTimers`, `state.hideSurprises`, `state.hideLeagues` (the user's choices, or a hidden section).
+- **Controller**: `addStateTransform` (runs on every loaded state and after a `track` merge), `addLoadListener`,
+  `addRefreshCondition`, `addSeenListener`, `runAction` (your own server call with the controller's error handling),
+  `updateState`, and `oddsFooterBuilder` (a line under the odds in `SurpriseOdds`, `StreakCard`, `MilestoneProgress`).
+- **Client**: `eventDecorator` (add context fields to every event), `addAnswerListener`, `callRaw` (any RPC with the
+  client's error mapping), `extraFollowupPrefKeys`. `report` sends an event with an `onceKey` once per key.
+- **Events**: `RewardsEvent.custom('my_event', props: ..., context: ..., onceKey: ...)` (`name` is
+  `RewardsEventName.custom`, `wire` is your name), `RewardsEvent.withContext`, `RewardsEvent.toJson`.
+- **Errors**: `rewardsReasonOf` also reads upper-case codes (`rewards: RW_SOME_CODE text`, or the code in the error's
+  `details`).
+- **Texts**: `RewardsTexts(extensions: [MyTexts()])`, read with `texts.extension<MyTexts>()`; one that implements
+  `RewardsErrorTexts` names reasons the kit does not know in `texts.error(reason)`.
+- **Widgets**: `RewardsHub(leadingSections:, extraSections:, kindBuilders:)` (a program kind this version does not know,
+  by `ProgramInfo.kindWire`), `DailyGoalRing(goal:)` and `StreakState.goalOverride` / `withGoalOverride`,
+  `MysteryOdds(footer:)`, `RewardReveal(onRevealed:)`.
+
 ## Rewarded ads through RevenueCat
 
 The app shows the ad with RevenueCat's AdMob adapter; RevenueCat verifies it and tells the engine through its
@@ -389,6 +420,41 @@ Two separate rewards, do not mix them up:
   arrives a little later).
 
 Google's sample ad unit ids load and show but are never verified (no server-side verification): use a real unit.
+
+## Attribution
+
+`RewardsHub` and `QuizScreen` show a small "Rewards by Myind" link at the bottom of their content. It is on by default and free to
+remove: the package stays MIT and nothing checks for it.
+
+```dart
+RewardsHub(/* … */ showAttribution: false)   // hides the link
+RewardsHub(/* … */ attributionVariant: 2)    // other words: 0 "Built with Myind referral kit", 1 "Rewards by Myind",
+                                             // 2 "Free referral kit by Myind", 3 "Made with Myind"
+```
+
+We'd love it if you keep it, or add the badge to your README instead:
+
+```markdown
+[![Built with Myind](https://www.myind.ai/referral-kit/badge.svg)](https://www.myind.ai/referral-kit)
+```
+
+`MyindAttribution` is the link on its own (put it anywhere, e.g. an About page) and `MyindAttributionConfig` holds the
+URLs. The link opens `https://www.myind.ai/...` with `utm_source`, `utm_medium=attribution` and `utm_campaign`; nothing
+is sent at runtime. More: [NOTICE.md](https://github.com/shaantanu9/referral-rewards-kit/blob/main/NOTICE.md).
+
+On `QuizScreen` the link sits under the default quiz body; a `builder` body is all yours, so the link is not added to
+it. Since 0.8 the package depends on `url_launcher` (^6.3, BSD-3-Clause) to open the link; pass `onOpen` to
+`MyindAttribution` to open it your own way.
+
+Both packages export `MyindAttribution` and `MyindAttributionConfig`. A file that imports both packages and uses
+one of these names picks one with `hide`, e.g. `import 'package:rewards_kit/rewards_kit.dart' hide MyindAttribution,
+MyindAttributionConfig;`.
+
+## Showcase
+
+Built an app with the kit? Submit it at [myind.ai/referral-kit/showcase](https://www.myind.ai/referral-kit/showcase)
+and we feature it with a link back to your app. How it works and the badge snippet:
+[SHOWCASE.md](https://github.com/shaantanu9/referral-rewards-kit/blob/main/SHOWCASE.md).
 
 ## Analytics events
 

@@ -12,7 +12,8 @@ import 'texts_v2.dart';
 /// and falls back to "amount kind" (`5 coins`); a reward with `params.amount_range` reads "5–50 coins". The 0.2
 /// widgets read [quiz] and [programs], the 0.3 surprise widgets [reveal], the 0.4
 /// `FollowupSettings` [followups], the 0.6 `LeagueBoard` [leagues] and `RewardsRecapCard` [recapCard], and the 0.7
-/// choices, streak repair, personal best, head start and levels [fairPlay].
+/// choices, streak repair, personal best, head start and levels [fairPlay]. An extension package keeps its own texts
+/// in [extensions] (read with [extension]).
 class RewardsTexts {
   const RewardsTexts({
     String Function(RewardSpec reward)? reward,
@@ -56,6 +57,7 @@ class RewardsTexts {
     this.leagues = const LeagueTexts(),
     this.recapCard = const RecapCardTexts(),
     this.fairPlay = const FairPlayTexts(),
+    this.extensions = const [],
   }) : _reward = reward,
        _streakDays = streakDays,
        _nextIn = nextIn,
@@ -123,6 +125,28 @@ class RewardsTexts {
   /// Streak / surprise / timer choices, streak repair, personal best, head start and levels (0.7).
   final FairPlayTexts fairPlay;
 
+  /// An extension package's own text objects (extension hook). One that implements [RewardsErrorTexts] also names
+  /// the reasons this class does not know.
+  final List<Object> extensions;
+
+  /// The first of [extensions] of type [T], or null.
+  T? extension<T>() {
+    for (final e in extensions) {
+      if (e is T) return e as T;
+    }
+    return null;
+  }
+
+  String? _extensionError(String reason) {
+    for (final e in extensions) {
+      if (e is RewardsErrorTexts) {
+        final line = e.errorLine(reason);
+        if (line != null) return line;
+      }
+    }
+    return null;
+  }
+
   String reward(RewardSpec r) {
     final f = _reward;
     if (f != null) return f(r);
@@ -176,8 +200,14 @@ class RewardsTexts {
         'no_attempts_left' => quiz.comeBack,
         'not_enough_questions' => quiz.unavailable,
         'unavailable' => quiz.unavailable,
-        _ => 'Something went wrong. Try again.',
+        _ => _extensionError(reason) ?? 'Something went wrong. Try again.',
       };
+}
+
+/// Texts in [RewardsTexts.extensions] that name refusal reasons the kit does not know.
+abstract interface class RewardsErrorTexts {
+  /// The line for [reason], or null when it is not one of this object's.
+  String? errorLine(String reason);
 }
 
 String? _optName(Object? v) => v is String && v.trim().isNotEmpty ? v.trim() : null;

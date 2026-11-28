@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
+import 'package:flutter/widgets.dart';
 
 import 'client.dart';
 import 'clock.dart';
@@ -13,6 +13,7 @@ import 'programs.dart';
 import 'quiz_models.dart';
 import 'state.dart';
 import 'tasks.dart';
+import 'texts.dart';
 
 /// Holds the last [RewardsState] for the widgets, the server clock, and a stream of grants as they land.
 ///
@@ -39,8 +40,62 @@ class RewardsController extends ChangeNotifier {
   final _recaps = <String, Recap>{};
   final _invites = <String, FriendInvite>{};
   final _leagues = <String, LeagueState>{};
+  final _transforms = <RewardsState Function(RewardsState state)>[];
+  final _loadListeners = <void Function(RewardsState state)>[];
+  final _refreshConditions = <bool Function(TrackResult result, RewardsState state)>[];
+  final _seenListeners = <void Function(List<RewardGrant> grants)>[];
 
   RewardsState get state => _state;
+
+  // ---- Extension hooks (0.8.1): an extension package adds its own server fields, events and widgets here. ----
+
+  /// Runs [transform] on every state loaded from the server ([refresh]) and after a [track] merge, in the order
+  /// added. Use it to read fields from [RewardsState.raw] into [RewardsState.extras], set [RewardsState.hidden] or a
+  /// streak's goal override.
+  void addStateTransform(RewardsState Function(RewardsState state) transform) {
+    _transforms.add(transform);
+    if (_loaded) _state = transform(_state);
+  }
+
+  /// Calls [listener] after each successful [refresh] with the new state.
+  void addLoadListener(void Function(RewardsState state) listener) => _loadListeners.add(listener);
+
+  /// After a [track], the state is reloaded when [test] returns true (as well as in the kit's own cases).
+  void addRefreshCondition(bool Function(TrackResult result, RewardsState state) test) => _refreshConditions.add(test);
+
+  /// Calls [listener] with the grants [markSeen] marked seen.
+  void addSeenListener(void Function(List<RewardGrant> grants) listener) => _seenListeners.add(listener);
+
+  /// A line shown under the odds of [program] by `SurpriseOdds`, `StreakCard` and `MilestoneProgress` (via
+  /// `MysteryOdds.footer`), or null for nothing.
+  Widget? Function(BuildContext context, String program, RewardsTexts texts)? oddsFooterBuilder;
+
+  /// Replaces the state with [update]'s result (a local change after an extension's own server call) and, when
+  /// [notify] is true, tells the widgets.
+  void updateState(RewardsState Function(RewardsState state) update, {bool notify = true}) {
+    _state = update(_state);
+    if (notify) _notify();
+  }
+
+  /// Runs one server call with the controller's error handling, applies its answer, notifies; returns null or a
+  /// short reason (`offline`, `unavailable`, the server's reason), like every action of this controller.
+  Future<String?> runAction<T>(Future<T> Function() call, void Function(T value) apply) => _act(call, apply);
+
+  RewardsState _transformed(RewardsState s) {
+    var out = s;
+    for (final t in _transforms) {
+      out = t(out);
+    }
+    return out;
+  }
+
+  void _tell<T>(List<void Function(T)> listeners, T value) {
+    for (final l in List.of(listeners)) {
+      try {
+        l(value);
+      } catch (_) {}
+    }
+  }
 
   /// True once a [refresh] succeeded.
   bool get loaded => _loaded;
@@ -127,12 +182,13 @@ class RewardsController extends ChangeNotifier {
     try {
       final s = await client.state();
       clock.sync(s.serverTime);
-      _state = s;
+      _state = _transformed(s);
       _loaded = true;
       _error = null;
       _unavailable = null;
       if (!s.enabled) client.report(const RewardsEvent(RewardsEventName.unavailable, {'reason': 'disabled'}));
       _emit(s.inbox);
+      _tell(_loadListeners, _state);
     } catch (e) {
       _fail(e);
     } finally {
@@ -153,10 +209,12 @@ class RewardsController extends ChangeNotifier {
       return reason;
     }
     if (r.duplicate || !r.enabled) return null;
-    _state = _state.copyWith(
-      streaks: mergeBy(_state.streaks, r.streaks, (s) => s.program),
-      milestones: mergeBy(_state.milestones, r.milestones, (m) => m.program),
-      quests: mergeBy(_state.quests, r.quests, (q) => q.program),
+    _state = _transformed(
+      _state.copyWith(
+        streaks: mergeBy(_state.streaks, r.streaks, (s) => s.program),
+        milestones: mergeBy(_state.milestones, r.milestones, (m) => m.program),
+        quests: mergeBy(_state.quests, r.quests, (q) => q.program),
+      ),
     );
     _updateHistories(r.streaks);
     applyGrants(r.grants, notify: false);
@@ -166,7 +224,8 @@ class RewardsController extends ChangeNotifier {
         _state.milestones.isNotEmpty ||
         _state.quests.isNotEmpty ||
         _state.friends.isNotEmpty ||
-        _state.offers.any((o) => o.status == OfferStatus.notStarted);
+        _state.offers.any((o) => o.status == OfferStatus.notStarted) ||
+        _refreshConditions.any((test) => test(r, _state));
     if (mayHaveMoved) await refresh();
     return null;
   }
@@ -231,6 +290,7 @@ class RewardsController extends ChangeNotifier {
     if (ids.isEmpty) return null;
     try {
       await client.markSeen(ids);
+      _tell(_seenListeners, granted.toList());
       _state = _state.copyWith(inbox: _state.inbox.where((g) => !ids.contains(g.id)).toList());
       _notify();
       return null;

@@ -11,7 +11,9 @@ import 'base.dart';
 /// The odds of every surprise reward (`state.surprises`, ADR 0002 §18.6): "1 in 10 chance of 5–50 coins". Show it
 /// wherever surprises can happen: the odds are always shown, surprises are free only, and the server caps them per
 /// day. Shows nothing when there are none (or none for [program]), or when the user switched surprises off (0.7
-/// `state.choices.surprisesOff`: no surprise is drawn for them, so there are no odds to show).
+/// `state.choices.surprisesOff`: no surprise is drawn for them, so there are no odds to show), or when the state hides
+/// surprises (`state.hideSurprises`). Under each program's odds, `controller.oddsFooterBuilder`'s line when it gives
+/// one.
 class SurpriseOdds extends StatelessWidget {
   const SurpriseOdds({
     super.key,
@@ -41,7 +43,7 @@ class SurpriseOdds extends StatelessWidget {
       final state = controller.state;
       final p = program;
       final list = p == null ? state.surprises : state.surprisesOf(p);
-      if (list.isEmpty || state.choices.surprisesOff) return const SizedBox.shrink();
+      if (list.isEmpty || state.hideSurprises) return const SizedBox.shrink();
       final b = builder;
       if (b != null) return b(context, list);
       final t = RewardsTheme.of(context);
@@ -64,6 +66,8 @@ class SurpriseOdds extends StatelessWidget {
                   ),
                 ],
               ),
+            for (final key in {for (final s in list) s.program})
+              ?controller.oddsFooterBuilder?.call(context, key, texts),
           ],
         ),
       );

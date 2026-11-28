@@ -9,7 +9,7 @@ import '../theme.dart';
 import 'base.dart';
 
 /// Today's progress towards a streak's daily goal ("1/2"), a check once the day counts. Shows nothing while the
-/// streak is `hidden` or streaks are switched off (0.7).
+/// streak is `hidden` or streaks are switched off (0.7). The goal is [goal] when given, else `StreakState.ringGoal`.
 class DailyGoalRing extends StatelessWidget {
   const DailyGoalRing({
     super.key,
@@ -18,8 +18,13 @@ class DailyGoalRing extends StatelessWidget {
     this.size = 56,
     this.strokeWidth = 6,
     this.texts = const RewardsTexts(),
+    this.goal,
     this.builder,
   });
+
+  /// The per-day goal to show instead of the streak's (`StreakState.ringGoal`: the app's goal, or a state
+  /// transform's override); null for the streak's own.
+  final int? goal;
 
   final RewardsController controller;
 
@@ -39,10 +44,13 @@ class DailyGoalRing extends StatelessWidget {
       if (s == null || s.hidden || st.choices.streaksOff) return const SizedBox.shrink();
       final b = builder;
       if (b != null) return b(context, s);
+      final override = goal;
+      final ring = override == null || override < 1 ? s : s.withGoalOverride(override);
+      final goalShown = ring.ringGoal, progress = ring.ringProgress, done = ring.ringDone;
       final t = RewardsTheme.of(context);
       final x = texts.programs;
       return Semantics(
-        label: s.todayDone ? x.goalDone : x.goal(s.todayCount, s.dailyGoal),
+        label: done ? x.goalDone : x.goal(s.todayCount, goalShown),
         child: SizedBox.square(
           dimension: size,
           child: Stack(
@@ -51,16 +59,16 @@ class DailyGoalRing extends StatelessWidget {
               SizedBox.square(
                 dimension: size,
                 child: CircularProgressIndicator(
-                  value: s.goalProgress,
+                  value: progress,
                   strokeWidth: strokeWidth,
-                  color: s.todayDone ? t.success : t.accent,
+                  color: done ? t.success : t.accent,
                   backgroundColor: t.muted?.withValues(alpha: 0.2),
                 ),
               ),
-              if (s.todayDone)
+              if (done)
                 Icon(Icons.check, color: t.success, size: size * 0.45)
               else
-                Text(x.goal(s.todayCount, s.dailyGoal), style: t.bodyStyle?.copyWith(color: t.onSurface)),
+                Text(x.goal(s.todayCount, goalShown), style: t.bodyStyle?.copyWith(color: t.onSurface)),
             ],
           ),
         ),

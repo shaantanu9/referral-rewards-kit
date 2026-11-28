@@ -61,10 +61,9 @@ class _DefaultStreak extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final t = RewardsTheme.of(context);
-    final choices = c.state.choices;
     final now = c.clock.now();
     final risk = s.atRisk(now, within: within);
-    final next = choices.surprisesOff ? s.nextReward?.fixed : s.nextReward;
+    final next = c.state.hideSurprises ? s.nextReward?.fixed : s.nextReward;
     final left = s.daysToNextReward;
     final repair = s.repair;
     final x = texts.fairPlay;
@@ -94,7 +93,7 @@ class _DefaultStreak extends StatelessWidget {
               clock: c.clock,
               prefix: x.repairEndsIn,
               style: t.bodyStyle?.copyWith(color: t.muted),
-              hidden: choices.timersOff,
+              hidden: c.state.hideTimers,
             ),
           ] else if (s.repairedRecently(now)) ...[
             const SizedBox(height: 8),
@@ -103,7 +102,7 @@ class _DefaultStreak extends StatelessWidget {
           const SizedBox(height: 8),
           if (s.todayDone)
             Text(texts.streakDoneToday, style: t.bodyStyle?.copyWith(color: t.success))
-          else if (risk && choices.timersOff)
+          else if (risk && c.state.hideTimers)
             Text(texts.streakDoToday, style: t.bodyStyle?.copyWith(color: t.warning))
           else if (risk)
             Countdown(
@@ -122,7 +121,8 @@ class _DefaultStreak extends StatelessWidget {
           if (next != null && left != null) ...[
             const SizedBox(height: 4),
             Text(texts.nextIn(texts.reward(next), left), style: t.bodyStyle?.copyWith(color: t.onSurface)),
-            if (next.isMystery) MysteryOdds(reward: next, texts: texts),
+            if (next.isMystery)
+              MysteryOdds(reward: next, texts: texts, footer: c.oddsFooterBuilder?.call(context, s.program, texts)),
           ],
         ],
       ),

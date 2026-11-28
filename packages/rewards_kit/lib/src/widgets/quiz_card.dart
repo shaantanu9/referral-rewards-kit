@@ -99,7 +99,7 @@ class QuizCard extends StatelessWidget {
               endsAt: q.endsAt,
               clock: controller.clock,
               prefix: x.closesIn,
-              hidden: controller.state.choices.timersOff,
+              hidden: controller.state.hideTimers,
               style: muted,
               onExpired: controller.refresh,
             ),

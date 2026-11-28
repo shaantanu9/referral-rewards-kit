@@ -85,19 +85,58 @@ enum RewardsEventName {
 
   /// Rewards cannot be used right now. Props: `reason` (`not_deployed` | `signed_out` | `no_project` | `offline` |
   /// `server_error` | `disabled`).
-  unavailable('rewards_unavailable');
+  unavailable('rewards_unavailable'),
+
+  /// An event an extension package names itself ([RewardsEvent.custom]); its real name is [RewardsEvent.wire].
+  custom('custom');
 
   const RewardsEventName(this.wire);
   final String wire;
 }
 
+/// One analytics event: a [name], its [props], and [context], top-level fields an event decorator added
+/// (`RewardsClient.eventDecorator`). [toJson] gives the flat map for an analytics SDK.
 class RewardsEvent {
-  const RewardsEvent(this.name, [this.props = const {}]);
+  const RewardsEvent(this.name, [this.props = const {}, this.context = const {}, this.onceKey]) : _wire = null;
+
+  /// An event named by an extension package: [name] is [RewardsEventName.custom] and [wire] is [wireName].
+  const RewardsEvent.custom(String wireName, {this.props = const {}, this.context = const {}, this.onceKey})
+    : name = RewardsEventName.custom,
+      _wire = wireName;
+
   final RewardsEventName name;
   final Map<String, Object> props;
+  final String? _wire;
+
+  /// Top-level fields next to `event` and `props` (e.g. an A/B variant or a session id added by a decorator). A
+  /// `DateTime` value is written as UTC ISO-8601 by [toJson].
+  final Map<String, Object> context;
+
+  /// When set, `RewardsClient.report` sends this event once per key for that client.
+  final String? onceKey;
+
+  /// The wire name: [name]'s, or the custom one.
+  String get wire => _wire ?? name.wire;
+
+  /// This event with [more] context fields added; fields already set are kept.
+  RewardsEvent withContext(Map<String, Object> more) {
+    if (more.isEmpty) return this;
+    final merged = {...more, ...context};
+    return _wire == null
+        ? RewardsEvent(name, props, merged, onceKey)
+        : RewardsEvent.custom(_wire, props: props, context: merged, onceKey: onceKey);
+  }
+
+  /// The whole event as a flat map: `event`, the [context] fields, and `props`.
+  Map<String, Object> toJson() => {
+    'event': wire,
+    for (final e in context.entries)
+      e.key: e.value is DateTime ? (e.value as DateTime).toUtc().toIso8601String() : e.value,
+    'props': props,
+  };
 
   @override
-  String toString() => 'RewardsEvent(${name.wire}, $props)';
+  String toString() => 'RewardsEvent($wire, $props)';
 }
 
 typedef RewardsEventSink = void Function(RewardsEvent event);

@@ -5,7 +5,7 @@ import 'fakes.dart';
 import 'fakes_v2.dart';
 
 void main() {
-  test('useRecharge merges units and next time, keeps every_minutes; empty corrects to zero', () async {
+  test('useRecharge merges units and the next refill, keeps every_minutes; empty corrects to zero', () async {
     final rpc = FakeRpc({
       'rewards_state': (_) => sampleStateV2(),
       'rewards_recharge_use': (_) => {

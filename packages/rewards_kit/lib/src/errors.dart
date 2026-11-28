@@ -128,13 +128,17 @@ class RewardsFormatException implements Exception {
   String toString() => 'RewardsFormatException: $message';
 }
 
-final _reasonPattern = RegExp(r'rewards: ([a-z][a-z0-9_]*)');
+final _reasonPattern = RegExp(r'rewards: (RW_[A-Z0-9_]+|[a-z][a-z0-9_]*)');
+final _codePattern = RegExp(r'\b(RW_[A-Z0-9_]+)\b');
 
 /// The `<reason>` of a `rewards: <reason>` error, read from its text (a supabase_flutter `PostgrestException`, a
-/// PostgREST error body's `message`, or anything whose `toString()` carries it). Null when there is none.
+/// PostgREST error body's `message`, or anything whose `toString()` carries it). An upper-case code
+/// (`rewards: RW_SOME_CODE human text`, or `RW_SOME_CODE` only in the error's `details`) gives the code. Null when
+/// there is none.
 String? rewardsReasonOf(Object error) {
   if (error is RewardsException) return error.reason;
-  return _reasonPattern.firstMatch(error.toString())?.group(1);
+  final text = error.toString();
+  return _reasonPattern.firstMatch(text)?.group(1) ?? _codePattern.firstMatch(text)?.group(1);
 }
 
 /// Whether [error] means "the rewards functions do not exist on this server": [RewardsUnavailableException] with

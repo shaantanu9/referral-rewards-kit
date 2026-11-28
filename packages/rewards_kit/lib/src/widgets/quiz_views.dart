@@ -16,6 +16,7 @@ class QuizBody extends StatelessWidget {
     this.onPlaySound,
     this.imageBuilder,
     this.onDone,
+    this.footer,
   });
 
   final QuizController quiz;
@@ -23,6 +24,9 @@ class QuizBody extends StatelessWidget {
   final void Function(String soundId)? onPlaySound;
   final Widget Function(BuildContext context, String url)? imageBuilder;
   final VoidCallback? onDone;
+
+  /// Shown under the content, inside the scroll (e.g. `QuizScreen`'s attribution link).
+  final Widget? footer;
 
   @override
   Widget build(BuildContext context) {
@@ -34,7 +38,7 @@ class QuizBody extends StatelessWidget {
       style: FilledButton.styleFrom(backgroundColor: t.accent, foregroundColor: t.onAccent),
       child: Text(label),
     );
-    final children = switch (quiz.phase) {
+    final List<Widget> children = switch (quiz.phase) {
       QuizPhase.idle || QuizPhase.loading => [const Center(child: CircularProgressIndicator())],
       QuizPhase.unavailable => [Text(x.unavailable, style: body)],
       QuizPhase.error => [
@@ -54,6 +58,8 @@ class QuizBody extends StatelessWidget {
       ],
       QuizPhase.finished => _finished(t, button),
     };
+    final footer = this.footer;
+    if (footer != null) children.addAll([const SizedBox(height: 16), footer]);
     return SingleChildScrollView(
       padding: t.padding,
       child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, mainAxisSize: MainAxisSize.min, children: children),

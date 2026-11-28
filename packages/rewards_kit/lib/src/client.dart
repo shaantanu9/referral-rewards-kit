@@ -20,7 +20,7 @@ typedef RewardsRpc = Future<Object?> Function(String fn, Map<String, Object?> pa
 
 /// Typed client for the user RPCs (ADR 0002 §11 and §18.3).
 class RewardsClient {
-  RewardsClient({required RewardsRpc rpc, this.timezone, this.onEvent}) : _rpc = rpc;
+  RewardsClient({required RewardsRpc rpc, this.timezone, this.onEvent, this.eventDecorator}) : _rpc = rpc;
 
   final RewardsRpc _rpc;
 
@@ -31,9 +31,51 @@ class RewardsClient {
 
   final RewardsEventSink? onEvent;
 
-  void report(RewardsEvent e) => reportRewardsEvent(onEvent, e);
+  /// Changes each event before it reaches [onEvent] (extension hook), e.g. to add context fields with
+  /// [RewardsEvent.withContext]. An exception from it is ignored and the event is sent unchanged.
+  RewardsEvent Function(RewardsEvent event)? eventDecorator;
+
+  final _once = <String>{};
+  final _answerListeners = <void Function(String fn, Object? answer)>[];
+
+  /// Sends [e] to [onEvent] through [eventDecorator]. An event with an `onceKey` is sent once per key for this
+  /// client.
+  void report(RewardsEvent e) {
+    final key = e.onceKey;
+    if (key != null && !_once.add(key)) return;
+    var out = e;
+    final d = eventDecorator;
+    if (d != null) {
+      try {
+        out = d(e);
+      } catch (_) {}
+    }
+    reportRewardsEvent(onEvent, out);
+  }
+
+  /// Calls [listener] with the decoded answer of every successful RPC of this client (extension hook). An exception
+  /// from it never reaches the caller.
+  void addAnswerListener(void Function(String fn, Object? answer) listener) => _answerListeners.add(listener);
+
+  /// Extra `rewards_followup_prefs` keys [followupPrefs] sends as they are (extension hook); the answer's values are
+  /// on [FollowupPrefs.raw].
+  final Set<String> extraFollowupPrefKeys = {};
+
+  /// Calls any RPC with this client's error mapping and returns its decoded JSON (admin reads, a newer RPC, an
+  /// extension package's own functions).
+  Future<Object?> callRaw(String fn, Map<String, Object?> params) => _call(fn, params);
 
   Future<Object?> _call(String fn, Map<String, Object?> params) async {
+    final answer = await _callOnly(fn, params);
+    for (final l in List.of(_answerListeners)) {
+      try {
+        l(fn, answer);
+      } catch (_) {}
+    }
+    return answer;
+  }
+
+  Future<Object?> _callOnly(String fn, Map<String, Object?> params) async {
     try {
       return decodeResult(await _rpc(fn, params));
     } on RewardsUnavailableException {
@@ -237,14 +279,15 @@ class RewardsClient {
   /// Reads the user's follow-up choices, or saves [patch] first and returns the result. Keys: `notifications_off`,
   /// `emails_off`, `reminder_time` (a [TimeOfDay] or "HH:MM"; sent as "HH:MM", null clears it), `muted_groups` (a
   /// list of group names, 0.5; sent as a list of non-empty strings, left out when it is not a list), and (0.7)
-  /// `streaks_off`, `surprises_off`, `timers_off` (booleans, [RewardsChoices.keys]). Other keys are not sent. Reports `rewards_followup_prefs_changed` once per saved key. The result is kept as
+  /// `streaks_off`, `surprises_off`, `timers_off` (booleans, [RewardsChoices.keys]), plus [extraFollowupPrefKeys]. Other keys are not sent. Reports `rewards_followup_prefs_changed` once per saved key. The result is kept as
   /// [lastFollowupPrefs].
   Future<FollowupPrefs> followupPrefs([Map<String, Object?> patch = const {}]) => _followupPrefs(patch, const {});
 
   Future<FollowupPrefs> _followupPrefs(Map<String, Object?> patch, Map<String, Object> extra) async {
     final body = <String, Object?>{
       for (final e in patch.entries)
-        if (FollowupPrefs.keys.contains(e.key) && (e.key != FollowupPrefs.mutedGroupsKey || e.value is Iterable))
+        if ((FollowupPrefs.keys.contains(e.key) || extraFollowupPrefKeys.contains(e.key)) &&
+            (e.key != FollowupPrefs.mutedGroupsKey || e.value is Iterable))
           e.key: switch (e.key) {
             FollowupPrefs.reminderTimeKey => _reminderTimeWire(e.value),
             FollowupPrefs.mutedGroupsKey => parseMutedGroups(e.value).toList(),

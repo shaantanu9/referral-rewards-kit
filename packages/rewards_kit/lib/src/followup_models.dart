@@ -20,6 +20,7 @@ class FollowupPlanItem {
     this.body = '',
     this.payload = '',
     this.group = '',
+    this.raw = const {},
   });
 
   /// Null when the item has no whole-number `id` or no valid `at`: such an item cannot be scheduled.
@@ -35,8 +36,12 @@ class FollowupPlanItem {
       body: str(m['body']),
       payload: str(m['payload']),
       group: str(m['group']),
+      raw: m,
     );
   }
+
+  /// The item as the server sent it (extension hook: fields a newer server adds).
+  final Map<String, Object?> raw;
 
   /// A stable 31-bit number per (program, local day): the phone's notification id.
   final int id;
@@ -125,6 +130,7 @@ class FollowupPrefs {
     this.mutedGroups = const {},
     this.groups = const [],
     this.choices = RewardsChoices.none,
+    this.raw = const {},
   });
 
   factory FollowupPrefs.fromJson(Map<String, Object?> m) => FollowupPrefs(
@@ -134,6 +140,7 @@ class FollowupPrefs {
     mutedGroups: parseMutedGroups(m[mutedGroupsKey]),
     groups: _groups(m['groups']),
     choices: RewardsChoices.fromJson(m),
+    raw: m,
   );
 
   static const notificationsOffKey = 'notifications_off';
@@ -160,6 +167,10 @@ class FollowupPrefs {
   /// Streaks, surprises and timers on or off (0.7). All on from an older server.
   final RewardsChoices choices;
 
+  /// The prefs as the server sent them, with later [patched] keys applied (extension hook: keys a newer server or an
+  /// extension package adds, see `RewardsClient.extraFollowupPrefKeys`). Not part of `==`.
+  final Map<String, Object?> raw;
+
   /// The patch that mutes or unmutes [group], computed from this value's [mutedGroups].
   Map<String, Object?> groupMutedPatch(String group, bool muted) => {
     mutedGroupsKey: [
@@ -183,6 +194,7 @@ class FollowupPrefs {
     mutedGroups: mutedGroups ?? this.mutedGroups,
     groups: groups ?? this.groups,
     choices: choices ?? this.choices,
+    raw: raw,
   );
 
   /// This value with [patch] applied the way the server applies it (unknown keys ignored); a new `muted_groups`
@@ -200,6 +212,7 @@ class FollowupPrefs {
         surprisesOff: _flag(patch, RewardsChoices.surprisesOffKey, choices.surprisesOff),
         timersOff: _flag(patch, RewardsChoices.timersOffKey, choices.timersOff),
       ),
+      raw: {...raw, ...patch},
     );
   }
 

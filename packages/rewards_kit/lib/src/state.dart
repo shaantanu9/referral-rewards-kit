@@ -9,6 +9,18 @@ import 'quiz_models.dart';
 import 'surprise_models.dart';
 import 'tasks.dart';
 
+/// A part of the rewards UI the widgets can hide for a whole state ([RewardsState.hidden]).
+enum RewardsSection {
+  /// Countdowns and deadlines.
+  timers,
+
+  /// Surprise odds and mystery draws.
+  surprises,
+
+  /// Weekly leagues.
+  leagues,
+}
+
 /// Everything `rewards_state()` returns. Immutable; the controller replaces it with [copyWith].
 class RewardsState {
   const RewardsState({
@@ -28,6 +40,9 @@ class RewardsState {
     this.quizzes = const [],
     this.surprises = const [],
     this.choices = RewardsChoices.none,
+    this.raw = const {},
+    this.extras = const {},
+    this.hidden = const {},
   });
 
   factory RewardsState.fromJson(Object? json) {
@@ -49,6 +64,7 @@ class RewardsState {
       quizzes: listOf(m['quizzes'], QuizState.fromJson),
       surprises: SurpriseOdd.listFrom(m['surprises']),
       choices: RewardsChoices.fromJson(m['choices']),
+      raw: m,
     );
   }
 
@@ -84,6 +100,25 @@ class RewardsState {
 
   /// The user's streak / surprise / timer choices (0.7). All on (nothing off) from an older server.
   final RewardsChoices choices;
+
+  /// The object as the server sent it (extension hook: fields a newer server adds). Kept by [copyWith].
+  final Map<String, Object?> raw;
+
+  /// Values an extension package keeps with the state (its parsed view, a local change). Kept by [copyWith];
+  /// empty again after the next load.
+  final Map<String, Object?> extras;
+
+  /// Sections the widgets hide for this state, set by a state transform (`RewardsController.addStateTransform`).
+  final Set<RewardsSection> hidden;
+
+  /// No countdowns or deadlines: the user switched timers off, or [hidden] has [RewardsSection.timers].
+  bool get hideTimers => choices.timersOff || hidden.contains(RewardsSection.timers);
+
+  /// No odds or draws: the user switched surprises off, or [hidden] has [RewardsSection.surprises].
+  bool get hideSurprises => choices.surprisesOff || hidden.contains(RewardsSection.surprises);
+
+  /// No leagues: [hidden] has [RewardsSection.leagues].
+  bool get hideLeagues => hidden.contains(RewardsSection.leagues);
 
   ProgramInfo? program(String key) => _find(programs, (p) => p.key == key);
   StreakState? streak(String program) => _find(streaks, (s) => s.program == program);
@@ -124,6 +159,9 @@ class RewardsState {
     List<QuizState>? quizzes,
     List<SurpriseOdd>? surprises,
     RewardsChoices? choices,
+    Map<String, Object?>? raw,
+    Map<String, Object?>? extras,
+    Set<RewardsSection>? hidden,
   }) => RewardsState(
     enabled: enabled ?? this.enabled,
     serverTime: serverTime ?? this.serverTime,
@@ -141,6 +179,9 @@ class RewardsState {
     quizzes: quizzes ?? this.quizzes,
     surprises: surprises ?? this.surprises,
     choices: choices ?? this.choices,
+    raw: raw ?? this.raw,
+    extras: extras ?? this.extras,
+    hidden: hidden ?? this.hidden,
   );
 }
 
@@ -161,6 +202,7 @@ class TrackResult {
     this.streaks = const [],
     this.milestones = const [],
     this.quests = const [],
+    this.raw = const {},
   });
 
   factory TrackResult.fromJson(Object? json) {
@@ -172,8 +214,12 @@ class TrackResult {
       streaks: listOf(m['streaks'], StreakState.fromJson),
       milestones: listOf(m['milestones'], MilestoneState.fromJson),
       quests: listOf(m['quests'], QuestState.fromJson),
+      raw: m,
     );
   }
+
+  /// The answer as the server sent it (extension hook: fields a newer server adds).
+  final Map<String, Object?> raw;
 
   /// False when the engine is switched off (nothing was stored).
   final bool enabled;

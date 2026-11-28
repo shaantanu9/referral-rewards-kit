@@ -9,6 +9,7 @@ import 'base.dart';
 import 'friend_streaks.dart';
 import 'league_board.dart';
 import 'milestone_progress.dart';
+import 'myind_attribution.dart';
 import 'offer_banner.dart';
 import 'quest_list.dart';
 import 'quiz_card.dart';
@@ -25,7 +26,12 @@ import 'window_badge.dart';
 ///
 /// When the state has surprise rules (`state.surprises`), one "Surprises" card ([SurpriseOdds]) with every odds line
 /// sits right under the inbox, so the odds are seen before anything is earned. [showSurprises] false hides it
-/// (then show the odds somewhere else yourself). It is not shown while the user switched surprises off (0.7).
+/// (then show the odds somewhere else yourself). It is not shown while the state hides surprises (the user switched
+/// them off, 0.7, or `state.hideSurprises`).
+///
+/// Extension hooks (0.8.1): [leadingSections] sit right under the inbox, [extraSections] under the odds card, before
+/// the programs; [kindBuilders] build programs of a kind this version does not know, by their wire kind
+/// (`ProgramInfo.kindWire`).
 class RewardsHub extends StatelessWidget {
   const RewardsHub({
     super.key,
@@ -42,7 +48,21 @@ class RewardsHub extends StatelessWidget {
     this.spacing = 12,
     this.header,
     this.showSurprises = true,
+    this.showAttribution = true,
+    this.attributionVariant = 1,
+    this.leadingSections,
+    this.extraSections,
+    this.kindBuilders = const {},
   });
+
+  /// Widgets right under the inbox (extension hook).
+  final List<Widget> Function(BuildContext context)? leadingSections;
+
+  /// Widgets under the odds card, before the programs (extension hook).
+  final List<Widget> Function(BuildContext context)? extraSections;
+
+  /// Builds a program of a kind this version does not know, keyed by `ProgramInfo.kindWire` (extension hook).
+  final Map<String, Widget Function(BuildContext context, ProgramInfo program)> kindBuilders;
 
   final RewardsController controller;
   final RewardsTexts texts;
@@ -68,9 +88,17 @@ class RewardsHub extends StatelessWidget {
   /// The "Surprises" odds card under the inbox. Default true.
   final bool showSurprises;
 
+  /// The small "Rewards by Myind" link at the bottom ([MyindAttribution]). Free to turn off: false hides it.
+  final bool showAttribution;
+
+  /// Which link text ([MyindAttribution.variant]); default 1, "Rewards by Myind".
+  final int attributionVariant;
+
   Widget _program(BuildContext context, ProgramInfo p) {
     final custom = programBuilders[p.key];
     if (custom != null) return custom(context, p);
+    final byKind = p.kind == ProgramKind.unknown ? kindBuilders[p.kindWire] : null;
+    if (byKind != null) return byKind(context, p);
     final title = p.public['title']?.toString();
     return switch (p.kind) {
       ProgramKind.streak => StreakCard(controller: controller, program: p.key, texts: texts),
@@ -117,9 +145,12 @@ class RewardsHub extends StatelessWidget {
       final children = <Widget>[
         ?header,
         RewardInbox(controller: controller, texts: texts),
-        if (showSurprises && controller.state.surprises.isNotEmpty && !controller.state.choices.surprisesOff)
+        ...?leadingSections?.call(context),
+        if (showSurprises && controller.state.surprises.isNotEmpty && !controller.state.hideSurprises)
           SurpriseOdds(controller: controller, texts: texts),
+        ...?extraSections?.call(context),
         for (final p in controller.state.programs) _program(context, p),
+        if (showAttribution) MyindAttribution(variant: attributionVariant),
       ];
       final column = Padding(
         padding: padding,

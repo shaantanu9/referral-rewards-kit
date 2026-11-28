@@ -29,11 +29,16 @@ class RewardReveal extends StatefulWidget {
     this.autoOpen = false,
     this.onOpened,
     this.onEvent,
+    this.onRevealed,
     this.builder,
   });
 
   final RewardGrant grant;
   final RewardsTexts texts;
+
+  /// Called once with [grant] when it is shown open, like [onOpened] (extension hook: an extension package's own
+  /// reveal event).
+  final void Function(RewardGrant grant)? onRevealed;
 
   /// Open by itself after the first frame (the same animation and haptic as a tap).
   final bool autoOpen;
@@ -105,6 +110,7 @@ class _RewardRevealState extends State<RewardReveal> with TickerProviderStateMix
 
   void _announce() {
     widget.onOpened?.call();
+    widget.onRevealed?.call(widget.grant);
     reportRewardsEvent(
       widget.onEvent,
       RewardsEvent(RewardsEventName.revealOpened, {'program': widget.grant.program, 'kind': widget.grant.kind}),

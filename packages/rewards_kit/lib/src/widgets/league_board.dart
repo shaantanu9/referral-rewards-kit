@@ -12,7 +12,8 @@ import 'countdown.dart';
 
 /// An opt-in weekly league (ADR 0002 §18.10). Before joining: what it is, what is shared, and a Join button. After:
 /// the tier, the real time left in the week, the board (display names and points only, the user's own row marked),
-/// who moves up, what each place pays, last week's own result, and Leave. Nothing marks who moves down.
+/// who moves up, what each place pays, last week's own result, and Leave. Nothing marks who moves down. Shows nothing
+/// when the state hides leagues (`state.hideLeagues`).
 ///
 /// Loads `rewards_league` itself after the first frame; the actions are the controller's (`joinLeague`,
 /// `leaveLeague`, `loadLeague`), which return null or a reason.
@@ -52,7 +53,8 @@ class _LeagueBoardState extends State<LeagueBoard> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted && widget.controller.league(widget.program) == null) widget.controller.loadLeague(widget.program);
+      final c = widget.controller;
+      if (mounted && c.league(widget.program) == null && !c.state.hideLeagues) c.loadLeague(widget.program);
     });
   }
 
@@ -73,7 +75,7 @@ class _LeagueBoardState extends State<LeagueBoard> {
     builder: (context) {
       final c = widget.controller;
       final l = c.league(widget.program);
-      if (l == null) return const SizedBox.shrink();
+      if (l == null || c.state.hideLeagues) return const SizedBox.shrink();
       final b = widget.builder;
       if (b != null) return b(context, l, c);
       final t = RewardsTheme.of(context);
@@ -118,7 +120,7 @@ class _LeagueBoardState extends State<LeagueBoard> {
                 clock: c.clock,
                 prefix: x.weekEndsIn,
                 style: muted,
-                hidden: c.state.choices.timersOff,
+                hidden: c.state.hideTimers,
               ),
               if (l.lastWeek != null) ...[
                 const SizedBox(height: 4),

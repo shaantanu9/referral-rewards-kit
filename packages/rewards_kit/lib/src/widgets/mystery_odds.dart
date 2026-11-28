@@ -9,12 +9,16 @@ import '../theme.dart';
 
 /// What a `mystery` reward can turn into, with each chance as a percentage. Show it wherever a mystery reward is
 /// offered: stating the odds before it is earned is required honesty (app store loot-box rules), and the kit keeps
-/// mystery rewards free only, never sold. Shows nothing when [reward] carries no odds.
+/// mystery rewards free only, never sold. Shows nothing when [reward] carries no odds. [footer] follows the odds
+/// (extension hook; `StreakCard` and `MilestoneProgress` pass `controller.oddsFooterBuilder`'s line).
 class MysteryOdds extends StatelessWidget {
-  const MysteryOdds({super.key, required this.reward, this.texts = const RewardsTexts(), this.builder});
+  const MysteryOdds({super.key, required this.reward, this.texts = const RewardsTexts(), this.footer, this.builder});
 
   final RewardSpec reward;
   final RewardsTexts texts;
+
+  /// A line under the odds, or null.
+  final Widget? footer;
 
   /// Your own look. Each odd's `chance` is 0..1; `formatPercent` gives the default text.
   final Widget Function(BuildContext context, List<MysteryOdd> odds)? builder;
@@ -42,6 +46,7 @@ class MysteryOdds extends StatelessWidget {
               Expanded(child: Text(texts.reward(o.spec), style: muted)),
             ],
           ),
+        ?footer,
       ],
     );
   }

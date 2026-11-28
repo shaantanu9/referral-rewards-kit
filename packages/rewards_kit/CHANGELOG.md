@@ -1,5 +1,44 @@
 # Changelog
 
+## 0.8.1 (unreleased)
+
+Extension hooks. No server change; nothing changes for an app that does not use them.
+
+- **Models**: `raw` (the server JSON) on `RewardsState`, `TrackResult`, `StreakState`, `FollowupPlanItem` and
+  `FollowupPrefs` (`patched` applies a patch to it too); `RewardsState.extras`; `RewardsState.hidden`
+  (`RewardsSection`) with `hideTimers`, `hideSurprises`, `hideLeagues`; `StreakState.goalOverride`, `ringGoal`,
+  `ringProgress`, `ringDone`, `withGoalOverride`.
+- **Client**: `eventDecorator`, `addAnswerListener`, `callRaw`, `extraFollowupPrefKeys`; `report` honours `onceKey`.
+- **Controller**: `addStateTransform`, `addLoadListener`, `addRefreshCondition`, `addSeenListener`, `runAction`,
+  `updateState`, `oddsFooterBuilder`.
+- **Events**: `RewardsEventName.custom`, `RewardsEvent.custom`, `context`, `onceKey`, `wire`, `withContext`, `toJson`.
+- **Errors**: `rewardsReasonOf` reads upper-case `RW_…` codes from the message or the details.
+- **Texts**: `RewardsTexts.extensions`, `extension<T>()`, `RewardsErrorTexts`.
+- **Widgets**: `RewardsHub.leadingSections`, `extraSections`, `kindBuilders`; `DailyGoalRing.goal`;
+  `MysteryOdds.footer`; `RewardReveal.onRevealed`; every widget reads the state's `hideTimers` / `hideSurprises` /
+  `hideLeagues`.
+
+
+## 0.8.0 (unreleased)
+
+Attribution (ADR 0003). No server change.
+
+- **Visible change: a small link now shows by default.** `RewardsHub` and `QuizScreen` show a small centered
+  "Rewards by Myind" link at the bottom of their content (inside the scroll, never on top of anything). It opens
+  `https://www.myind.ai/referral-kit` outside the app with
+  `utm_source=rewards_kit&utm_medium=attribution&utm_campaign=v1`. Nothing is sent at runtime.
+- **Turn it off:** `showAttribution: false` on either screen. It is free to remove; the package stays MIT. Pick other
+  words with `attributionVariant` (0–3, wraps). On `QuizScreen` it sits under the default body; a `builder` body does
+  not get it.
+- New `MyindAttribution` widget (`variant`, `textStyle`, `padding`, `source`, `onOpen`) and `MyindAttributionConfig`
+  (the four texts and the site, showcase, pro, badge, GitHub and pub.dev URLs). referral_kit 0.6 exports the same two
+  names; a file importing both packages and using them picks one with `hide`.
+- `QuizBody` has an optional `footer` (shown under the content, inside the scroll).
+- **New dependency: `url_launcher` (^6.3)**, to open the link. Pass `onOpen` to open it your own way.
+- Link: 11 sp, the theme's `onSurfaceVariant` at reduced emphasis (works in dark mode), a 44 dp tap target, and
+  `Semantics(link: true)` labelled "Opens myind.ai: <text>".
+- pubspec: `homepage` is now `https://www.myind.ai/referral-kit`; `documentation` points to the repo docs.
+
 ## 0.7.0 (2026-11-20)
 
 Fair play and progress (reference: `docs/rewards-api.md`, "Fair play and progress"). Needs server migration 20261120000022; on an older server every

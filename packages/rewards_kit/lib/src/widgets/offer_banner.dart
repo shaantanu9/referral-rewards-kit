@@ -82,7 +82,7 @@ class _OfferBannerState extends State<OfferBanner> {
                   endsAt: o.endsAt,
                   clock: widget.controller.clock,
                   prefix: texts.offerEndsIn,
-                  hidden: widget.controller.state.choices.timersOff,
+                  hidden: widget.controller.state.hideTimers,
                   style: t.bodyStyle?.copyWith(color: t.warning),
                   onExpired: () => setState(() => _expiredLocally = true),
                 ),

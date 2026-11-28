@@ -25,6 +25,8 @@ class StreakState {
     this.repairedAt,
     this.bestDayCount = 0,
     this.recordToday = false,
+    this.goalOverride,
+    this.raw = const {},
   });
 
   factory StreakState.fromJson(Map<String, Object?> m) {
@@ -48,8 +50,51 @@ class StreakState {
       repairedAt: time(m['repaired_at']),
       bestDayCount: intOr(m['best_day_count']),
       recordToday: boolOr(m['record_today']),
+      raw: m,
     );
   }
+
+  /// The streak as the server sent it (extension hook: fields a newer server adds).
+  final Map<String, Object?> raw;
+
+  /// A per-day goal that replaces [dailyGoal] in the daily-goal ring (extension hook), or null. The streak itself
+  /// still counts with [dailyGoal].
+  final int? goalOverride;
+
+  /// The goal the daily-goal ring shows: [goalOverride] when set, else [dailyGoal].
+  int get ringGoal => goalOverride ?? dailyGoal;
+
+  /// 0..1 towards [ringGoal]; the same as [goalProgress] without an override.
+  double get ringProgress {
+    final g = goalOverride;
+    if (g == null) return goalProgress;
+    return (todayCount / g).clamp(0, 1).toDouble();
+  }
+
+  /// Today reached [ringGoal].
+  bool get ringDone => goalOverride == null ? todayDone : todayCount >= goalOverride!;
+
+  /// This streak with [goal] as its [goalOverride] (null or below 1 removes it).
+  StreakState withGoalOverride(int? goal) => StreakState(
+    program: program,
+    current: current,
+    longest: longest,
+    todayDone: todayDone,
+    freezes: freezes,
+    endsTodayAt: endsTodayAt,
+    breaksAt: breaksAt,
+    nextReward: nextReward,
+    dailyGoal: dailyGoal,
+    todayCount: todayCount,
+    weeklyFreeFreezesLeft: weeklyFreeFreezesLeft,
+    hidden: hidden,
+    repair: repair,
+    repairedAt: repairedAt,
+    bestDayCount: bestDayCount,
+    recordToday: recordToday,
+    goalOverride: goal == null || goal < 1 ? null : goal,
+    raw: raw,
+  );
 
   final String program;
   final int current;

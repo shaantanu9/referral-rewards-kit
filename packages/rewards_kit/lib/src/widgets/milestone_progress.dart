@@ -45,7 +45,7 @@ class MilestoneProgress extends StatelessWidget {
       final b = builder;
       if (b != null) return b(context, m, controller);
       final t = RewardsTheme.of(context);
-      final surprisesOff = controller.state.choices.surprisesOff;
+      final surprisesOff = controller.state.hideSurprises;
       final next = surprisesOff ? m.nextReward?.fixed : m.nextReward;
       final x = texts.fairPlay;
       final level = m.level;
@@ -81,7 +81,12 @@ class MilestoneProgress extends StatelessWidget {
               style: muted,
             ),
             if (m.headStart > 0) Text(x.headStart(m.headStart, label), style: muted),
-            if (next != null && next.isMystery) MysteryOdds(reward: next, texts: texts),
+            if (next != null && next.isMystery)
+              MysteryOdds(
+                reward: next,
+                texts: texts,
+                footer: controller.oddsFooterBuilder?.call(context, m.program, texts),
+              ),
           ],
         ),
       );

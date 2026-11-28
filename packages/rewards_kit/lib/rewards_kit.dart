@@ -3,6 +3,7 @@
 /// recap card, with countdowns that use the server's clock and a builder on every widget so the look is the app's own.
 library;
 
+export 'src/attribution/attribution_config.dart';
 export 'src/client.dart' show RewardsClient, RewardsRpc, followupOpenedKey;
 export 'src/clock.dart';
 export 'src/controller.dart';
@@ -36,6 +37,7 @@ export 'src/widgets/followup_settings.dart';
 export 'src/widgets/friend_streaks.dart';
 export 'src/widgets/league_board.dart';
 export 'src/widgets/milestone_progress.dart';
+export 'src/widgets/myind_attribution.dart';
 export 'src/widgets/mystery_odds.dart';
 export 'src/widgets/offer_banner.dart';
 export 'src/widgets/quest_list.dart';

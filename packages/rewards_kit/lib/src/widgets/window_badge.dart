@@ -59,7 +59,7 @@ class _WindowBadgeState extends State<WindowBadge> {
       final deadline = open ? w.endsAt : w.startsAt;
       if (deadline == null) return const SizedBox.shrink();
       final color = open ? t.accent : t.muted;
-      final noTimer = c.state.choices.timersOff;
+      final noTimer = c.state.hideTimers;
       if (noTimer && !open) return Countdown(endsAt: deadline, clock: c.clock, onExpired: _edge, hidden: true);
       return Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
