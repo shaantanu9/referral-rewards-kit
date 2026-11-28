@@ -1,6 +1,7 @@
 /// Flutter client and screens for referral-kit (ADR 0001): invite friends, enter an invite code, show rewards.
 library;
 
+export 'src/attribution/attribution_config.dart';
 export 'src/availability.dart';
 export 'src/client.dart';
 export 'src/code_format.dart';
@@ -27,5 +28,6 @@ export 'src/widgets/invite_extras.dart';
 export 'src/widgets/invite_hub.dart';
 export 'src/widgets/invite_page_settings.dart';
 export 'src/widgets/message.dart';
+export 'src/widgets/myind_attribution.dart';
 export 'src/widgets/reward_card.dart';
 export 'src/widgets/welcome_card.dart';

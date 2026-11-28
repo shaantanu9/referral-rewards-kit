@@ -1,5 +1,23 @@
 # Changelog
 
+## 0.6.0 (unreleased)
+
+Attribution (ADR 0003). No server change.
+
+- **Visible change: a small link now shows by default.** `InviteHub` and `InviteFriendsScreen` show a small centered
+  "Built with Myind referral kit" link at the bottom of their content (inside the scroll, never on top of anything).
+  It opens `https://www.myind.ai/referral-kit` outside the app, through the screen's `launcher`, with
+  `utm_source=referral_kit&utm_medium=attribution&utm_campaign=v0`. Nothing is sent at runtime.
+- **Turn it off:** `showAttribution: false` on either screen. It is free to remove; the package stays MIT. Pick other
+  words with `attributionVariant` (0–3, wraps). `InviteHub` shows it once (its embedded invite part does not add a
+  second one).
+- New `MyindAttribution` widget (the link on its own: `variant`, `textStyle`, `padding`, `source`, `onOpen`) and
+  `MyindAttributionConfig` (the four texts and the site, showcase, pro, badge, GitHub and pub.dev URLs). rewards_kit
+  0.8 exports the same two names; a file importing both packages and using them picks one with `hide`.
+- Link: 11 sp, the theme's `onSurfaceVariant` at reduced emphasis (works in dark mode), a 44 dp tap target, and
+  `Semantics(link: true)` labelled "Opens myind.ai: <text>".
+- pubspec: `homepage` is now `https://www.myind.ai/referral-kit`; `documentation` points to the repo docs.
+
 ## 0.5.0 (2026-11-20)
 
 The growth round (research: `docs/research/referral-growth.md`). Needs server migration 23

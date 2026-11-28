@@ -20,6 +20,7 @@ import 'code_text.dart';
 import 'invite_extras.dart';
 import 'invite_page_settings.dart';
 import 'message.dart';
+import 'myind_attribution.dart';
 
 /// The "Invite friends" screen (ADR 4.1): the code, Share, Copy, the rules with their conditions, caps, joined count,
 /// rewards earned, pending rewards with dates, the terms link, and the empty and paused states. Every sentence comes
@@ -60,6 +61,8 @@ class InviteFriendsScreen extends StatefulWidget {
     this.showQrCode = true,
     this.showInvitePageSettings = true,
     this.clock = DateTime.now,
+    this.showAttribution = true,
+    this.attributionVariant = 0,
   });
 
   final ReferralClient client;
@@ -134,6 +137,12 @@ class InviteFriendsScreen extends StatefulWidget {
 
   /// Now, for the boost banner (a boost that has ended is not shown).
   final DateTime Function() clock;
+
+  /// The small "Built with Myind" link at the bottom ([MyindAttribution]). Free to turn off: false hides it.
+  final bool showAttribution;
+
+  /// Which link text ([MyindAttribution.variant]).
+  final int attributionVariant;
 
   @override
   State<InviteFriendsScreen> createState() => _InviteFriendsScreenState();
@@ -518,6 +527,9 @@ class _InviteFriendsScreenState extends State<InviteFriendsScreen> {
           child: TextButton(style: buttonStyle, onPressed: widget.onOpenTerms, child: Text(l10n.termsLink)),
         ),
       ]);
+    }
+    if (widget.showAttribution) {
+      children.addAll([gap, MyindAttribution(variant: widget.attributionVariant, onOpen: widget.launcher.launch)]);
     }
     if (widget.embedded) {
       return Padding(

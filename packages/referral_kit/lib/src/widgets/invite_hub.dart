@@ -17,6 +17,7 @@ import 'code_text.dart';
 import 'invite_code_section.dart';
 import 'invite_friends_screen.dart';
 import 'message.dart';
+import 'myind_attribution.dart';
 
 /// The two parts of an [InviteHub].
 enum InviteHubSection {
@@ -85,6 +86,8 @@ class InviteHub extends StatefulWidget {
     this.showInvitePageSettings = true,
     @Deprecated('The friend part always shows the server count; use texts.deadline to change its words.')
     this.showWindow = true,
+    this.showAttribution = true,
+    this.attributionVariant = 0,
   });
 
   final ReferralClient client;
@@ -164,6 +167,13 @@ class InviteHub extends StatefulWidget {
   final bool showWhatsApp;
   final bool showQrCode;
   final bool showInvitePageSettings;
+
+  /// The small "Built with Myind" link at the bottom of the hub ([MyindAttribution]), shown once for both parts.
+  /// Free to turn off: false hides it.
+  final bool showAttribution;
+
+  /// Which link text ([MyindAttribution.variant]).
+  final int attributionVariant;
 
   @override
   State<InviteHub> createState() => InviteHubState();
@@ -254,6 +264,7 @@ class InviteHubState extends State<InviteHub> {
               showQrCode: widget.showQrCode,
               showInvitePageSettings: widget.showInvitePageSettings,
               clock: widget.clock,
+              showAttribution: false,
             ),
           ),
         if (both) const Divider(height: 1, indent: 16, endIndent: 16),
@@ -283,6 +294,11 @@ class InviteHubState extends State<InviteHub> {
                 clock: widget.clock,
               ),
             ),
+          ),
+        if (widget.showAttribution)
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: MyindAttribution(variant: widget.attributionVariant, onOpen: widget.launcher.launch),
           ),
       ],
     );

@@ -2,7 +2,13 @@
 
 Built and maintained by [Myind](https://www.myind.ai).
 
-Updated: 2026-11-19 (0.4.0)
+[![Built with Myind](https://www.myind.ai/referral-kit/badge.svg)](https://www.myind.ai/referral-kit)
+
+[Site](https://www.myind.ai/referral-kit) · [Showcase](https://www.myind.ai/referral-kit/showcase) ·
+[Docs](https://github.com/shaantanu9/referral-rewards-kit/tree/main/docs) · [pub.dev](https://pub.dev/packages/referral_kit) ·
+[GitHub](https://github.com/shaantanu9/referral-rewards-kit) · React / Next.js / React Native ports: in progress
+
+Updated: 2026-11-27 (0.6.0)
 The Flutter part of [referral-kit](https://github.com/shaantanu9/referral-rewards-kit/blob/main/README.md): a typed client for the kit's Supabase RPCs, the "Invite friends"
 screen, invite-code entry, the reward card, an install id that survives reinstall, an offline claim queue, a prompt
 policy and copy built from the live rules. Design: [ADR 0001](https://github.com/shaantanu9/referral-rewards-kit/blob/main/docs/adr/0001-referral-kit.md) sections 4, 7, 8,
@@ -31,7 +37,7 @@ dependencies:
   referral_kit:
     git:
       url: https://github.com/shaantanu9/referral-rewards-kit.git
-      ref: referral_kit-v0.5.0                            # a tag; never a moving branch in a release build
+      ref: referral_kit-v0.6.0                            # a tag; never a moving branch in a release build
       path: packages/referral_kit
 ```
 
@@ -362,6 +368,37 @@ purchase, later in that session, or within 24 h after one.
 The kit's own moment `ReferralPromptMoment.welcomeRewardReceived` (the pass-it-on card): `shouldPromptFor(moment)` is
 true once ever, never in the first session, with the same purchase and 14-day rules; `markPromptedFor(moment)`.
 
+## Attribution
+
+`InviteHub` and `InviteFriendsScreen` show a small "Built with Myind referral kit" link at the bottom of their content. It is on by default and free to
+remove: the package stays MIT and nothing checks for it.
+
+```dart
+InviteHub(/* … */ showAttribution: false)   // hides the link
+InviteHub(/* … */ attributionVariant: 2)    // other words: 0 "Built with Myind referral kit", 1 "Rewards by Myind",
+                                            // 2 "Free referral kit by Myind", 3 "Made with Myind"
+```
+
+We'd love it if you keep it, or add the badge to your README instead:
+
+```markdown
+[![Built with Myind](https://www.myind.ai/referral-kit/badge.svg)](https://www.myind.ai/referral-kit)
+```
+
+`MyindAttribution` is the link on its own (put it anywhere, e.g. an About page) and `MyindAttributionConfig` holds the
+URLs. The link opens `https://www.myind.ai/...` with `utm_source`, `utm_medium=attribution` and `utm_campaign`; nothing
+is sent at runtime. More: [NOTICE.md](https://github.com/shaantanu9/referral-rewards-kit/blob/main/NOTICE.md).
+
+Both packages export `MyindAttribution` and `MyindAttributionConfig`. A file that imports both packages and uses
+one of these names picks one with `hide`, e.g. `import 'package:rewards_kit/rewards_kit.dart' hide MyindAttribution,
+MyindAttributionConfig;`.
+
+## Showcase
+
+Built an app with the kit? Submit it at [myind.ai/referral-kit/showcase](https://www.myind.ai/referral-kit/showcase)
+and we feature it with a link back to your app. How it works and the badge snippet:
+[SHOWCASE.md](https://github.com/shaantanu9/referral-rewards-kit/blob/main/SHOWCASE.md).
+
 ## Dependencies
 
 | Package | Licence | Why |
@@ -371,7 +408,7 @@ true once ever, never in the first session, with the same purchase and 14-day ru
 | `play_install_referrer` (>=0.5 <0.7) | BSD-2-Clause | Play Install Referrer API |
 | `share_plus` (>=11 <14) | BSD-3-Clause | System share sheet |
 | `shared_preferences` (^2.3) | BSD-3-Clause | Default `KeyValueStore` |
-| `url_launcher` (^6.3) | BSD-3-Clause | The WhatsApp button (`https://wa.me/?text=`) |
+| `url_launcher` (^6.3) | BSD-3-Clause | The WhatsApp button (`https://wa.me/?text=`) and the attribution link |
 | `qr_flutter` (^4.1) | BSD-3-Clause | The invite link's QR code |
 | `intl`, `flutter_localizations` | BSD-3-Clause | Plurals, dates |
 
