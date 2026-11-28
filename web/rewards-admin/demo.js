@@ -12,7 +12,8 @@ const monday = (n) => {
   return d.toISOString().slice(0, 10);
 };
 
-export function createDemoBackend() {
+/** `extra(ctx)` (optional) returns more demo functions; it may wrap the base ones (ctx.fns). */
+export function createDemoBackend(extra = null) {
   const settings = {
     enabled: true,
     ads_enabled: false,
@@ -626,6 +627,8 @@ export function createDemoBackend() {
         correct_rate: (12 + i * 20) / (48 + i),
       })),
   };
+
+  if (extra) Object.assign(fns, extra({ programs, rules, settings, eventTypes, grants, note, fns: { ...fns } }));
 
   return {
     async rpc(fn, params = {}) {

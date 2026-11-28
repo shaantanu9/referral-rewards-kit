@@ -14,6 +14,7 @@ APP="${1:-}"
 NAME="${2:-}"
 shift 2 || true
 REFERRAL=0
+PREMIUM=0
 DRY=0
 for a in "$@"; do
   case "$a" in
@@ -68,9 +69,11 @@ fi
 echo "Rewards engine migrations (unchanged, in order):"
 for f in "$KIT"/supabase/migrations/*_rewards_*.sql; do copy "$f" "$MIG/$(basename "$f")"; done
 
+KIT_MIGRATIONS=("$KIT"/supabase/migrations/*.sql)
+
 # The app's own config runs after every kit migration: a timestamp later than the last one copied.
 STAMP="$(date -u +%Y%m%d%H%M%S)"
-last="$(ls "$KIT"/supabase/migrations/*.sql | xargs -n1 basename | sort | tail -1 | cut -c1-14)"
+last="$(printf '%s\n' "${KIT_MIGRATIONS[@]}" | xargs -n1 basename | sort | tail -1 | cut -c1-14)"
 if [[ "$STAMP" < "$last" ]]; then STAMP="$((last + 1))"; fi
 echo "The app's config (fill every <<...>>):"
 config() { # template kind stamp: one config per app and kind, whatever its timestamp

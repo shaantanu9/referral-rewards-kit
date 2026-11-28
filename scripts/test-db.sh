@@ -5,6 +5,14 @@
 # Exit 0 only when every migration applies and every test passes. Leaves nothing running.
 set -euo pipefail
 
+CORE_ONLY=0
+for a in "$@"; do
+  case "$a" in
+    --core-only) CORE_ONLY=1 ;;
+    *) echo "unknown option: $a" >&2; exit 2 ;;
+  esac
+done
+
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"  # tests read repo files (presets) by path relative to the root
 PGBIN="${PGBIN:-$(dirname "$(command -v initdb || echo /opt/homebrew/opt/postgresql@17/bin/initdb)")}"
@@ -24,14 +32,17 @@ PSQL=("$PGBIN/psql" -X -q -v ON_ERROR_STOP=1 -h localhost -p "$PORT")
 "${PSQL[@]}" -U "$ADMIN" -d postgres -c "create database $DB" >/dev/null
 "${PSQL[@]}" -U "$ADMIN" -d "$DB" -f "$ROOT/supabase/tests/stub/supabase_stub.sql" >/dev/null
 
-for m in "$ROOT"/supabase/migrations/*.sql; do
-  echo "migrate $(basename "$m")"
+MIGRATIONS=("$ROOT"/supabase/migrations/*.sql)
+TESTS=("$ROOT"/supabase/tests/*.test.sql)
+
+for m in "${MIGRATIONS[@]}"; do
+  echo "migrate ${m#"$ROOT"/supabase/}"
   "${PSQL[@]}" -U postgres -d "$DB" -f "$m" >/dev/null
 done
 
 passed=0
-for t in "$ROOT"/supabase/tests/*.test.sql; do
-  echo "test $(basename "$t")"
+for t in "${TESTS[@]}"; do
+  echo "test ${t#"$ROOT"/supabase/}"
   out="$("${PSQL[@]}" -U "$ADMIN" -d "$DB" -f "$t" 2>&1)" || { echo "$out" | grep -v '^NOTICE:  ok - ' ; echo "FAILED: $(basename "$t")"; exit 1; }
   n=$(grep -c 'NOTICE:  ok - ' <<<"$out" || true)
   passed=$((passed + n))

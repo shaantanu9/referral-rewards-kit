@@ -27,6 +27,10 @@ const SECTIONS = [
   ["log", "Audit log", renderLog],
 ];
 
+// Optional extra sections (view_premium.js): added when the file is present, skipped in a copy without it.
+const extraSections = await import("./view_premium.js").then((m) => m.PREMIUM_SECTIONS).catch(() => []);
+SECTIONS.splice(SECTIONS.length - 1, 0, ...extraSections);
+
 const root = document.getElementById("app");
 const demo = new URLSearchParams(location.search).has("demo") || location.hash.startsWith("#demo");
 

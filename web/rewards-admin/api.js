@@ -37,7 +37,9 @@ export function keyProblem(key) {
 
 export async function createBackend({ demo, url, key }) {
   if (demo) {
-    const d = createDemoBackend();
+    // Optional extra sections ship their own demo functions; a copy without them still runs.
+    const extra = await import("./demo_premium.js").then((m) => m.premiumDemoFns).catch(() => null);
+    const d = createDemoBackend(extra);
     return {
       demo: true,
       rpc: d.rpc,
