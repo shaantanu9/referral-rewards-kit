@@ -1,0 +1,14 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "jsx": "react-jsx",
+    "types": ["jest"],
+    "baseUrl": ".",
+    "paths": {
+      "@myind/referral-core": ["../referral-core/src/index.ts"],
+      "@myind/referral-core/testing": ["../referral-core/src/testing/index.ts"]
+    }
+  },
+  "include": ["src", "test", "tsup.config.ts"]
+}

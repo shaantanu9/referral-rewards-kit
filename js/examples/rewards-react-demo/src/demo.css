@@ -1,0 +1,147 @@
+/* The demo page around the components; the components themselves use only @myind/rewards-react/styles.css. */
+html,
+body {
+  margin: 0;
+}
+body {
+  background: #f7f2fa;
+}
+@media (prefers-color-scheme: dark) {
+  body {
+    background: #141218;
+  }
+}
+.demo {
+  min-height: 100vh;
+  padding: 16px;
+  font-family: var(--rk-font);
+  color: var(--rk-on-surface);
+  background: color-mix(in srgb, var(--rk-surface) 35%, transparent);
+}
+.demo[data-theme='light'] {
+  background: #f7f2fa;
+}
+.demo[data-theme='dark'] {
+  background: #141218;
+}
+.demo-header {
+  max-width: 1200px;
+  margin: 0 auto 16px;
+}
+.demo-header h1 {
+  margin: 4px 0;
+  font-size: 24px;
+}
+.demo-header p {
+  margin: 0;
+  color: var(--rk-muted);
+}
+.demo-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--rk-warning);
+  color: #fff !important;
+  font-weight: 600;
+  font-size: 13px;
+}
+.demo-layout {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 260px minmax(0, 1fr);
+  gap: 16px;
+  align-items: start;
+}
+@media (max-width: 800px) {
+  .demo-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+.demo-panel {
+  position: sticky;
+  top: 16px;
+  padding: 16px;
+  border-radius: 16px;
+  background: var(--rk-surface);
+}
+@media (max-width: 800px) {
+  .demo-panel {
+    position: static;
+  }
+}
+.demo-panel h2,
+.demo-panel h3 {
+  margin: 0 0 8px;
+  font-size: 15px;
+}
+.demo-panel h3 {
+  margin-top: 16px;
+}
+.demo-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.demo-buttons--row {
+  flex-direction: row;
+}
+.demo-buttons button,
+.demo-small {
+  min-height: 36px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  border: 1px solid color-mix(in srgb, var(--rk-muted) 50%, transparent);
+  background: transparent;
+  color: var(--rk-on-surface);
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+}
+.demo-buttons button[aria-pressed='true'] {
+  background: var(--rk-accent);
+  color: var(--rk-on-accent);
+}
+.demo-check {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  min-height: 32px;
+}
+.demo-log {
+  margin: 0;
+  padding-left: 18px;
+  color: var(--rk-muted);
+  font-size: 13px;
+}
+.demo-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
+  gap: 16px;
+}
+.demo-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+}
+.demo-section--wide {
+  grid-column: 1 / -1;
+}
+.demo-section > h2 {
+  margin: 0;
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--rk-muted);
+}
+.demo-note {
+  margin: 0;
+  color: var(--rk-muted);
+  font-size: 13px;
+}
+.demo-row {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}

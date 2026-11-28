@@ -1,0 +1,84 @@
+{
+  "name": "@myind/rewards-react",
+  "version": "0.1.0",
+  "private": true,
+  "description": "React components for rewards-kit: daily streaks, milestones, quizzes, quests, timed offers, surprises with honest odds, weekly leagues, recaps and reminder settings, on your own Supabase project. Every Flutter rewards_kit widget for React DOM and Next.js, styled with CSS variables, SSR-safe.",
+  "license": "MIT",
+  "homepage": "https://www.myind.ai/referral-kit",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/shaantanu9/referral-rewards-kit.git",
+    "directory": "js/packages/rewards-react"
+  },
+  "bugs": "https://github.com/shaantanu9/referral-rewards-kit/issues",
+  "keywords": [
+    "rewards",
+    "gamification",
+    "streaks",
+    "daily-streak",
+    "milestones",
+    "quiz",
+    "quests",
+    "leaderboard",
+    "leagues",
+    "loyalty",
+    "engagement",
+    "retention",
+    "react",
+    "react-components",
+    "nextjs",
+    "supabase",
+    "typescript"
+  ],
+  "type": "module",
+  "sideEffects": [
+    "*.css"
+  ],
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    },
+    "./styles.css": "./dist/styles.css",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsup && node scripts/copy-css.mjs",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "lint": "tsc --noEmit -p tsconfig.lint.json",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@myind/rewards-core": "workspace:*"
+  },
+  "peerDependencies": {
+    "react": ">=18",
+    "react-dom": ">=18"
+  },
+  "devDependencies": {
+    "@testing-library/dom": "10.4.0",
+    "@testing-library/react": "16.3.0",
+    "@types/react": "19.1.8",
+    "@types/react-dom": "19.1.6",
+    "jsdom": "26.1.0",
+    "react": "19.1.0",
+    "react-dom": "19.1.0",
+    "tsup": "8.5.1",
+    "typescript": "5.9.3",
+    "vitest": "3.2.7"
+  }
+}

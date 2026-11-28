@@ -1,0 +1,20 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "jsx": "react-jsx",
+    "types": ["jest"],
+    "baseUrl": ".",
+    "paths": {
+      "@myind/referral-core": ["../../packages/referral-core/src/index.ts"],
+      "@myind/referral-core/testing": ["../../packages/referral-core/src/testing/index.ts"],
+      "@myind/rewards-core": ["../../packages/rewards-core/src/index.ts"],
+      "@myind/rewards-core/testing": ["../../packages/rewards-core/src/testing/index.ts"],
+      "@myind/referral-react-native": ["../../packages/referral-react-native/src/index.ts"],
+      "@myind/referral-react-native/*": ["../../packages/referral-react-native/src/adapters/*"],
+      "@myind/rewards-react-native": ["../../packages/rewards-react-native/src/index.ts"],
+      "@myind/rewards-react-native/*": ["../../packages/rewards-react-native/src/adapters/*"]
+    }
+  },
+  "include": ["index.ts", "src", "test"]
+}

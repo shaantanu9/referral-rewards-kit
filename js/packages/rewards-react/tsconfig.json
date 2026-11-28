@@ -1,0 +1,15 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "jsx": "react-jsx",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    // Type-check and test against the core's source, so no build is needed first. The build (tsconfig.build.json)
+    // uses the built core like an app would.
+    "paths": {
+      "@myind/rewards-core": ["../rewards-core/src/index.ts"],
+      "@myind/rewards-core/testing": ["../rewards-core/src/testing/index.ts"]
+    }
+  },
+  "include": ["src", "test", "tsup.config.ts", "vitest.config.ts"]
+}

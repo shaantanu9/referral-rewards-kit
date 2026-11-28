@@ -1,0 +1,77 @@
+{
+  "name": "@myind/referral-core",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Framework-agnostic referral program client for Supabase: invite codes, claims, rewards, analytics events, offline claim queue, localised copy (en, hi, id). The core of referral-kit for React, Next.js and React Native.",
+  "license": "MIT",
+  "homepage": "https://www.myind.ai/referral-kit",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/shaantanu9/referral-rewards-kit.git",
+    "directory": "js/packages/referral-core"
+  },
+  "bugs": "https://github.com/shaantanu9/referral-rewards-kit/issues",
+  "keywords": [
+    "referral",
+    "referral-program",
+    "invite",
+    "invite-code",
+    "invite-friends",
+    "refer-a-friend",
+    "rewards",
+    "growth",
+    "viral",
+    "supabase",
+    "postgrest",
+    "revenuecat",
+    "react",
+    "react-native",
+    "nextjs",
+    "expo",
+    "typescript"
+  ],
+  "type": "module",
+  "sideEffects": false,
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    },
+    "./testing": {
+      "import": {
+        "types": "./dist/testing/index.d.ts",
+        "default": "./dist/testing/index.js"
+      },
+      "require": {
+        "types": "./dist/testing/index.d.cts",
+        "default": "./dist/testing/index.cjs"
+      }
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "lint": "tsc --noEmit -p tsconfig.lint.json",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "tsup": "8.5.1",
+    "typescript": "5.9.3",
+    "vitest": "3.2.7"
+  }
+}

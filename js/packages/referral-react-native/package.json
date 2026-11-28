@@ -1,0 +1,177 @@
+{
+  "name": "@myind/referral-react-native",
+  "version": "0.1.0",
+  "private": true,
+  "description": "React Native screens for referral-kit: invite friends, enter an invite code, rewards that landed, welcome gift, invite page settings, QR code. Every referral_kit Flutter widget, on the same Supabase server, with optional Expo / community adapters for storage, clipboard, network and the Play install referrer.",
+  "license": "MIT",
+  "homepage": "https://www.myind.ai/referral-kit",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/shaantanu9/referral-rewards-kit.git",
+    "directory": "js/packages/referral-react-native"
+  },
+  "bugs": "https://github.com/shaantanu9/referral-rewards-kit/issues",
+  "keywords": [
+    "referral",
+    "referral-program",
+    "invite",
+    "invite-code",
+    "invite-friends",
+    "refer-a-friend",
+    "rewards",
+    "growth",
+    "react-native",
+    "expo",
+    "supabase",
+    "typescript"
+  ],
+  "type": "module",
+  "sideEffects": false,
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    },
+    "./async-storage": {
+      "import": {
+        "types": "./dist/async-storage.d.ts",
+        "default": "./dist/async-storage.js"
+      },
+      "require": {
+        "types": "./dist/async-storage.d.cts",
+        "default": "./dist/async-storage.cjs"
+      }
+    },
+    "./secure-store": {
+      "import": {
+        "types": "./dist/secure-store.d.ts",
+        "default": "./dist/secure-store.js"
+      },
+      "require": {
+        "types": "./dist/secure-store.d.cts",
+        "default": "./dist/secure-store.cjs"
+      }
+    },
+    "./clipboard": {
+      "import": {
+        "types": "./dist/clipboard.d.ts",
+        "default": "./dist/clipboard.js"
+      },
+      "require": {
+        "types": "./dist/clipboard.d.cts",
+        "default": "./dist/clipboard.cjs"
+      }
+    },
+    "./netinfo": {
+      "import": {
+        "types": "./dist/netinfo.d.ts",
+        "default": "./dist/netinfo.js"
+      },
+      "require": {
+        "types": "./dist/netinfo.d.cts",
+        "default": "./dist/netinfo.cjs"
+      }
+    },
+    "./install-referrer": {
+      "import": {
+        "types": "./dist/install-referrer.d.ts",
+        "default": "./dist/install-referrer.js"
+      },
+      "require": {
+        "types": "./dist/install-referrer.d.cts",
+        "default": "./dist/install-referrer.cjs"
+      }
+    },
+    "./qrcode": {
+      "import": {
+        "types": "./dist/qrcode.d.ts",
+        "default": "./dist/qrcode.js"
+      },
+      "require": {
+        "types": "./dist/qrcode.d.cts",
+        "default": "./dist/qrcode.cjs"
+      }
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "lint": "tsc --noEmit -p tsconfig.lint.json",
+    "test": "jest"
+  },
+  "dependencies": {
+    "@myind/referral-core": "workspace:*"
+  },
+  "peerDependencies": {
+    "@react-native-async-storage/async-storage": ">=2",
+    "@react-native-community/netinfo": ">=11",
+    "expo-application": ">=6",
+    "expo-clipboard": ">=7",
+    "expo-secure-store": ">=14",
+    "react": ">=19",
+    "react-native": ">=0.78",
+    "react-native-qrcode-svg": ">=6.3",
+    "react-native-svg": ">=15"
+  },
+  "peerDependenciesMeta": {
+    "@react-native-async-storage/async-storage": {
+      "optional": true
+    },
+    "@react-native-community/netinfo": {
+      "optional": true
+    },
+    "expo-application": {
+      "optional": true
+    },
+    "expo-clipboard": {
+      "optional": true
+    },
+    "expo-secure-store": {
+      "optional": true
+    },
+    "react-native-qrcode-svg": {
+      "optional": true
+    },
+    "react-native-svg": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@babel/core": "7.29.13",
+    "@react-native-async-storage/async-storage": "2.2.0",
+    "@react-native-community/netinfo": "12.0.1",
+    "@react-native/babel-preset": "0.88.1",
+    "@react-native/jest-preset": "0.88.1",
+    "@testing-library/react-native": "14.1.0",
+    "@types/jest": "29.5.14",
+    "@types/react": "19.2.17",
+    "babel-jest": "29.7.0",
+    "expo": "58.0.24",
+    "expo-application": "58.1.2",
+    "expo-clipboard": "58.0.4",
+    "expo-secure-store": "58.0.3",
+    "jest": "29.7.0",
+    "react": "19.3.0",
+    "react-native": "0.88.1",
+    "react-native-qrcode-svg": "6.3.54",
+    "react-native-svg": "15.16.0",
+    "test-renderer": "1.3.1",
+    "tsup": "8.5.1",
+    "typescript": "5.9.3"
+  }
+}

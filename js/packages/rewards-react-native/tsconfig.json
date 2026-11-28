@@ -1,0 +1,14 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "jsx": "react-jsx",
+    "types": ["jest"],
+    "baseUrl": ".",
+    "paths": {
+      "@myind/rewards-core": ["../rewards-core/src/index.ts"],
+      "@myind/rewards-core/testing": ["../rewards-core/src/testing/index.ts"]
+    }
+  },
+  "include": ["src", "test", "tsup.config.ts"]
+}

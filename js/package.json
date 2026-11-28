@@ -1,0 +1,23 @@
+{
+  "name": "myind-referral-kit-js",
+  "private": true,
+  "description": "JavaScript / TypeScript ports of referral_kit and rewards_kit (cores, React, Next.js, React Native).",
+  "license": "MIT",
+  "type": "module",
+  "packageManager": "pnpm@11.7.0",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "gen:l10n": "node scripts/gen-l10n.mjs",
+    "typecheck": "pnpm -r --if-present typecheck",
+    "lint": "pnpm -r --if-present lint",
+    "test": "pnpm -r --if-present test",
+    "build": "pnpm -r --if-present build"
+  },
+  "devDependencies": {
+    "tsup": "8.5.1",
+    "typescript": "5.9.3",
+    "vitest": "3.2.7"
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "jsx": "react-jsx",
+    // Type-check against the core's source, so no build is needed first. The build uses tsconfig.build.json.
+    "paths": {
+      "@myind/referral-core": ["../referral-core/src/index.ts"],
+      "@myind/referral-core/testing": ["../referral-core/src/testing/index.ts"]
+    }
+  },
+  "include": ["src", "test", "tsup.config.ts", "vitest.config.ts"]
+}

@@ -1,0 +1,29 @@
+{
+  "source": "acme",
+  "links": [
+    {
+      "variant": 0,
+      "text": "Built with Myind referral kit",
+      "url": "https://www.myind.ai/referral-kit?utm_source=acme&utm_medium=attribution&utm_campaign=v0",
+      "label": "Opens myind.ai: Built with Myind referral kit"
+    },
+    {
+      "variant": 1,
+      "text": "Rewards by Myind",
+      "url": "https://www.myind.ai/referral-kit?utm_source=acme&utm_medium=attribution&utm_campaign=v1",
+      "label": "Opens myind.ai: Rewards by Myind"
+    },
+    {
+      "variant": 2,
+      "text": "Free referral kit by Myind",
+      "url": "https://www.myind.ai/referral-kit/showcase?utm_source=acme&utm_medium=attribution&utm_campaign=v2",
+      "label": "Opens myind.ai: Free referral kit by Myind"
+    },
+    {
+      "variant": 3,
+      "text": "Made with Myind",
+      "url": "https://www.myind.ai?utm_source=acme&utm_medium=attribution&utm_campaign=v3",
+      "label": "Opens myind.ai: Made with Myind"
+    }
+  ]
+}

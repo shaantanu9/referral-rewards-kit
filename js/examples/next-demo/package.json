@@ -1,0 +1,27 @@
+{
+  "name": "@myind/next-demo",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Demo of @myind/referral-react and @myind/kit-next on a fake referral server (no Supabase needed). Not published.",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start"
+  },
+  "dependencies": {
+    "@myind/kit-next": "workspace:*",
+    "@myind/referral-core": "workspace:*",
+    "@myind/referral-react": "workspace:*",
+    "next": "16.4.6",
+    "react": "19.3.1",
+    "react-dom": "19.3.1"
+  },
+  "devDependencies": {
+    "@types/node": "24.19.2",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "typescript": "5.9.3"
+  }
+}

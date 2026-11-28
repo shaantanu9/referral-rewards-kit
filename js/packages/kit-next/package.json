@@ -1,0 +1,98 @@
+{
+  "name": "@myind/kit-next",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Next.js App Router helpers for referral-kit: server-side referral RPC (anon key + user token), the invite landing route /i/[code] with metadata and preview, the terms page, the invite OG image (next/og), and the Built with Myind link.",
+  "license": "MIT",
+  "homepage": "https://www.myind.ai/referral-kit",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/shaantanu9/referral-rewards-kit.git",
+    "directory": "js/packages/kit-next"
+  },
+  "bugs": "https://github.com/shaantanu9/referral-rewards-kit/issues",
+  "keywords": [
+    "referral",
+    "referral-program",
+    "invite",
+    "invite-link",
+    "nextjs",
+    "next",
+    "app-router",
+    "route-handler",
+    "open-graph",
+    "og-image",
+    "supabase",
+    "growth",
+    "typescript"
+  ],
+  "type": "module",
+  "sideEffects": false,
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    },
+    "./og": {
+      "import": {
+        "types": "./dist/og.d.ts",
+        "default": "./dist/og.js"
+      },
+      "require": {
+        "types": "./dist/og.d.cts",
+        "default": "./dist/og.cjs"
+      }
+    },
+    "./attribution": {
+      "import": {
+        "types": "./dist/attribution.d.ts",
+        "default": "./dist/attribution.js"
+      },
+      "require": {
+        "types": "./dist/attribution.d.cts",
+        "default": "./dist/attribution.cjs"
+      }
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "rm -rf dist && tsup",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "lint": "tsc --noEmit -p tsconfig.lint.json",
+    "test": "vitest run",
+    "gen:template": "node scripts/gen-template.mjs"
+  },
+  "dependencies": {
+    "@myind/referral-core": "workspace:*",
+    "@myind/referral-react": "workspace:*"
+  },
+  "peerDependencies": {
+    "next": ">=15",
+    "react": ">=18",
+    "react-dom": ">=18"
+  },
+  "devDependencies": {
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "next": "16.4.6",
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
+    "tsup": "8.5.1",
+    "typescript": "5.9.3",
+    "vitest": "3.2.7"
+  }
+}
